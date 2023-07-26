@@ -87,9 +87,9 @@ class database_session(object):
 
 
 #running as a source script 
-if '__main__' == __name__:
 
-    data1 = ['desc position;', 'select * from rank_;']
-    conn = database_session(data1)
-    conn.execute_commands('select * from worker;')
-    conn.close_session()
+
+data1 = ['desc position;', 'select * from rank_;']
+conn = database_session(data1)
+conn.execute_commands('select * from worker;')
+conn.close_session()
