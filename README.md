@@ -27,7 +27,7 @@ development:
 
 first step requirments:
 DB connection library
-tkinter
+flask
 
 maybe:
 dataclasses
