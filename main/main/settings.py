@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import json
+import mysql
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+WINDOWS_PATH_FOR_DJANGO = 'D:\git_shell\Git\etc\crm_secret_key.json'
+MAC_PATH_FOR_DJANGO = '/etc/workers_crm.json'
 BASE_DIR = Path(__file__).resolve().parent.parent
-with open(r'D:\git_shell\Git\etc\crm_secret_key.json') as json_file:
+with open(MAC_PATH_FOR_DJANGO) as json_file:
     read_data = json.load(json_file)
     DJANGO_KEY = read_data['SECRET_KEY']
     DATABASE_KEY = read_data["DB_PASSWORD"]
@@ -85,6 +88,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+
     }
 }
 
@@ -129,3 +133,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'dashboard.User'
