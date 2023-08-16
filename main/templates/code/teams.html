@@ -1,33 +1,60 @@
-{% extends 'code/base.html' %} {% block content %}
+{% extends 'code/base.html' %} {% block content %} {% load static %}
+
 <div style="margin: 4rem 8rem 4rem">
-  <table class="table table-md" bs-data="light">
-    <thead class="table-light">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">First</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
-      </tr>
-    </thead>
-    <tbody class="table-light">
-      <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-      </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td colspan="2">Larry the Bird</td>
-        <td>@twitter</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- this is the manager one row -->
+  <div class="container text-center" style="margin: 5px 5px 10px 5px">
+    <div class="row justify-content-md-left">
+      <div class="col-md-auto">
+        <img
+          src="{% static 'dashboard/images/tile002.png'%}"
+          class="rounded-5"
+          alt="..."
+          style="border: 2px solid white; width: 45px"
+        />
+      </div>
+      <div class="col-md-auto">
+        <h5>Team manager</h5>
+        <p>Adam Jamson</p>
+      </div>
+    </div>
+  </div>
+  <!-- this is the workers rows table -->
+  <div class="border border-info border-1 pt-2">
+    <table class="table table-md table-hover">
+      <thead class="table-dark border-bottom border-secondary">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Handle</th>
+          <th scope="col">View</th>
+        </tr>
+      </thead>
+
+      <tbody class="table-dark">
+        <tr>
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Jacob</td>
+          <td>Thornton</td>
+          <td>@fat</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td colspan="2">Larry the Bird</td>
+          <td>@twitter</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
+
 {% endblock content %}
