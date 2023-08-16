@@ -14,6 +14,7 @@ def dashboard(request):
     df = pd.DataFrame(dict(
     group = ["A", "B", "C", "D", "E"],
     value = [14, 12, 8, 10, 16]))
+    print(df)
 
     graph_fig = px.bar(df, x = 'group', y = 'value')
     graph_chart = graph_fig.to_html()
