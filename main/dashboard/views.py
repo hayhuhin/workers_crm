@@ -34,4 +34,5 @@ def dashboard(request):
 
 
 def teams(request):
+    
     return render(request,'code/teams.html',{})
