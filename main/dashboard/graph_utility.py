@@ -6,12 +6,16 @@ import pandas as pd
 #class that will create graph with the parameters that i will choose and there will be 
 #option to display it as html or image that will be saved in the static folder
 
+
+
 class graph_creator(object):
+    """graph creator class with 3 graph types :bar_graph,pie_graph,donut_graph.
+        each method have its own arguments that have to be filled with data.
+        every method returns html by default or image.
+    """
     def __init__(self):
 
         self.template = 'plotly_dark'
-
-        
 
     
     def bar_graph(self,group:list,value:list,path=None,to_html=True):
@@ -23,6 +27,7 @@ class graph_creator(object):
         else:
             graph = graph_fig.write_image(path)
         return graph
+
 
     def pie_graph(self,values:list,names:list,path=None,to_html=True):
 
@@ -52,4 +57,25 @@ class graph_creator(object):
         else:
             graph = donut_fig.write_image(path)
         return graph
+    
+
+class monthly_graph():
+    def __init__(self):
+        pass
+
+    def week_1(self):
+        pass
+
+
+    def week_2(self):
+        pass
+
+
+    def week_3(self):
+        pass
+
+
+    def week_4(self):
+        pass
+
     

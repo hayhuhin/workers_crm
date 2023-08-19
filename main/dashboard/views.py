@@ -54,36 +54,22 @@ def profile(request):
     instance_of_graph_creator = graph_creator()
     
     
-    
-        #the pie figure
-    revenue_fig = px.pie(values = [20, 50, 37, 18],template="plotly_dark",
-             names = ['G1', 'G2', 'G3', 'G4'])
-    #the bg color of the pie
-    revenue_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
-    #text position and the font size udjustments
-    revenue_fig.update_traces(textposition="outside",textfont_size=30,textinfo='percent+label')
-    # takes the plotly figure and transforms it to image that is saved in static/dashboard/images/pie.png that is later is displayed in the html
-
-    revenue_pie_chart = revenue_fig.write_image(r"C:\Users\hayhuhin\Desktop\crm_project\main\dashboard\static\dashboard\images\pie.png")
+    # contribution pie graph 
+    path = r"C:\Users\hayhuhin\Desktop\crm_project\main\dashboard\static\dashboard\images\pie.png"
+    values = [20, 50, 37, 18]
+    names = ['G1', 'G2', 'G3', 'G4']
+    revenue_pie_chart = instance_of_graph_creator.pie_graph(names=names,values=values,to_html=False,path=path)
 
 
-    #the donut figure of the plotly express library
-    # donut_figure = px.pie(values = [20, 50, 37, 18],template="plotly_dark",
-    #          names = ['G1', 'G2', 'G3', 'G4'],
-    #          color = ['G1', 'G2', 'G3', 'G4'],
-    #          hole = 0.5)
-    # #the bg color of the pie
-    # donut_figure.update_layout(paper_bgcolor='rgba(0,0,0,0)')
-    # #text position and the font size udjustments
-    # donut_figure.update_traces(textposition="outside",textfont_size=30,textinfo='percent+label')
-    # # takes the plotly figure and transforms it to image that is saved in static/dashboard/images/donut.png that is later is displayed in the html
-    # contrib_chart = donut_figure.write_image(r"C:\Users\hayhuhin\Desktop\crm_project\main\dashboard\static\dashboard\images/donut.png")
-
-    donut_graph_class = graph_creator()
-    contrib_chart = donut_graph_class.donut_graph(values=[20, 50, 37, 18],names= ['sales 1', 'sales 2', 'sales 3', 'sales 4'],path=r"C:\Users\hayhuhin\Desktop\crm_project\main\dashboard\static\dashboard\images\donut.png")
+    # contribution pie graph 
+    path = r"C:\Users\hayhuhin\Desktop\crm_project\main\dashboard\static\dashboard\images\donut.png"
+    values=[20, 50, 37, 18]
+    names= ['sales 1', 'sales 2', 'sales 3', 'sales 4']
+    contrib_donut_chart = instance_of_graph_creator.donut_graph(values=values,names= names,path=path)
 
 
 
-    context = {'revenue_pie_chart':revenue_pie_chart,'contrib_chart':contrib_chart}
+    #returns html/image as dict to the page
+    context = {'revenue_pie_chart':revenue_pie_chart,'contrib_chart':contrib_donut_chart}
     return render(request,'code/profile.html',context)
 
