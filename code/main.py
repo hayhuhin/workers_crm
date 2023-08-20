@@ -19,5 +19,7 @@ class main_tkinter_app:
 
 
 if __name__ == "__main__":
-    main_run = main_tkinter_app(frame_displayer_class)
-    main_run.run()
+    # main_run = main_tkinter_app(frame_displayer_class)
+    # main_run.run()
+    pass
+ 

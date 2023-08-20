@@ -1,3 +1,0 @@
-coupling was deleted in main and frontend(settings variables visible only in frontend app)
-graphs from internet -https://chartscss.org/charts/line/
-bootstrap - https://getbootstrap.com/docs/5.3/getting-started/introduction/
