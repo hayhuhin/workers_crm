@@ -59,15 +59,8 @@ def profile(request):
     instance_of_graph_creator = graph_creator()
 
 
-
-    
-    
     # contribution pie graph 
-
-
     path = str(curr_path) +"/dashboard/static/dashboard/images/pie.png"
-    print(10 * "*")
-    print(path)
     values = [20, 50, 37, 18]
     names = ['G1', 'G2', 'G3', 'G4']
     revenue_pie_chart = instance_of_graph_creator.pie_graph(names=names,values=values,to_html=False,path=path)

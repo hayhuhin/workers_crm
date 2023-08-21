@@ -57,3 +57,24 @@ class Employer(models.Model):
 
     def __str__(self):
         return self.username
+    
+
+class Lead_Creator(models.Model):
+    name = models.CharField(max_length=50)
+    action = models.CharField(max_length=50,default="None",null=True)
+    profit = models.IntegerField(default=0,null=True)
+    created_by = models.ForeignKey(Employer,on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now=True)
+    
+
+    def __str__(self):
+        return self.name
+    
+
+class Company_Income(models.Model):
+    daily_income = models.IntegerField()
+    date = models.DateField()
+
+    def __str__(self):
+        return f"daily income : {self.daily_income} , date: {self.date}"
+    
