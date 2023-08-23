@@ -55,26 +55,3 @@ def personal_tasks(request):
 def daily_tasks(request):
     return render(request,'code/daily_tasks.html',{})
 
-def profile(request):
-    instance_of_graph_creator = graph_creator()
-
-
-    # contribution pie graph 
-    path = str(curr_path) +"/dashboard/static/dashboard/images/pie.png"
-    values = [20, 50, 37, 18]
-    names = ['G1', 'G2', 'G3', 'G4']
-    revenue_pie_chart = instance_of_graph_creator.pie_graph(names=names,values=values,to_html=False,path=path)
-
-
-    # contribution pie graph 
-    path = str(curr_path)+"/dashboard/static/dashboard/images/donut.png"
-    values=[20, 50, 37, 18]
-    names= ['sales 1', 'sales 2', 'sales 3', 'sales 4']
-    contrib_donut_chart = instance_of_graph_creator.donut_graph(values=values,names= names,path=path)
-
-
-
-    #returns html/image as dict to the page
-    context = {'revenue_pie_chart':revenue_pie_chart,'contrib_chart':contrib_donut_chart}
-    return render(request,'code/profile.html',context)
-
