@@ -1,47 +1,11 @@
 {% extends 'code/base.html' %}{% block content %} {% load static %}
-<div class="container text-left" style="margin-top: 8rem">
-  <div class="row row-cols-1 row-cols-md-4 g-1">
-    <div class="col border border-light border-1">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">James Jameson</h5>
-          <h6 class="card-subtitle mb-2 text-body-secondary">Sales Team</h6>
 
-          <img
-            src="{% static 'employer/images/photo.png'%}"
-            class="card-img-top"
-            alt="..."
-          />
-          <p class="card-text">100 leads - this month.</p>
-          <p class="card-text">100,000 revenue - this month.</p>
-        </div>
-        <div class="card-footer text-body-secondary">
-          <div class="container">
-            <div class="row">
-              <div class="col-sm-auto" style="margin-top: 15px">
-                <a href="#" class="btn btn-success">EDIT</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  {{ profile|safe }}
 
+        {{ monthly|safe }}
 
-        <div class="col border border-info border-1">
-         <div class="ms-1" style="width:300px;height:370px"> 
-          <h3>monthly lead profit</h3>
-          <img src={% static 'employer/images/pie.png' %} style='width:100%'/>
-          </div>
-        </div> 
-
-          <div class="col border border-info border-1">
-            <div  style="width:300px;height:370px">
-              <h3>weakly lead profit</h3>
-          <img src="{% static 'employer/images/donut.png'%}"style='width:100%'/>
-
-            </div>
-          </div>
+{% comment %} 
+          {{weakly}} {% endcomment %}
 
             <!-- tasks window -->
             <div class="col">

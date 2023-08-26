@@ -18,7 +18,7 @@ class graph_presentation(object):
           <img
             src={}
             class="card-img-top"
-            alt="..."
+            alt=""
           />
           <p class="card-text">100 leads - this month.</p>
           <p class="card-text">100,000 revenue - this month.</p>
@@ -38,13 +38,21 @@ class graph_presentation(object):
     
     def graph_card(self,user_data,user_calc):
         """returns html card with the graph data that recieved from users queries"""
-        pass
+
+        card_html = """<div class="col border border-info border-1">
+                          <div class="ms-1" style="width:300px;height:370px"> 
+                          <h3>{}</h3>
+                          <div name="plotly_element">{}</div>
+                        </div>
+                            </div>""".format(user_data,user_calc)
+        
+        return card_html
     
 
     def test(self):
       """test method that creates an instance and prints the html returns with test data """
       instance = graph_presentation(calculations='calc')
-      data = instance.user_card({'username':'test user','user_position':'test team','picture':'"employer/images/photo.png"'})
+      data = instance.user_card({'username':'test user','user_position':'test team','picture':'employer/images/photo.png'})
       print(data)
 
 
