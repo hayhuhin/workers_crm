@@ -32,12 +32,12 @@ class graph_creator(object):
     def pie_graph(self,values:list,names:list,path=None,to_html=True):
 
         pie_fig = px.pie(values=values,names=names,template=self.template)
+        pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
 
         if to_html:
             graph = pie_fig.to_html()
         else:
-            pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
-            pie_fig.update_traces(textposition="outside",textfont_size=30,textinfo='percent+label')
             graph = pie_fig.write_image(path)
         return graph
 
@@ -50,7 +50,7 @@ class graph_creator(object):
         #the bg color of the pie
         donut_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
         #text position and the font size udjustments
-        donut_fig.update_traces(textposition="outside",textfont_size=30,textinfo='percent+label')
+        donut_fig.update_traces(textfont_size=12,textinfo='percent+label')#textposition="outside",
         if to_html:
             graph = donut_fig.to_html()
         
