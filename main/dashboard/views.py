@@ -2,7 +2,6 @@ from django.shortcuts import render,redirect,HttpResponse
 import plotly.express as px
 import pandas as pd
 from  pathlib import Path
-from .graph_utility import graph_creator
 
 
 curr_path = Path.cwd()

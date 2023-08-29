@@ -1,5 +1,4 @@
 from django.shortcuts import render,HttpResponse
-from dashboard.graph_utility import graph_creator
 from pathlib import Path
 from dashboard.models import Job_position,Employer
 from .graph import graph_presentation
@@ -82,7 +81,6 @@ def employer(request):
 
 
         #graph creating class
-        instance_of_graph_creator = graph_creator()
         
         #graph html builder(combine the graph representation with html)
         instance_of_graph_presentation = graph_presentation()
