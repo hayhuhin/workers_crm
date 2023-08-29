@@ -1,7 +1,52 @@
+import plotly.express as px
+import pandas as pd
+
+
 class graph_presentation(object):
     def __init__(self,presentation='card'):
         self.presentation = presentation
+        self.template = 'plotly_dark'
+    
+    def bar_graph(self,group:list,value:list,path=None,to_html=True):
+        data_frame = pd.DataFrame(dict(group=group,value=value))
 
+        graph_fig = px.bar(data_frame,x='group',y='value')
+        if to_html:
+            graph = graph_fig.to_html()
+        else:
+            graph = graph_fig.write_image(path)
+        return graph
+
+
+    def pie_graph(self,values:list,names:list,path=None,to_html=True):
+
+        pie_fig = px.pie(values=values,names=names,template=self.template)
+        pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
+
+        if to_html:
+            graph = pie_fig.to_html()
+        else:
+            graph = pie_fig.write_image(path)
+        return graph
+
+
+    def donut_graph(self,values:list,names:list,path="",to_html=True):
+        donut_fig = px.pie(values = values,template=self.template,
+                names = names,
+                # color = ['G1', 'G2', 'G3', 'G4'],
+                hole = 0.5)
+        #the bg color of the pie
+        donut_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        #text position and the font size udjustments
+        donut_fig.update_traces(textfont_size=12,textinfo='percent+label')#textposition="outside",
+        if to_html:
+            graph = donut_fig.to_html()
+        
+        else:
+            graph = donut_fig.write_image(path)
+        return graph
+    
 
     def user_card(self,user_data):
         """returns html card with the user data that recieved from the user"""
@@ -56,6 +101,10 @@ class graph_presentation(object):
 
 
 
-#uncomment if you want to test the class 
-# test_instance = graph_presentation('calc')
-# test_instance.test()
+
+class graph_queries:
+    def __init__(self):
+        pass
+    
+    def query(self,):
+        pass

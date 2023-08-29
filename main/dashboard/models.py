@@ -63,6 +63,7 @@ class Lead_Creator(models.Model):
     name = models.CharField(max_length=50)
     action = models.CharField(max_length=50,default="None",null=True)
     profit = models.IntegerField(default=0,null=True)
+    completed = models.BooleanField(default=False)
     created_by = models.ForeignKey(Employer,on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=True)
     
@@ -71,10 +72,16 @@ class Lead_Creator(models.Model):
         return self.name
     
 
-class Company_Income(models.Model):
-    daily_income = models.IntegerField()
-    date = models.DateField()
+class Company_Cache_Income(models.Model):
+    last_year = models.IntegerField()
+    current_year = models.IntegerField()
+    last_updated = models.DateField()
 
-    def __str__(self):
-        return f"daily income : {self.daily_income} , date: {self.date}"
-    
+
+
+class Real_Time_Income(models.Model):
+    worker_name = models.ForeignKey('Employer',null=True,on_delete=models.SET_NULL)
+    income_amount = models.IntegerField()
+    date = models.DateTimeField()
+
+
