@@ -1,4 +1,3 @@
-
 <html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
@@ -70,9 +69,19 @@
                 </li>
               </ul>
             </li>
+            {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+              <a class="nav-link Enabled" href="/logout" aria-disabled="False"
+                >Logout</a
+              >
             </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link Enabled" href="/login" aria-disabled="False"
+                >Login</a
+              >
+            </li>
+            {% endif %}
           </ul>
         </div>
       </div>
@@ -116,4 +125,3 @@
     </footer>
   </body>
 </html>
-

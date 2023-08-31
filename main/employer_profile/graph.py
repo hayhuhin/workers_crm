@@ -1,6 +1,6 @@
 import plotly.express as px
 import pandas as pd
-
+# from dashboard.models import Position_responsabilities
 
 class graph_presentation(object):
     def __init__(self,presentation='card'):
@@ -94,7 +94,7 @@ class graph_presentation(object):
     
 
     def test(self):
-      """test method that creates an instance and prints the html returns with test data """
+      """test method that creates an instance and prints the html output of the graphs"""
       instance = graph_presentation(calculations='calc')
       data = instance.user_card({'username':'test user','user_position':'test team','picture':'employer/images/photo.png'})
       print(data)
@@ -104,7 +104,12 @@ class graph_presentation(object):
 
 class graph_queries:
     def __init__(self):
-        pass
+        self.data = []
     
-    def query(self,):
-        pass
+    def task_completion(self,user):
+      # task = Position_responsabilities.objects.get(id=2)
+      task = 'radco'
+      users_task_objects = user.employer.job_position
+      record = users_task_objects
+      test_record = task
+      print(test_record)

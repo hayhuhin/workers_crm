@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
-from dashboard.models import Job_position,Employer
-from .graph import graph_presentation
+# from dashboard.models import Job_position,Employer
+from .graph import graph_presentation,graph_queries
 
 
 #current path
@@ -10,20 +10,20 @@ curr_path = Path.cwd()
 
 # Create your views here.
 
-def specific_user_rank_query(username:str):
+# def specific_user_rank_query(username:str):
 
-    user = Employer.objects.get(username=username)
-    rank = user.job_position_MTM.rank
+#     # user = Employer.objects.get(username=username)
+#     # rank = user.job_position_MTM.rank
 
-    return (str(rank))
+#     return (str(rank))
 
 
 def employer_detection(request):
     username = request.user
-    job_position = request.user.employer.job_position_MTM.position
-    job_rank = request.user.employer.job_position_MTM.rank
+    department = request.user.employer.job_position.position
+    rank = request.user.employer.job_position.rank
 
-    user_data = {'username':username,'job_position':job_position,'job_rank':job_rank}
+    user_data = {'username':username,'job_position':department,'job_rank':rank}
     return user_data
 
 
@@ -31,6 +31,7 @@ def employer_detection(request):
 """funtion that returns data to the webpage at /profile"""
 
 def employer(request):
+    print(request.user.employer)
     curr_path = Path.cwd()
     user_data = employer_detection(request)
 
@@ -64,7 +65,7 @@ def employer(request):
 
         #returns html/image as dict to the page
         
-        user_data = {'username':'valeri levinson','user_position':'team leader','picture':'"{% static "employer/images/photo.png" %}"'}
+        user_data = {'username':user_data['username'],'user_position':user_data['job_position'],'picture':'"{% static "employer/images/photo.png" %}"'}
 
         profile_card = instance_of_graph_presentation.user_card(user_data=user_data)
 
@@ -72,16 +73,14 @@ def employer(request):
         weekly_graph_card = instance_of_graph_presentation.graph_card('weekly lead',user_calc=weekly_donut_graph)
 
 
-
+        graph_queries_inst = graph_queries()
+        graph_queries_inst.task_completion(request.user)
         context = {'profile':profile_card,'monthly_graph':monthly_graph_card,'weekly_graph':weekly_graph_card}
-        return render(request,'code/profile_test.html',context)
+        return render(request,'code/profile.html',context)
 
 
     if user_data['job_rank'] <= 400 and user_data['job_rank'] > 300:
 
-
-        #graph creating class
-        
         #graph html builder(combine the graph representation with html)
         instance_of_graph_presentation = graph_presentation()
 
@@ -110,4 +109,6 @@ def employer(request):
 
 
         context = {"teams_completion_monthly":teams_completion_monthly}
-        return render(request,'code/profile_test.html',context)
+        graph_queries_inst = graph_queries()
+        graph_queries_inst.task_completion(request.user)
+        return render(request,'code/profile.html',context)
