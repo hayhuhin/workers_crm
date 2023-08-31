@@ -1,11 +1,13 @@
 import plotly.express as px
 import pandas as pd
+from pathlib import Path
 # from dashboard.models import Position_responsabilities
 
 class graph_presentation(object):
     def __init__(self,presentation='card'):
         self.presentation = presentation
         self.template = 'plotly_dark'
+        self.currant_path = Path.cwd()
     
     def bar_graph(self,group:list,value:list,path=None,to_html=True):
         data_frame = pd.DataFrame(dict(group=group,value=value))
@@ -18,7 +20,9 @@ class graph_presentation(object):
         return graph
 
 
-    def pie_graph(self,values:list,names:list,path=None,to_html=True):
+    def pie_graph(self,values:list,names:list,path='',to_html=True):
+        path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
+
 
         pie_fig = px.pie(values=values,names=names,template=self.template)
         pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
@@ -32,6 +36,8 @@ class graph_presentation(object):
 
 
     def donut_graph(self,values:list,names:list,path="",to_html=True):
+        path = str(self.currant_path) +"/employer_profile/static/employer/images/donut.png"
+
         donut_fig = px.pie(values = values,template=self.template,
                 names = names,
                 # color = ['G1', 'G2', 'G3', 'G4'],
@@ -49,18 +55,21 @@ class graph_presentation(object):
     
 
     def user_card(self,user_data):
-        """returns html card with the user data that recieved from the user"""
+        """returns html card with the user data that recieved from the user
+          the user data must contain 'username','user_position','picture' as a 
+          dict 
+        """
 
         username = user_data['username']
-        user_position = user_data['user_position']
-        picture = user_data['picture']
+        user_position = user_data['job_position']
+        # picture = user_data['picture']
         card_html = """<div class="card">
         <div class="card-body">
           <h5 class="card-title">{}</h5>
           <h6 class="card-subtitle mb-2 text-body-secondary">{}</h6>
 
           <img
-            src={}
+            src=''
             class="card-img-top"
             alt=""
           />
@@ -75,7 +84,7 @@ class graph_presentation(object):
               </div>
             </div>
           </div>
-        </div>""".format(username,user_position,picture)
+        </div>""".format(username,user_position)
         
         return card_html
     
