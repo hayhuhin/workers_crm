@@ -16,7 +16,7 @@ def employer_data_extraction(request):
     rank = request.user.employer.job_position.rank
 
     request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'path':''}
-    return user_data
+    return request_data
 
 
 def profile_page(request):
