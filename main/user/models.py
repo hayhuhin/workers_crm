@@ -53,14 +53,6 @@ class Task(models.Model):
 #         return self.title
 
 
-
-# def create_employer(sender,instance,created,**kwargs):
-#     if created:
-#         employer = Employer(User=instance)
-#         employer.save()
-#     post_save.connect(create_employer,sender=User)
-
-
 # class Lead_Creator(models.Model):
 #     name = models.CharField(max_length=50)
 #     action = models.CharField(max_length=50,default="None",null=True)
@@ -86,3 +78,5 @@ class Task(models.Model):
 #     date = models.DateTimeField()
 
 
+class CompanyWorthModel:
+    pass
