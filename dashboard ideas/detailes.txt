@@ -94,3 +94,26 @@ as user logging he will recieve a rank number that defined when registering the 
 the rank number is a priority number that gives the crm a way to know which information the user have permission to see.
 
 the chunks of html will be displayed with the 
+
+
+query_class
+class that will get all the detailes to make a query to the database and get the data 
+that needed to be desplayed in the graph with the rank identification(security reasons)
+
+called once inside every page
+and calculate and generate output to the plotly method to be used for the graph presentation
+
+args:username,rank,position,leads
+method-security(checks that the args are not malicious and the get method is clean)
+
+
+method-get_daily_data
+
+
+method-get_weakly_data
+
+
+method-get_monthly_data
+
+
+method-get_yearly_data
