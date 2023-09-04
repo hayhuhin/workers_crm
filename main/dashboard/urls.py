@@ -9,7 +9,6 @@ urlpatterns = [
     path('dashboard',dashboard_views.dashboard),
     # path('teams',dashboard_views.teams),
     path('personal_tasks',dashboard_views.personal_tasks),
-    path('daily_tasks',dashboard_views.daily_tasks),
     # path('profile',dashboard_views.profile),
 ]
 

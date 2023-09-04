@@ -51,6 +51,3 @@ def teams(request):
 def personal_tasks(request):
     return render(request,'code/personal_tasks.html',{})
 
-def daily_tasks(request):
-    return render(request,'code/daily_tasks.html',{})
-
