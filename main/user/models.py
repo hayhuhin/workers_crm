@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User 
 from django.db.models.signals import post_save
-from tasks.models import Lead
+from tasks.models import Lead,Task,DepartmentTask
 
 
 
@@ -14,6 +14,9 @@ class Employer(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
     lead = models.ForeignKey(Lead,blank=True,null=True,on_delete=models.SET_NULL)
+    task = models.ForeignKey(Task,blank=True,null=True,on_delete=models.SET_NULL)
+
+    
 
 
     def __str__(self):
@@ -25,21 +28,11 @@ class Department(models.Model):
     rank = models.IntegerField(null=True)
     started_at = models.DateTimeField()
     salary = models.IntegerField()
-    task = models.ForeignKey("Task",blank=True,on_delete=models.SET_NULL,null=True)
+    task = models.ForeignKey(DepartmentTask,blank=True,null=True,on_delete=models.SET_NULL)
+
 
     def __str__(self):
         return self.position
-
-
-class Task(models.Model):
-    title = models.CharField(max_length=50)
-    content = models.CharField(max_length=350)
-    created_at = models.DateTimeField(auto_now=True)
-    completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.title
-
 
 
 
