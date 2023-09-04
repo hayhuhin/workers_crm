@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group,User
 from .models import Employer,Department
+from tasks.models import Lead
 
 admin.site.unregister(Group)
 
@@ -18,3 +19,4 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User,UserAdmin)
 admin.site.register(Department)
+admin.site.register(Lead)

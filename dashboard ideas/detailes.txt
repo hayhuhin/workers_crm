@@ -117,3 +117,14 @@ method-get_monthly_data
 
 
 method-get_yearly_data
+
+
+
+
+
+tasks todo list
+merge the personal tasks and the job tasks
+
+add leads on the same page
+-add "add button and delete for tasks and leads"
+

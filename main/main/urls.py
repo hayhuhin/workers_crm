@@ -26,6 +26,8 @@ urlpatterns = [
     path('',include('teams.urls')),
     path('',include('employer_profile.urls')),
     path('',include('user.urls')),
+    path('',include('tasks.urls')),
+
 
 
 ]
