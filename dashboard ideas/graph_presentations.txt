@@ -1,1 +1,10 @@
-graph presentations
+graph presentations in the dashboard page
+
+first graph shows the company worth by its last years
+
+second graph today income seperated by teams 
+
+third graph company stack value in the market
+
+forth graph monthly income to the company
+
