@@ -62,6 +62,7 @@ class graph_presentation(object):
 
         username = user_data['username']
         user_position = user_data['job_position']
+        profile_pic = user_data['profile_pic']
         # picture = user_data['picture']
         card_html = """<div class="card">
         <div class="card-body">
@@ -69,9 +70,11 @@ class graph_presentation(object):
           <h6 class="card-subtitle mb-2 text-body-secondary">{}</h6>
 
           <img
-            src=''
+
+            src={}
             class="card-img-top"
-            alt=""
+            style="height:225px"
+            alt="employer picture"
           />
           <p class="card-text">100 leads - this month.</p>
           <p class="card-text">100,000 revenue - this month.</p>
@@ -84,7 +87,7 @@ class graph_presentation(object):
               </div>
             </div>
           </div>
-        </div>""".format(username,user_position)
+        </div>""".format(username,user_position,profile_pic)
         
         return card_html
     

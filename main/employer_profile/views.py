@@ -13,9 +13,10 @@ def employer_data_extraction(request):
     first_name = request.user.employer.first_name
     last_name = request.user.employer.last_name
     department = request.user.employer.job_position.position
-    rank = request.user.employer.job_position.rank
+    rank = request.user.employer.job_position.rank 
+    profile_pic = request.user.employer.profile_pic.url
 
-    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'path':''}
+    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
     return request_data
 
 
