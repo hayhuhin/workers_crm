@@ -26,20 +26,22 @@
   <!-- this is the tasks card section -->
   <div class="container">
     <div class="row row-cols-1 row-cols-md-4 g-4">
+
+      {% for context in context %}
       <div class="col">
         <div class="card m-1">
           <div class="card-header">Featured</div>
           <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
+            <h5 class="card-title">{{context.title}}</h5>
+            <p class="card-text">{{context.content}}</p>
           
           </div>
           <div class="card-footer text-body-secondary">
             <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
+              <small class="text-body-secondary m-1" >{{context.created_at}}</small>
               <div class="col-sm-auto" style="margin-top: 15px">
     
-              <a href="#" class="btn btn-primary">done</a>
+              <a href="#"  class="btn btn-primary">done</a>
               <a href="#" class="btn btn-danger">undone</a>
               </div>
           </div>
@@ -47,91 +49,12 @@
           
         </div>
       </div>
-      <div class="col">
-        <div class="card m-1">
-          <div class="card-header">Featured</div>
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-          
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <a href="#" class="btn btn-primary">done</a>
-              <a href="#" class="btn btn-danger">undone</a>
-              </div>
-          </div>
-          </div>
-          
-        </div>
-      </div>
-      <div class="col">
-        <div class="card m-1">
-          <div class="card-header">Featured</div>
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-          
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <a href="#" class="btn btn-primary">done</a>
-              <a href="#" class="btn btn-danger">undone</a>
-              </div>
-          </div>
-          </div>
-          
-        </div>
-      </div>
-      <div class="col">
-        <div class="card m-1">
-          <div class="card-header">Featured</div>
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-          
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <a href="#" class="btn btn-primary">done</a>
-              <a href="#" class="btn btn-danger">undone</a>
-              </div>
-          </div>
-          </div>
-          
-        </div>
-      </div>
-      <div class="col">
-        <div class="card m-1">
-          <div class="card-header">Featured</div>
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-          
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <a href="#" class="btn btn-primary">done</a>
-              <a href="#" class="btn btn-danger">undone</a>
-              </div>
-          </div>
-          </div>
-          
-        </div>
-      </div>
+
+      {% endfor %}
       
+          
+        </div>
+      </div>
     
     
     </div>
@@ -167,17 +90,18 @@
 <!-- the cards TASKS -->
 <div class="container">
 <div class="row row-cols-1 row-cols-md-4 g-4">
+{% for task in user_task %}
   <div class="col">
     <div class="card m-1">
       <div class="card-header">Featured</div>
       <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
+        <h5 class="card-title">{% task.title %}</h5>
+        <p class="card-text">{% task.content%}</p>
       
       </div>
       <div class="card-footer text-body-secondary">
         <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
+          <small class="text-body-secondary m-1" >{% task.created_at %}</small>
           <div class="col-sm-auto" style="margin-top: 15px">
 
           <a href="#" class="btn btn-primary">done</a>
@@ -188,90 +112,7 @@
       
     </div>
   </div>
-  <div class="col">
-    <div class="card m-1">
-      <div class="card-header">Featured</div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      
-      </div>
-      <div class="card-footer text-body-secondary">
-        <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-          <div class="col-sm-auto" style="margin-top: 15px">
-
-          <a href="#" class="btn btn-primary">done</a>
-          <a href="#" class="btn btn-danger">undone</a>
-          </div>
-      </div>
-      </div>
-      
-    </div>
-  </div>
-  <div class="col">
-    <div class="card m-1">
-      <div class="card-header">Featured</div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      
-      </div>
-      <div class="card-footer text-body-secondary">
-        <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-          <div class="col-sm-auto" style="margin-top: 15px">
-
-          <a href="#" class="btn btn-primary">done</a>
-          <a href="#" class="btn btn-danger">undone</a>
-          </div>
-      </div>
-      </div>
-      
-    </div>
-  </div>
-  <div class="col">
-    <div class="card m-1">
-      <div class="card-header">Featured</div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      
-      </div>
-      <div class="card-footer text-body-secondary">
-        <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-          <div class="col-sm-auto" style="margin-top: 15px">
-
-          <a href="#" class="btn btn-primary">done</a>
-          <a href="#" class="btn btn-danger">undone</a>
-          </div>
-      </div>
-      </div>
-      
-    </div>
-  </div>
-  <div class="col">
-    <div class="card m-1">
-      <div class="card-header">Featured</div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      
-      </div>
-      <div class="card-footer text-body-secondary">
-        <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
-          <div class="col-sm-auto" style="margin-top: 15px">
-
-          <a href="#" class="btn btn-primary">done</a>
-          <a href="#" class="btn btn-danger">undone</a>
-          </div>
-      </div>
-      </div>
-      
-    </div>
-  </div>
+  
 </div>
   </div>
 </div>

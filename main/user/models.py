@@ -29,7 +29,7 @@ class Department(models.Model):
     rank = models.IntegerField(null=True)
     started_at = models.DateTimeField()
     salary = models.IntegerField()
-    task = models.ForeignKey(DepartmentTask,blank=True,null=True,on_delete=models.SET_NULL)
+    task = models.ManyToManyField(DepartmentTask,blank=True)
 
 
     def __str__(self):
