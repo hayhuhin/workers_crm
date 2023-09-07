@@ -19,6 +19,7 @@
   <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
   <div class="progress-bar" style="width: 15%">15%</div>
   </div>
+
   </div>
   </div>
 
@@ -41,18 +42,17 @@
               <small class="text-body-secondary m-1" >{{context.created_at}}</small>
               <div class="col-sm-auto" style="margin-top: 15px">
     
-              <a href="#"  class="btn btn-primary">done</a>
-              <a href="#" class="btn btn-danger">undone</a>
+              <button id="{{context.id}}" class="btn btn-primary">Done </button>
+              <button id="{{context.id}}" class="btn btn-danger">Undone</button>
+              <button id="{{context.id}}" class="btn btn-secondary">Edit</button>
               </div>
           </div>
           </div>
-          
+
         </div>
       </div>
-
       {% endfor %}
-      
-          
+
         </div>
       </div>
     
@@ -80,39 +80,79 @@
   </div><!-- col end div-->
 
   <div class="col">
-  <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-<div class="progress-bar" style="width: 15%">15%</div>
-</div>
-</div>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar" style="width: 15%">15%</div>
+    </div>
+  </div>
 </div>
 
 
 <!-- the cards TASKS -->
 <div class="container">
 <div class="row row-cols-1 row-cols-md-4 g-4">
-{% for task in user_task %}
+{% for employer in employers %}
   <div class="col">
     <div class="card m-1">
       <div class="card-header">Featured</div>
       <div class="card-body">
-        <h5 class="card-title">{% task.title %}</h5>
-        <p class="card-text">{% task.content%}</p>
+        <h5 class="card-title">{{ employer.task.title }}</h5>
+        <p class="card-text">{{ employer.task.content }}</p>
       
       </div>
       <div class="card-footer text-body-secondary">
         <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >{% task.created_at %}</small>
+          <small class="text-body-secondary m-1" >{{ employer.task.created_at }}</small>
           <div class="col-sm-auto" style="margin-top: 15px">
 
-          <a href="#" class="btn btn-primary">done</a>
-          <a href="#" class="btn btn-danger">undone</a>
+          <form method='POST'>
+          {% csrf_token %}
+          <button type="submit" name="Task_done" href="#"  class="btn btn-primary" id="{{employer.task.id}}">Done</button>
+          <button type="submit"  name="Task_Undone" href="#" class="btn btn-danger" id="{{employer.task.id}}">Undone</button>
+          <button type="submit"  name="Task_Edit" href="#" class="btn btn-secondary" id="{{employer.task.id}}">Edit</button>
+          </form>
           </div>
       </div>
       </div>
-      
+      {% endfor %}
     </div>
   </div>
-  
+
+<!-- add task modal section below -->
+
+<form method='post'>
+{% csrf_token %}
+<div class='col'>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTasModal" data-bs-whatever="@getbootstrap">Create New</button>
+  <div class="modal fade" id="addTasModal" tabindex="-1" aria-labelledby="addTasModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addTasModalLabel">New Task</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">Title</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Content</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" name="save_task" value="save" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</form>
+  <!-- end div of the modal -->
+
+  </div>
 </div>
   </div>
 </div>
@@ -130,26 +170,64 @@
  <!-- the container end div-->
  <div class="container">
     <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for employer in employers %}
       <div class="col">
         <div class="card m-1">
           <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
+            <h5 class="card-title">{{employer.lead.name}}</h5>
+            <p class="card-text">{{employer.lead.description}}</p>
           
           </div>
           <div class="card-footer text-body-secondary">
             <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >Last updated 3 mins ago</small>
+              <small class="text-body-secondary m-1" >{{employer.lead.created_at}}</small>
               <div class="col-sm-auto" style="margin-top: 15px">
     
-              <a href="#" class="btn btn-primary">done</a>
+              <a href="#" class="btn btn-primary">Done</a>
               <a href="#" class="btn btn-secondary">Edit</a>
               </div>
           </div>
           </div>
           
         </div>
+        {% endfor %}
+
       </div>
+
+      <!-- end div of the leads modal-->
+
+<form method='post'>
+{% csrf_token %}
+<div class='col'>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addleadModal" data-bs-whatever="@getbootstrap">Create New</button>
+  <div class="modal fade" id="addleadModal" tabindex="-1" aria-labelledby="addTasleadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addleadModalLabel">New Lead</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">Title</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Content</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" name="" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</form>
+<!-- end div of the leads modal-->
 
       </div>
       </div>

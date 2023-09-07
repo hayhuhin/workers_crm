@@ -10,8 +10,10 @@ def tasks(request):
     #user data
     user = Employer.objects.get(user=request.user)
     employer_department = Employer.objects.get(user=request.user).job_position
-    employer_tasks = Employer.objects.get(user=request.user).task
-    print(employer_tasks)
+    employer_tasks = Employer.objects.filter(user=request.user)
+    # employer_leads = Employer.objects.filter(user=request.user)
+    # print(employer_leads.lead)
+
 
 
     #first user validation
@@ -19,8 +21,16 @@ def tasks(request):
         employer_department_tasks = DepartmentTask.objects.filter(department__position=employer_department)
 
 
-        context = {'context':employer_department_tasks,'user_task':employer_tasks}
-        return render(request,'code/tasks.html',context)
+        context = {'context':employer_department_tasks,'employers':employer_tasks}
+    
+    if request.method == 'POST':
+        data = request.POST
+        act = data.get('save_task')
+        print(act)
+        # print(request.POST.get('id'))
+
+    return render(request,'code/tasks.html',context)
+    
 
 
 def sign_up(request):
