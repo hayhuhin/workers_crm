@@ -14,8 +14,8 @@ class Employer(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     profile_pic = models.ImageField(default='profile_pics/profile_picture.jpeg',upload_to='profile_pics')
     job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
-    lead = models.ForeignKey(Lead,blank=True,null=True,on_delete=models.SET_NULL)
-    task = models.ForeignKey(Task,blank=True,null=True,on_delete=models.SET_NULL)
+    lead = models.ManyToManyField(Lead)
+    task = models.ManyToManyField(Task)
 
     
 

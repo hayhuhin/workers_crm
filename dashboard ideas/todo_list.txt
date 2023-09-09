@@ -6,3 +6,13 @@ display user specific - leads,job tasks,personal tasks
 1.modify the html to be desplayed properly
 
 2.add id for each element in the html
+
+
+---------------
+create data into DB:
+must be as form 
+
+
+#bug:
+adding leads in tasks form instead of in leads form
+###################
