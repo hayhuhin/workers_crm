@@ -8,11 +8,5 @@ display user specific - leads,job tasks,personal tasks
 2.add id for each element in the html
 
 
----------------
-create data into DB:
-must be as form 
-
-
-#bug:
-adding leads in tasks form instead of in leads form
-###################
+3.make the profile page to look more like the tasks page 
+>>>>>>> 7860d16 (commit before pull)
