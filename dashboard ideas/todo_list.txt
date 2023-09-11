@@ -7,8 +7,19 @@ display user specific - leads,job tasks,personal tasks
 
 1.fix:in tasks views all if statements and form validation is wrong - FIXED
 2.add:tasks - complete method- DONE , leads - complete and edit methods - DONE
-visuals:make the tasks page look better with spacings and positioning + ajax method that will not refresh the page
 
+------------------------
 
+VISUALS:
+1.make the tasks page look better with spacings ,positioning and sizing
+2.ajax method that will not refresh the page
+3.messaging after submiting forms
 
+FIX:
+1.security- research ways to edit cards without exposing the id of the card in the url
+2.
+
+ADD:
+1.add a way of representing a lot of leads and tasks inside one page whitout overflaw
+2.
 
