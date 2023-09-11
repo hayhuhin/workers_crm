@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import DepartmentTask,Lead,Task
 from user.models import Employer
-from .forms import CreateLead,CreateTask,EditTask
+from .forms import CreateLead,CreateTask,EditTaskForm,EditLeadForm
 
 
 
@@ -16,83 +17,125 @@ def tasks(request):
     #user data
     user = Employer.objects.get(user=request.user)
     
-    def task_id_record(data):
-        if data:
-            return data 
-        else:
-            return None
-
-    instance_id = None
-
     employer_department = Employer.objects.get(user=request.user).job_position
 
     employer_tasks = user.task.all()
 
     employer_leads = user.lead.all()
 
-    #tast and lead forms
-    add_task_form = CreateTask()
-    add_lead_form = CreateLead()
-    edit_task_form = EditTask()
 
-    #first user validation
+    #task and lead forms
+    add_lead_form = CreateLead()
+    add_task_form = CreateTask()
+
+
+
+    #user validation if authenticated and the request.user is equal to the model of the employer
     if str(request.user) == str(user) and request.user.is_authenticated:
         employer_department_tasks = DepartmentTask.objects.filter(department__position=employer_department)
 
+    context = {'context':employer_department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form,}
 
+    #checking if the method is POST
     if request.method == 'POST':   
+
         #adding tasks data to DB
-        if request.POST.get('add_task') == "add_task":
+        if request.POST.get('add_task'):
             post_data = request.POST
 
-            task_record = Task.objects.create(title=post_data.get('title'),content=post_data.get('content'))
+            task_record = Task.objects.create(title=post_data.get('title'),content=post_data.get('content'))        
             user.task.add(task_record)
 
-        if request.POST.get('add_lead') == 'add_lead':
+
+        if request.POST.get('completed_task'):
+            task_data = request.POST
+
+            task_id = int((task_data.get("completed_task")))
+            Task.objects.filter(id=task_id).update(completed=True)
+
+            
+            return render(request,'code/tasks.html',context)
+
+
+        if request.POST.get('incompleted_task'):
+            task_data = request.POST
+
+            task_id = int((task_data.get("incompleted_task")))
+            Task.objects.filter(id=task_id).update(completed=False)
+            
+            return render(request,'code/tasks.html',context)
+
+
+        #adding lead to the DB
+        if request.POST.get('add_lead'):
             post_data = request.POST
 
             lead_record = Lead.objects.create(name=post_data.get('name'),description=post_data.get('description'))
             user.lead.add(lead_record)
 
-        #modify,edit,delete existent data to DB
-
-        if request.POST.get('task_done'):
-            #will set the task as DONE
-            post_data = request.POST
-
         
+        #DELETE the task from the DB
         if request.POST.get("task_delete"):
-            #DELETE the task from the DB
             post_data = request.POST
+
             task_id = int(post_data.get("task_delete"))
             delete_record = Task.objects.get(id=task_id)
             delete_record.delete()
 
-        if request.POST.get("task_edit"):
-            post_data = request.POST
-            task_id = int(post_data.get("task_edit"))
-            instance_id = task_id_record(task_id)
-            edit_task_data = Task.objects.get(id=task_id)
+            #messages that represented 
+            messages.add_message(request,messages.ERROR,"Deleted")
 
-            context = {'context':employer_department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form,'edit_task_form':edit_task_form,'task_data':edit_task_data}
+
+        if request.POST.get("lead_complete"):
+            post_data = request.POST
+
+            lead_id = int(post_data.get("lead_complete"))
+            
+            Lead.objects.filter(id=lead_id).update(completed=True)
+            print(Lead.objects.filter(id=lead_id).values())
+  
+            
             return render(request,'code/tasks.html',context)
 
-        #TODO fix the acces to global variable from local place
-        if request.POST.get("add_task_submited"):
+        if request.POST.get("lead_not_completed"):
             post_data = request.POST
-            print(instance_id)
 
-            task_record = user.task.get(id=task_id)
-            print(task_record)
-            task_record.update(title=post_data.get('title'),content=post_data.get('content'))
-
-    context = {'context':employer_department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form}
+            lead_id = int(post_data.get("lead_not_completed"))
+            Lead.objects.filter(id=lead_id).update(completed=False)
 
     return render(request,'code/tasks.html',context)
 
 
+def Edit_Task(request,ID):
+    task_id = Task.objects.get(id=ID)
+    form = EditTaskForm(instance=task_id)
 
-def sign_up(request):
-    # if request.method == 'POST':
-    pass
-    # return render(request,'code/signup.html',{'form':form})
+    if request.method == "POST":
+        form = EditTaskForm(request.POST,instance=task_id)
+        if form.is_valid():
+            form.save()
+            # messages.succsess(request,"updated successfully")
+            return redirect("tasks")
+
+
+    context = {"edit_task_form":form,"task_data":task_id}
+    
+    return render(request,"code/edit_task.html",context)
+
+
+
+def Edit_lead(request,ID):
+    lead_id = Lead.objects.get(id=ID)
+    form = EditLeadForm(instance=lead_id)
+
+    if request.method == "POST":
+        form = EditLeadForm(request.POST,instance=lead_id)
+        if form.is_valid():
+            form.save()
+            # messages.succsess(request,"updated successfully")
+            return redirect("tasks")
+
+
+    context = {"edit_Lead_form":form,"lead_data":lead_id}
+    
+    return render(request,"code/edit_lead.html",context)

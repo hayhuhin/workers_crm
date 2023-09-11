@@ -3,10 +3,12 @@ tasks model
 tasks-delete-add-edit-methods
 display user specific - leads,job tasks,personal tasks
 
-1.modify the html to be desplayed properly
-
-2.add id for each element in the html
 
 
-3.make the profile page to look more like the tasks page 
->>>>>>> 7860d16 (commit before pull)
+1.fix:in tasks views all if statements and form validation is wrong - FIXED
+2.add:tasks - complete method- DONE , leads - complete and edit methods - DONE
+visuals:make the tasks page look better with spacings and positioning + ajax method that will not refresh the page
+
+
+
+

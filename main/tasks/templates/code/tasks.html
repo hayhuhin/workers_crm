@@ -1,7 +1,21 @@
 {% extends 'code/base.html' %} {% block content %}  {% load widget_tweaks %}
+
 <!-- the html++ bootstrap code here -->
-<!-- this is the DEPARTMENT TASKS TITLE -->
 <div class='container position-relative'style='margin-top:4rem ;'>
+
+
+
+<!-- this is the DEPARTMENT TASKS TITLE -->
+{% if messages %}
+<div class="alert alert-danger position-absolute"  style='width:300px' role="alert" >
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+</div>
+{% endif %}
+
   <!-- <div class="position-relative"> -->
 <figure class="text-center" style="padding-bottom: 0.5rem;">
   <blockquote class="blockquote">
@@ -89,15 +103,19 @@
 <!-- end of the progress bar-->
 
 
-
 <!-- the cards TASKS -->
 <div class="container">
   <div class="row row-cols-1 row-cols-md-4 g-4">
     {% for task in employer_tasks %}
     <div class="col">
       <div class="card m-1">
-        <div class="card-header">Featured</div>
+{% if task.completed %}
+        <div class="card-header text-success">Completed</div>
+        <div class="card-body text-success">
+        {% else %}
+        <div class="card-header">Incompleted</div>
         <div class="card-body">
+        {% endif %}
           <h5 class="card-title">{{ task.title }}</h5>
           <p class="card-text">{{ task.content }}</p>
       
@@ -107,70 +125,31 @@
           <small class="text-body-secondary m-1" >{{ task.created_at }}</small>
           <div class="col-sm-auto" style="margin-top: 15px">
 
+
           <form method='POST'>
           {% csrf_token %}
-          <button type="submit" name="task_done"  value="{{task.id}}" href="#"  class="btn btn-primary" id="{{task.id}}">Complete</button>
+          {% if task.completed %}
+          <button type="submit" name="incompleted_task"  value="{{task.id}}" href="#"  class="btn btn-primary" id="{{task.id}}">Incompleted</button>
+          {% else %}
+          <button type="submit" name="completed_task"  value="{{task.id}}" href="#"  class="btn btn-primary" id="{{task.id}}">complete</button>
+          {% endif %}
           <button type="submit"  name="task_delete" value="{{task.id}}" href="#" class="btn btn-danger" id="{{task.id}}">Delete</button>
-          <button type="submit"  class="btn btn-secondary" name="task_edit" value="{{task.id}}" >Edit</button>
+          <a type="button" href="{% url 'edit_task' task.id %}" class="btn btn-secondary" name="task_edit" value="{{task.id}}" >Edit</a>
         </form>
           </div>
 
 
-
-<!--           
-          
-          
-          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTasModal" data-bs-whatever="@getbootstrap">Create New</button>
-  <div class="modal fade" id="addTasModal" tabindex="-1" aria-labelledby="addTasModalLabel" aria-hidden="true">
-           -->
-          
         </div>
       </div>
       
     </div>
   </div>
+
   {% endfor %}
-  {% if edit_task_form %}
 
-  <!-- <div class="modal" id="EditTaskModal" tabindex="-1"> -->
 
-      <div class="position-absolute top-50 start-50 translate-middle border border-danger card p-3">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="EditTaskModalLabel">New Task</h1>
-          <a type="button" class="btn-close" href="/tasks" aria-label="Close"></a>
-        </div>
-        <div class="modal-body">
 
-          <!-- form of adding new task to the db -->
-          <form method="POST">
 
-            {% csrf_token %}
-  
-            <!-- widget that lets me add html attributes to the form fields-->
-  
-  
-            <div class="mb-3">
-              <label for="title" class="col-form-label">Title</label>
-              {% render_field edit_task_form.title type="text" id="title" class="form-control" value=task_data.title %}
-            </div>
-            <div class="mb-3">
-              <label for="content" class="col-form-label">Description</label>
-              {% render_field edit_task_form.content type="text" name=task.id id="content" class="form-control" placeholder=task_data.content %}
-            </div>
-          </div>
-          <div class="modal-footer">
-            <a type="button" class="btn btn-secondary" href="/tasks">Close</a>
-            <button type="submit" name="add_task_submited" value="add_task_submited" class="btn btn-primary">Save</button>
-          </div>
-        </form>
-    </div>
-  </div>
-  </div>
-</div>
-
-  {% endif %}
 
 <!-- add task modal section below -->
 
@@ -236,7 +215,20 @@
     {% for lead in leads %}
       <div class="col">
         <div class="card m-1">
-          <div class="card-body">
+
+          {% if lead.completed %}
+
+          <div class="card-header text-success ">COMPLETED</div>
+
+            <div class="card-body text-success ">
+
+          {% else %}
+          <div class="card-header">Not Completed</div>
+
+            <div class="card-body">
+
+          {% endif %}
+
             <h5 class="card-title">{{lead.name}}</h5>
             <p class="card-text">{{lead.description}}</p>
           
@@ -245,9 +237,17 @@
             <div class="col-sm-auto" style="margin-top: 15px">
               <small class="text-body-secondary m-1" >{{lead.created_at}}</small>
               <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <a href="#" class="btn btn-primary">Complete</a>
-              <a href="#" class="btn btn-secondary">Edit</a>
+              <form method= "POST">
+              {% csrf_token %}
+
+              {% if lead.completed %}
+              <button type="submit" name="lead_not_completed" value="{{lead.id}}" class="btn btn-primary">Incomplete</button>
+              <button type="submit" class="btn btn-secondary">Edit</button>
+              {% else %}
+              <button type="submit" name="lead_complete" value="{{lead.id}}" class="btn btn-primary">Complete</button>
+              <a type="button" href="{% url 'edit_lead' lead.id %}" class="btn btn-secondary" name="lead_edit" value="{{lead.id}}" >Edit</a>
+              {% endif %}
+              </form>
               </div>
           </div>
           </div>
@@ -303,4 +303,5 @@
           </div>
           </div>
         </div>
+
 {% endblock content%}
