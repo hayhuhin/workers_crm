@@ -1,9 +1,14 @@
-{% extends 'code/base.html' %} {% block content %}  {% load widget_tweaks %}
+{% extends 'code/base.html' %} {% block content %}  {% load widget_tweaks %}{% load static %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+<script src="{% static 'script.js'%}"></script>
+
 
 <!-- the html++ bootstrap code here -->
-<div class='container position-relative'style='margin-top:4rem ;'>
+<div class='container position-relative'style='margin-top:4rem '>
 
-
+<span id="success"></span>
 
 <!-- this is the DEPARTMENT TASKS TITLE -->
 {% if messages %}
@@ -17,29 +22,30 @@
 {% endif %}
 
   <!-- <div class="position-relative"> -->
-<figure class="text-center" style="padding-bottom: 0.5rem;">
+<div class='container'>
+
+<!-- the department tasks -->
+<figure class="text-center">
   <blockquote class="blockquote">
-    <h1>Department Tasks</h1>
+    <h1>Tasks</h1>
   </blockquote>
 </figure>
-
 <!-- this is the progress bar -->
-<div class='row'>
+
+
+<div class='row m-4'>
   <div class='col-sm-auto'>
-    <p >Daily Tasks Completion</p>
+    <p>Daily Tasks Completion</p>
   </div><!-- col end div-->
-
   <div class="col">
-  <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-  <div class="progress-bar" style="width: 15%">15%</div>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar" style="width: 15%">15%</div>
+    </div>
   </div>
-
   </div>
-  </div>
-
 
   <!-- this is the tasks card section -->
-  <div class="container">
+ 
     <div class="row row-cols-1 row-cols-md-4 g-4">
 
       {% for context in context %}
@@ -56,7 +62,7 @@
               <small class="text-body-secondary m-1" >{{context.created_at}}</small>
               <div class="col-sm-auto" style="margin-top: 15px">
     
-              <button id="{{context.id}}" class="btn btn-primary">Compelete </button>
+              <button class="btn btn-primary">Compelete </button>
               <button id="{{context.id}}" class="btn btn-danger">Delete</button>
               <button id="{{context.id}}" class="btn btn-secondary">Edit</button>
               </div>
@@ -90,7 +96,7 @@
 <!-- this is the progress bar -->
 
 
-<div class='row'>
+<div class='row m-4'>
   <div class='col-sm-auto'>
     <p >Daily Tasks Completion</p>
   </div><!-- col end div-->
@@ -99,10 +105,55 @@
       <div class="progress-bar" style="width: 15%">15%</div>
     </div>
   </div>
- <div class
-=""
- 
+
+<!-- add task modal section below -->
+
+
+<div class='col-sm-auto'>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTasModal" data-bs-whatever="@getbootstrap">Create New</button>
+  <div class="modal fade" id="addTasModal" tabindex="-1" aria-labelledby="addTasModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addTasModalLabel">New Task</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- form of adding new task to the db --> 
+        <form id="add_task_submit" method="POST">
+
+          {% csrf_token %}
+
+          <!-- widget that lets me add html attributes to the form fields-->
+
+
+          <div class="mb-3">
+            <label for="title" class="col-form-label">Title</label>
+            {% render_field add_task_form.title type="text" id="title" class="form-control"  %}
+          </div>
+          <div class="mb-3">
+            <label for="content" class="col-form-label">Description</label>
+            {% render_field add_task_form.content type="text" id="content" class="form-control"  %}
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="add_task" value="add_task" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+
+
+    </div>
+  </div>
+  </div>
+
+
+<!-- end of add task modal section -->
 </div>
+</div>
+
 <!-- end of the progress bar-->
 
 
@@ -152,51 +203,6 @@
 
 
 
-
-
-<!-- add task modal section below -->
-
-
-<div class='col'>
-<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTasModal" data-bs-whatever="@getbootstrap">Create New</button>
-  <div class="modal fade" id="addTasModal" tabindex="-1" aria-labelledby="addTasModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addTasModalLabel">New Task</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-
-          <!-- form of adding new task to the db -->
-        <form method="POST">
-
-          {% csrf_token %}
-
-          <!-- widget that lets me add html attributes to the form fields-->
-
-
-          <div class="mb-3">
-            <label for="title" class="col-form-label">Title</label>
-            {% render_field add_task_form.title type="text" id="title" class="form-control"  %}
-          </div>
-          <div class="mb-3">
-            <label for="content" class="col-form-label">Description</label>
-            {% render_field add_task_form.content type="text" id="content" class="form-control"  %}
-
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" name="add_task" value="add_task" class="btn btn-primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  </div>
-</form>
-  <!-- end div of the modal -->
-
   </div>
 </div>
   </div>
@@ -204,12 +210,59 @@
 </div>
 
 <!-- the title of the tasks -->
-<div class='container'style='margin-top:4rem ;'>
+<div class='container text-end'style='margin-top:4rem ;'>
 <figure class="text-center">
   <blockquote class="blockquote">
     <h1>Leads</h1>
   </blockquote>
 </figure>
+
+<div class="row m-4">
+  <div class="col">
+
+ <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLeadModal" data-bs-whatever="@getbootstrap">Create New</button>
+            <div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModal" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addLeadModalLabel">New Lead</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+          
+                    <!-- form of adding new task to the db -->
+                  <form method="POST">
+          
+                    {% csrf_token %}
+          
+                    <!-- widget that lets me add html attributes to the form fields-->
+
+          
+                    <div class="mb-3">
+                      <label for="name" class="col-form-label">Name</label>
+                      {% render_field add_lead_form.name type="text" id="name" class="form-control"  %}
+                    </div>
+                    <div class="mb-3">
+                      <label for="description" class="col-form-label">Description</label>
+                      {% render_field add_lead_form.description type="text" id="description" class="form-control"  %}
+          
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="add_lead" value="add_lead" class="btn btn-primary">Save</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            </div>
+          </form>
+
+
+  </div>
+</div>
+</div>
+
 
 <!-- the another task section-->
  <!-- the container end div-->
@@ -259,52 +312,20 @@
         </div>
         {% endfor %}
 
-        
-        <div class='col'>
-          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLeadModal" data-bs-whatever="@getbootstrap">Create New</button>
-            <div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModal" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addLeadModalLabel">New Lead</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-          
-                    <!-- form of adding new task to the db -->
-                  <form method="POST">
-          
-                    {% csrf_token %}
-          
-                    <!-- widget that lets me add html attributes to the form fields-->
-
-          
-                    <div class="mb-3">
-                      <label for="name" class="col-form-label">Name</label>
-                      {% render_field add_lead_form.name type="text" id="name" class="form-control"  %}
-                    </div>
-                    <div class="mb-3">
-                      <label for="description" class="col-form-label">Description</label>
-                      {% render_field add_lead_form.description type="text" id="description" class="form-control"  %}
-          
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="add_lead" value="add_lead" class="btn btn-primary">Save</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-            </div>
-          </form>
-            <!-- end div of the modal -->
-          
-            </div>
           </div>
             </div>
           </div>
           </div>
         </div>
+
+
+
+
+<script>
+
+$(document).on('submit','#add_task_submit',add_task_ajax)
+
+  </script>
+
 
 {% endblock content%}

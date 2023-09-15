@@ -11,8 +11,8 @@ display user specific - leads,job tasks,personal tasks
 ------------------------
 
 VISUALS:
-1.make the tasks page look better with spacings ,positioning and sizing
-2.ajax method that will not refresh the page
+1.make the tasks page look better with spacings ,positioning and sizing - DONE
+2.ajax method that will not refresh the page - 
 3.messaging after submiting forms
 
 FIX:

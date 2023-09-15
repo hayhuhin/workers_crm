@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import DepartmentTask,Lead,Task
@@ -39,13 +39,21 @@ def tasks(request):
     #checking if the method is POST
     if request.method == 'POST':   
 
+
         #adding tasks data to DB
-        if request.POST.get('add_task'):
+        if request.POST.get('name') == "add_task":
+            print("Xxxxxxxxxxxxxxxxx")
             post_data = request.POST
 
             task_record = Task.objects.create(title=post_data.get('title'),content=post_data.get('content'))        
-            user.task.add(task_record)
 
+            user.task.add(task_record)
+            # return HttpResponse("succesfuly added")
+
+
+
+            # return render(request,)
+        
 
         if request.POST.get('completed_task'):
             task_data = request.POST
@@ -120,7 +128,7 @@ def Edit_Task(request,ID):
 
     context = {"edit_task_form":form,"task_data":task_id}
     
-    return render(request,"code/edit_task.html",context)
+    # return render(request,"code/edit_task.html",context)
 
 
 
