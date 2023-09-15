@@ -12,8 +12,8 @@ display user specific - leads,job tasks,personal tasks
 
 VISUALS:
 1.make the tasks page look better with spacings ,positioning and sizing - DONE
-2.ajax method that will not refresh the page - 
-3.messaging after submiting forms
+2.ajax method that will not refresh the page - DONE
+3.messaging after submiting forms - unfinished
 
 FIX:
 1.security- research ways to edit cards without exposing the id of the card in the url
@@ -22,4 +22,9 @@ FIX:
 ADD:
 1.add a way of representing a lot of leads and tasks inside one page whitout overflaw
 2.
+
+tasks:
+add proper names to each tag and function
+add ajax method to all submits in the task page
+add proper messages after submitting a form
 

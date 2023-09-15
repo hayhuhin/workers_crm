@@ -1,86 +1,90 @@
 {% extends 'code/base.html' %} {% block content %}  {% load widget_tweaks %}{% load static %}
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js' integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==' crossorigin='anonymous' referrerpolicy='no-referrer'></script> 
 <script src="{% static 'script.js'%}"></script>
 
 
 <!-- the html++ bootstrap code here -->
 <div class='container position-relative'style='margin-top:4rem '>
 
-<span id="success"></span>
+<span id='success'></span>
 
-<!-- this is the DEPARTMENT TASKS TITLE -->
+<!-- the messages alret that pops up after submit a form -->
+
 {% if messages %}
-<div class="alert alert-danger position-absolute"  style='width:300px' role="alert" >
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-</div>
+  <div class='alert alert-danger position-absolute'  style='width:300px' role='alert' >
+    <ul class='messages'>
+      {% for message in messages %}
+      <li{% if message.tags %} class='{{ message.tags }}'{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
 {% endif %}
 
-  <!-- <div class="position-relative"> -->
+<!-- end of the message alert section-->
+
+
+
+<!-- the department tasks section -->
 <div class='container'>
 
 <!-- the department tasks -->
-<figure class="text-center">
-  <blockquote class="blockquote">
+<figure class='text-center'>
+  <blockquote class='blockquote'>
     <h1>Tasks</h1>
   </blockquote>
 </figure>
+
+
 <!-- this is the progress bar -->
-
-
 <div class='row m-4'>
   <div class='col-sm-auto'>
     <p>Daily Tasks Completion</p>
-  </div><!-- col end div-->
-  <div class="col">
-    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-      <div class="progress-bar" style="width: 15%">15%</div>
+  </div>
+
+
+  <div class='col'>
+    <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
+      <div class='progress-bar' style='width: 15%'>15%</div>
     </div>
   </div>
-  </div>
 
-  <!-- this is the tasks card section -->
- 
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+</div><!-- row end div-->
 
-      {% for context in context %}
-      <div class="col">
-        <div class="card m-1">
-          <div class="card-header">Featured</div>
-          <div class="card-body">
-            <h5 class="card-title">{{context.title}}</h5>
-            <p class="card-text">{{context.content}}</p>
-          
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >{{context.created_at}}</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-    
-              <button class="btn btn-primary">Compelete </button>
-              <button id="{{context.id}}" class="btn btn-danger">Delete</button>
-              <button id="{{context.id}}" class="btn btn-secondary">Edit</button>
+
+
+<!-- this is the tasks card section --> 
+<div class='row row-cols-1 row-cols-md-4 g-4'>
+
+  {% for department_task in department_tasks %}
+    <div class='col'>
+      <div class='card m-1'>
+        <div class='card-header'>Featured</div>
+        <div class='card-body'>
+          <h5 class='card-title'>{{department_task.title}}</h5>
+          <p class='card-text'>{{department_task.content}}</p>
+        </div><!-- end of card-body-->
+
+          <div class='card-footer text-body-secondary'>
+            <div class='col-sm-auto' style='margin-top: 15px'>
+              <small class='text-body-secondary m-1' >{{department_task.created_at}}</small>
+              <div class='col-sm-auto' style='margin-top: 15px'>
+
+              <button class='btn btn-primary'>Compelete </button>
+              <button id='{{department_task.id}}' class='btn btn-danger'>Delete</button>
+              <button id='{{department_task.id}}' class='btn btn-secondary'>Edit</button>
               </div>
-          </div>
+            </div>
           </div>
 
-        </div>
       </div>
-      {% endfor %}
-
-        </div>
-      </div>
-    
-    
     </div>
-      </div>
-    
-    </div><!--container div-->
+  {% endfor %}
+
+    </div><!-- end of row div-->
+  </div><!-- the department tasks section container END DIV-->
+</div><!-- end div of class='container position-relative' -->
 
 
 
@@ -88,244 +92,271 @@
 
 <!-- the TASKS title -->
 <div class='container'style='margin-top:4rem ;'>
-<figure class="text-center">
-  <blockquote class="blockquote">
+<figure class='text-center'>
+  <blockquote class='blockquote'>
     <h1>Tasks</h1>
   </blockquote>
 </figure>
+
+
 <!-- this is the progress bar -->
-
-
 <div class='row m-4'>
   <div class='col-sm-auto'>
     <p >Daily Tasks Completion</p>
   </div><!-- col end div-->
-  <div class="col">
-    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-      <div class="progress-bar" style="width: 15%">15%</div>
+  <div class='col'>
+    <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
+      <div class='progress-bar' style='width: 15%'>15%</div>
     </div>
   </div>
+
 
 <!-- add task modal section below -->
 
-
+<!-- button 'new task' clicked and then trigger the modal form -->
 <div class='col-sm-auto'>
-<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTasModal" data-bs-whatever="@getbootstrap">Create New</button>
-  <div class="modal fade" id="addTasModal" tabindex="-1" aria-labelledby="addTasModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addTasModalLabel">New Task</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
+  <button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#add_task_modal' data-bs-whatever='@getbootstrap'>Create New</button>
+    <div class='modal fade' id='add_task_modal' tabindex='-1' aria-labelledby='add_task_modal_label' aria-hidden='true'>
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 class='modal-title fs-5' id='add_task_modal_label'>New Task</h1>
+            <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+          </div>
 
-          <!-- form of adding new task to the db --> 
-        <form id="add_task_submit" method="POST">
+
+      <!-- form of adding new task --> 
+      <div class='modal-body'>
+
+        <form id='add_task_submit_form' method='POST'>
 
           {% csrf_token %}
 
-          <!-- widget that lets me add html attributes to the form fields-->
+          <!-- body of the form fields-->
 
-
-          <div class="mb-3">
-            <label for="title" class="col-form-label">Title</label>
-            {% render_field add_task_form.title type="text" id="title" class="form-control"  %}
+          <div class='mb-3'>
+            <label for='title' class='col-form-label'>Title</label>
+              {% render_field add_task_form.title type='text' id='title' class='form-control'  %}
           </div>
-          <div class="mb-3">
-            <label for="content" class="col-form-label">Description</label>
-            {% render_field add_task_form.content type="text" id="content" class="form-control"  %}
 
+          <div class='mb-3'>
+            <label for='content' class='col-form-label'>Description</label>
+              {% render_field add_task_form.content type='text' id='content' class='form-control'  %}
           </div>
+
+      </div><!-- end div of the modal-body -->
+
+        <!-- modal footer section -->
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+          <button type='submit' name='submit_new_task' value='submit_new_task' class='btn btn-primary'>Save</button>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" name="add_task" value="add_task" class="btn btn-primary">Save</button>
-        </div>
+
       </form>
 
 
-    </div>
-  </div>
-  </div>
+      </div><!-- end of 'modal-content'-->
+
+      </div><!-- end of 'modal-dialog' -->
+    </div><!-- 'modal fade' -->
+
+  </div><!-- end of 'col-sm-auto'-->
+</div><!-- end of 'row m-4' -->
 
 
-<!-- end of add task modal section -->
-</div>
-</div>
-
-<!-- end of the progress bar-->
 
 
 <!-- the cards TASKS -->
-<div class="container">
-  <div class="row row-cols-1 row-cols-md-4 g-4">
+<div class='container'>
+
+  <div class='row row-cols-1 row-cols-md-4 g-4'>
+
     {% for task in employer_tasks %}
-    <div class="col">
-      <div class="card m-1">
-{% if task.completed %}
-        <div class="card-header text-success">Completed</div>
-        <div class="card-body text-success">
-        {% else %}
-        <div class="card-header">Incompleted</div>
-        <div class="card-body">
-        {% endif %}
-          <h5 class="card-title">{{ task.title }}</h5>
-          <p class="card-text">{{ task.content }}</p>
-      
-      </div>
-      <div class="card-footer text-body-secondary">
-        <div class="col-sm-auto" style="margin-top: 15px">
-          <small class="text-body-secondary m-1" >{{ task.created_at }}</small>
-          <div class="col-sm-auto" style="margin-top: 15px">
 
+      <div class='col'>
+        <div class='card m-1'>
 
-          <form method='POST'>
-          {% csrf_token %}
           {% if task.completed %}
-          <button type="submit" name="incompleted_task"  value="{{task.id}}" href="#"  class="btn btn-primary" id="{{task.id}}">Incompleted</button>
+
+            <div class='card-header text-success'>Completed</div>
+            <div class='card-body text-success'>
+
           {% else %}
-          <button type="submit" name="completed_task"  value="{{task.id}}" href="#"  class="btn btn-primary" id="{{task.id}}">complete</button>
-          {% endif %}
-          <button type="submit"  name="task_delete" value="{{task.id}}" href="#" class="btn btn-danger" id="{{task.id}}">Delete</button>
-          <a type="button" href="{% url 'edit_task' task.id %}" class="btn btn-secondary" name="task_edit" value="{{task.id}}" >Edit</a>
-        </form>
-          </div>
+
+            <div class='card-header text-bold'>Unfinished</div>
+            <div class='card-body'>
+
+              {% endif %}
+
+              <h5 class='card-title'>{{ task.title }}</h5>
+              <p class='card-text'>{{ task.content }}</p>
+
+            </div><!-- end of 'card-body' -->
+
+      <!-- card footer section-->
+        <div class='card-footer text-body-secondary'>
+          <div class='col-sm-auto' style='margin-top: 15px'>
+            <small class='text-body-secondary m-1' >{{ task.created_at }}</small>
+              <div class='col-sm-auto' style='margin-top: 15px'>
+
+                <form method='POST'>
+                  {% csrf_token %}
+
+                    {% if task.completed %}
+                      <button type='submit' name='on_progress_task'  value='{{task.id}}' href='#'  class='btn btn-primary' id='{{task.id}}'>On Progress</button>
+                    {% else %}
+                      <button type='submit' name='completed_task'  value='{{task.id}}' href='#'  class='btn btn-primary' id='{{task.id}}'>Complete</button>
+                    {% endif %}
+                    
+                  <button type='submit'  name='task_delete' value='{{task.id}}' href='#' class='btn btn-danger' id='{{task.id}}'>Delete</button>
+                  <a type='button' href="{% url 'edit_task' task.id %}" class='btn btn-secondary' name='task_edit' value='{{task.id}}' >Edit</a>
+                </form>
+
+              </div><!-- end of 'col-sm-auto' -->
 
 
-        </div>
-      </div>
-      
-    </div>
-  </div>
+            </div><!-- end of 'col-sm-auto' -->
 
-  {% endfor %}
+          </div><!-- end of 'card-footer text-body-secondary' -->
+          
+        </div><!-- end of 'card-body text-success' -->
 
+      </div><!-- end of 'card m-1' -->
 
+    {% endfor %}
 
-  </div>
-</div>
-  </div>
-</div>
-</div>
+    </div><!-- end of 'col' -->
+
+  </div><!-- end of 'row row-cols-1 row-cols-md-4 g-4' -->
+
+</div><!-- end of 'container' -->
+
+</div><!-- end of 'container'style='margin-top:4rem ;' on line 94 -->
+
 
 <!-- the title of the tasks -->
 <div class='container text-end'style='margin-top:4rem ;'>
-<figure class="text-center">
-  <blockquote class="blockquote">
+<figure class='text-center'>
+  <blockquote class='blockquote'>
     <h1>Leads</h1>
   </blockquote>
 </figure>
 
-<div class="row m-4">
-  <div class="col">
 
- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLeadModal" data-bs-whatever="@getbootstrap">Create New</button>
-            <div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModal" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addLeadModalLabel">New Lead</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-          
-                    <!-- form of adding new task to the db -->
-                  <form method="POST">
-          
-                    {% csrf_token %}
-          
-                    <!-- widget that lets me add html attributes to the form fields-->
+<!-- the add lead modal section-->
+<div class='row m-4'>
+  <div class='col'>
 
+    <button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#add_lead_modal' data-bs-whatever='@getbootstrap'>Create New</button>
+      <div class='modal fade' id='add_lead_modal' tabindex='-1' aria-labelledby='add_lead_modal_label' aria-hidden='true'>
+        <div class='modal-dialog'>
           
-                    <div class="mb-3">
-                      <label for="name" class="col-form-label">Name</label>
-                      {% render_field add_lead_form.name type="text" id="name" class="form-control"  %}
-                    </div>
-                    <div class="mb-3">
-                      <label for="description" class="col-form-label">Description</label>
-                      {% render_field add_lead_form.description type="text" id="description" class="form-control"  %}
-          
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="add_lead" value="add_lead" class="btn btn-primary">Save</button>
-                  </div>
-                </form>
-              </div>
+          <div class='modal-content'>
+            <div class='modal-header'>
+              <h1 class='modal-title fs-5' id='add_lead_modal_label'>New Lead</h1>
+              <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
             </div>
-            </div>
-          </form>
+            <div class='modal-body text-start'>
+    
+            <!-- form of adding new lead -->
+              <form method='POST'>
+                {% csrf_token %}
+    
+                <!-- lead form input fields -->
+                <div class='mb-3'>
+                  <label for='name' class='col-form-label'>Name</label>
+                  {% render_field add_lead_form.name type='text' id='name' class='form-control'  %}
+                </div>
+
+                <div class='mb-3'>
+                  <label for='description' class='col-form-label'>Description</label>
+                  {% render_field add_lead_form.description type='text' id='description' class='form-control'  %}
+                </div>
+
+              </div><!-- end of 'modal-body' -->
+
+                <div class='modal-footer'>
+                  <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                  <button type='submit' name='submit_new_lead' value='submit_new_lead' class='btn btn-primary'>Save</button>
+                </div>
+
+              </form>
+
+          </div><!-- end of 'modal-content' -->
+
+        </div><!-- end of 'modal-dialog' -->
+
+      </div><!-- end of 'modal fade' -->
 
 
-  </div>
-</div>
-</div>
+
+  </div><!-- end of 'col' -->
+</div><!-- end of 'row' -->
+</div><!-- end of 'container text-end' -->
 
 
-<!-- the another task section-->
+
  <!-- the container end div-->
- <div class="container">
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+ <div class='container'>
+    <div class='row row-cols-1 row-cols-md-4 g-4'>
     {% for lead in leads %}
-      <div class="col">
-        <div class="card m-1">
+      <div class='col'>
+
+        <div class='card m-1'>
 
           {% if lead.completed %}
-
-          <div class="card-header text-success ">COMPLETED</div>
-
-            <div class="card-body text-success ">
-
+            <div class='card-header text-success '>COMPLETED</div>
+            <div class='card-body text-success'>
           {% else %}
-          <div class="card-header">Not Completed</div>
-
-            <div class="card-body">
-
+            <div class='card-header'>On Progress</div>
+            <div class='card-body'>
           {% endif %}
 
-            <h5 class="card-title">{{lead.name}}</h5>
-            <p class="card-text">{{lead.description}}</p>
+              <h5 class='card-title'>{{lead.name}}</h5>
+              <p class='card-text'>{{lead.description}}</p>
+            
+            </div><!-- end of 'card-body' -->
+
+          <div class='card-footer text-body-secondary'>
+            
+            <div class='col-sm-auto' style='margin-top: 15px'>
+              <small class='text-body-secondary m-1' >{{lead.created_at}}</small>
+              <div class='col-sm-auto' style='margin-top: 15px'>
+
+                <form method= 'POST'>
+                  {% csrf_token %}
+
+                  {% if lead.completed %}
+                    <button type='submit' name='lead_not_completed' value='{{lead.id}}' class='btn btn-primary'>Incomplete</button>
+                    <button type='submit' class='btn btn-secondary'>Edit</button>
+                  {% else %}
+                    <button type='submit' name='lead_complete' value='{{lead.id}}' class='btn btn-primary'>Complete</button>
+                    <a type='button' href="{% url 'edit_lead' lead.id %}" class='btn btn-secondary' name='lead_edit' value='{{lead.id}}' >Edit</a>
+                  {% endif %}
+
+                </form>
+
+              </div><!-- end of 'col-sm-auto' -->
+
+            </div><!-- 'col-sm-auto' -->
+
+          </div><!-- 'card-footer text-body-secondary' -->
           
-          </div>
-          <div class="card-footer text-body-secondary">
-            <div class="col-sm-auto" style="margin-top: 15px">
-              <small class="text-body-secondary m-1" >{{lead.created_at}}</small>
-              <div class="col-sm-auto" style="margin-top: 15px">
-              <form method= "POST">
-              {% csrf_token %}
+        </div><!-- end of 'card-body' -->
 
-              {% if lead.completed %}
-              <button type="submit" name="lead_not_completed" value="{{lead.id}}" class="btn btn-primary">Incomplete</button>
-              <button type="submit" class="btn btn-secondary">Edit</button>
-              {% else %}
-              <button type="submit" name="lead_complete" value="{{lead.id}}" class="btn btn-primary">Complete</button>
-              <a type="button" href="{% url 'edit_lead' lead.id %}" class="btn btn-secondary" name="lead_edit" value="{{lead.id}}" >Edit</a>
-              {% endif %}
-              </form>
-              </div>
-          </div>
-          </div>
-          
-        </div>
-        </div>
-        {% endfor %}
+      </div><!-- end of 'card m-1' -->
 
-          </div>
-            </div>
-          </div>
-          </div>
-        </div>
+    {% endfor %}
 
+  </div><!-- end of 'col' -->
 
+</div><!-- end of row-->
 
+</div><!-- end of 'container' -->
 
+<!-- script section that uses ajax on forms -->
 <script>
-
-$(document).on('submit','#add_task_submit',add_task_ajax)
-
-  </script>
-
+  $(document).on('submit','#add_task_submit_form',add_task_ajax)
+</script>
 
 {% endblock content%}

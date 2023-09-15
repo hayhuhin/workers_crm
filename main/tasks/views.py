@@ -32,16 +32,17 @@ def tasks(request):
 
     #user validation if authenticated and the request.user is equal to the model of the employer
     if str(request.user) == str(user) and request.user.is_authenticated:
-        employer_department_tasks = DepartmentTask.objects.filter(department__position=employer_department)
+        department_tasks = DepartmentTask.objects.filter(department__position=employer_department)
 
-    context = {'context':employer_department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form,}
+    context = {'department_tasks':department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form,}
 
     #checking if the method is POST
     if request.method == 'POST':   
 
 
+
         #adding tasks data to DB
-        if request.POST.get('name') == "add_task":
+        if request.POST.get('name') == 'submit_new_task':
             print("Xxxxxxxxxxxxxxxxx")
             post_data = request.POST
 
@@ -65,17 +66,17 @@ def tasks(request):
             return render(request,'code/tasks.html',context)
 
 
-        if request.POST.get('incompleted_task'):
+        if request.POST.get('on_progress_task'):
             task_data = request.POST
 
-            task_id = int((task_data.get("incompleted_task")))
+            task_id = int((task_data.get("on_progress_task")))
             Task.objects.filter(id=task_id).update(completed=False)
             
             return render(request,'code/tasks.html',context)
 
 
         #adding lead to the DB
-        if request.POST.get('add_lead'):
+        if request.POST.get('submit_new_lead'):
             post_data = request.POST
 
             lead_record = Lead.objects.create(name=post_data.get('name'),description=post_data.get('description'))

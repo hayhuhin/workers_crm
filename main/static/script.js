@@ -9,7 +9,7 @@ function add_task_ajax (e)  {
             title: $('#title').val(),
             content: $('#content').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            name: "add_task",
+            name: 'submit_new_task',
 
 
         },
