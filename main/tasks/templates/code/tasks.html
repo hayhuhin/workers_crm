@@ -12,14 +12,8 @@
 
 <!-- the messages alret that pops up after submit a form -->
 
-{% if messages %}
-  <div class='alert alert-danger position-absolute'  style='width:300px' role='alert' >
-    <ul class='messages'>
-      {% for message in messages %}
-      <li{% if message.tags %} class='{{ message.tags }}'{% endif %}>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  </div>
+{% if messager %}
+<h2>this worked</h2>
 {% endif %}
 
 <!-- end of the message alert section-->
@@ -32,7 +26,7 @@
 <!-- the department tasks -->
 <figure class='text-center'>
   <blockquote class='blockquote'>
-    <h1>Tasks</h1>
+    <h1>Department Tasks</h1>
   </blockquote>
 </figure>
 
@@ -60,8 +54,9 @@
   {% for department_task in department_tasks %}
     <div class='col'>
       <div class='card m-1'>
-        <div class='card-header'>Featured</div>
-        <div class='card-body'>
+        {% if department_task.completed %}
+        <div class='card-header'>Completed</div>
+        <div class='card-body text-success'>
           <h5 class='card-title'>{{department_task.title}}</h5>
           <p class='card-text'>{{department_task.content}}</p>
         </div><!-- end of card-body-->
@@ -71,9 +66,25 @@
               <small class='text-body-secondary m-1' >{{department_task.created_at}}</small>
               <div class='col-sm-auto' style='margin-top: 15px'>
 
-              <button class='btn btn-primary'>Compelete </button>
-              <button id='{{department_task.id}}' class='btn btn-danger'>Delete</button>
-              <button id='{{department_task.id}}' class='btn btn-secondary'>Edit</button>
+
+                <button  name='task_on_progress_task' class='btn btn-primary department_task_on_progress_button' member_id='{{department_task.id}}' id='{{department_task.id}}'>On Progress</button>
+              {% else %}
+              <div class='card-header'>On progress</div>
+              <div class='card-body'>
+                <h5 class='card-title'>{{department_task.title}}</h5>
+                <p class='card-text'>{{department_task.content}}</p>
+              </div><!-- end of card-body-->
+      
+                <div class='card-footer text-body-secondary'>
+                  <div class='col-sm-auto' style='margin-top: 15px'>
+                    <small class='text-body-secondary m-1' >{{department_task.created_at}}</small>
+                    <div class='col-sm-auto' style='margin-top: 15px'>
+      
+      
+                <button  name='complete_task_form' class='btn btn-primary department_task_complete_button' member_id='{{department_task.id}}' id='{{department_task.id}}'>Complete</button>
+              {% endif %}
+              <button type='submit'  name='task_delete' class='btn btn-danger department_task_delete_button' member_id='{{department_task.id}}' id='{{department_task.id}}'>Delete</button>
+
               </div>
             </div>
           </div>
@@ -199,18 +210,22 @@
             <small class='text-body-secondary m-1' >{{ task.created_at }}</small>
               <div class='col-sm-auto' style='margin-top: 15px'>
 
-                <form method='POST'>
+
                   {% csrf_token %}
 
                     {% if task.completed %}
-                      <button type='submit' name='on_progress_task'  value='{{task.id}}' href='#'  class='btn btn-primary' id='{{task.id}}'>On Progress</button>
+                      <button  name='task_on_progress_task' class='btn btn-primary task_on_progress_button' member_id='{{task.id}}' id='{{task.id}}'>On Progress</button>
                     {% else %}
-                      <button type='submit' name='completed_task'  value='{{task.id}}' href='#'  class='btn btn-primary' id='{{task.id}}'>Complete</button>
+                      <button  name='complete_task_form' class='btn btn-primary task_complete_button' member_id='{{task.id}}' id='{{task.id}}'>Complete</button>
                     {% endif %}
                     
-                  <button type='submit'  name='task_delete' value='{{task.id}}' href='#' class='btn btn-danger' id='{{task.id}}'>Delete</button>
-                  <a type='button' href="{% url 'edit_task' task.id %}" class='btn btn-secondary' name='task_edit' value='{{task.id}}' >Edit</a>
-                </form>
+                  <button type='submit'  name='task_delete' class='btn btn-danger task_delete_button' member_id='{{task.id}}' id='{{task.id}}'>Delete</button>
+                  <a type='button' href="{% url 'edit_task' task.id %}" class='btn btn-secondary task_edit_button' name='task_edit' value='{{task.id}}' >Edit</a>
+
+
+
+                <!-- <button type='button' method='POST' name='complete_task_form'  value='{{task.id}}' href='#'  class='btn btn-primary' id='completed'>Complete</button> -->
+
 
               </div><!-- end of 'col-sm-auto' -->
 
@@ -322,19 +337,20 @@
             <div class='col-sm-auto' style='margin-top: 15px'>
               <small class='text-body-secondary m-1' >{{lead.created_at}}</small>
               <div class='col-sm-auto' style='margin-top: 15px'>
+                
 
-                <form method= 'POST'>
                   {% csrf_token %}
 
                   {% if lead.completed %}
-                    <button type='submit' name='lead_not_completed' value='{{lead.id}}' class='btn btn-primary'>Incomplete</button>
-                    <button type='submit' class='btn btn-secondary'>Edit</button>
+                    <button type='submit' name='lead_on_progress'  class='btn btn-primary lead_on_progress_button' member_id='{{lead.id}}'>On Progress</button>
+                    <a type='button' href="{% url 'edit_lead' lead.id %}" class='btn btn-secondary' name='lead_edit' value='{{lead.id}}' >Edit</a>
                   {% else %}
-                    <button type='submit' name='lead_complete' value='{{lead.id}}' class='btn btn-primary'>Complete</button>
+                    <button name='lead_complete' value='{{lead.id}}' member_id='{{lead.id}}' class='btn btn-primary lead_complete_button'>Complete</button>
                     <a type='button' href="{% url 'edit_lead' lead.id %}" class='btn btn-secondary' name='lead_edit' value='{{lead.id}}' >Edit</a>
                   {% endif %}
+                
 
-                </form>
+
 
               </div><!-- end of 'col-sm-auto' -->
 
@@ -356,7 +372,30 @@
 
 <!-- script section that uses ajax on forms -->
 <script>
+  $('.department_task_complete_button').on('click',department_task_complete_ajax)
+</script>
+<script>
+  $('.department_task_on_progress_button').on('click',department_task_on_progress_ajax)
+</script>
+<script>
+  $('.department_task_delete_button').on('click',department_task_delete_ajax)
+</script>
+<script>
   $(document).on('submit','#add_task_submit_form',add_task_ajax)
 </script>
-
+<script>
+  $('.task_complete_button').on('click',complete_task_ajax)
+</script>
+<script>
+  $('.task_on_progress_button').on('click',on_progress_task_ajax)
+</script>
+<script>
+  $('.task_delete_button').on('click',task_delete_ajax)
+</script>
+<script>
+  $('.lead_complete_button').on('click',lead_complete_ajax)
+</script>
+<script>
+  $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
+</script>
 {% endblock content%}

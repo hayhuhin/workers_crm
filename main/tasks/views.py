@@ -28,91 +28,108 @@ def tasks(request):
     add_lead_form = CreateLead()
     add_task_form = CreateTask()
 
-
+    alert_messages = 'item deleted'
 
     #user validation if authenticated and the request.user is equal to the model of the employer
     if str(request.user) == str(user) and request.user.is_authenticated:
         department_tasks = DepartmentTask.objects.filter(department__position=employer_department)
 
-    context = {'department_tasks':department_tasks,'employer_tasks':employer_tasks,'leads':employer_leads,'add_task_form':add_task_form,'add_lead_form':add_lead_form,}
-
-    #checking if the method is POST
-    if request.method == 'POST':   
 
 
-
-        #adding tasks data to DB
-        if request.POST.get('name') == 'submit_new_task':
-            print("Xxxxxxxxxxxxxxxxx")
-            post_data = request.POST
-
-            task_record = Task.objects.create(title=post_data.get('title'),content=post_data.get('content'))        
-
-            user.task.add(task_record)
-            # return HttpResponse("succesfuly added")
+    #department tasks section
 
 
+        #checking if the method is POST
+        if request.method == "POST":   
 
-            # return render(request,)
-        
+            if request.POST.get("name") == "department_task_complete":
+                post_data = request.POST
+                task_id = int((post_data.get("id")))
+                DepartmentTask.objects.filter(id=task_id).update(completed=True)
 
-        if request.POST.get('completed_task'):
-            task_data = request.POST
 
-            task_id = int((task_data.get("completed_task")))
-            Task.objects.filter(id=task_id).update(completed=True)
+            if request.POST.get("name") == "department_task_on_progress":
+                post_data = request.POST
+                task_id = int((post_data.get("id")))
+                DepartmentTask.objects.filter(id=task_id).update(completed=False)
 
             
-            return render(request,'code/tasks.html',context)
+            if request.POST.get("name") == "department_task_delete":
+                post_data = request.POST
+                task_id = int((post_data.get("id")))
+                delete_record = DepartmentTask.objects.get(id=task_id)
+                delete_record.delete()
 
 
-        if request.POST.get('on_progress_task'):
-            task_data = request.POST
 
-            task_id = int((task_data.get("on_progress_task")))
-            Task.objects.filter(id=task_id).update(completed=False)
+
+            #adding tasks data to DB
+            if request.POST.get("name") == "submit_new_task":
+                post_data = request.POST
+
+                task_record = Task.objects.create(title=post_data.get("title"),content=post_data.get("content"))        
+                user.task.add(task_record)
+    
+
+            if request.POST.get("name")  == "complete_task_form":
+                post_data = request.POST
+
+                task_id = int((post_data.get("id")))
+                Task.objects.filter(id=task_id).update(completed=True)
+                messages.add_message(request, messages.INFO, "Hello world.")
+
+
+
+            if request.POST.get("name") == "task_on_progress":
+                post_data = request.POST
+
+                task_id = int((post_data.get("id")))
+                Task.objects.filter(id=task_id).update(completed=False)
+
+
+
+            #adding lead to the DB
+            if request.POST.get("submit_new_lead"):
+                post_data = request.POST
+
+                lead_record = Lead.objects.create(name=post_data.get("name"),description=post_data.get("description"))
+                user.lead.add(lead_record)
+
             
-            return render(request,'code/tasks.html',context)
+            #DELETE the task from the DB
+            if request.POST.get("name") == "task_delete":
+                post_data = request.POST
+
+                task_id = int(post_data.get("id"))
+                delete_record = Task.objects.get(id=task_id)
+                delete_record.delete()
+
+                #messages that represented 
 
 
-        #adding lead to the DB
-        if request.POST.get('submit_new_lead'):
-            post_data = request.POST
 
-            lead_record = Lead.objects.create(name=post_data.get('name'),description=post_data.get('description'))
-            user.lead.add(lead_record)
+            if request.POST.get("name") == "lead_complete":
+                post_data = request.POST
 
-        
-        #DELETE the task from the DB
-        if request.POST.get("task_delete"):
-            post_data = request.POST
-
-            task_id = int(post_data.get("task_delete"))
-            delete_record = Task.objects.get(id=task_id)
-            delete_record.delete()
-
-            #messages that represented 
-            messages.add_message(request,messages.ERROR,"Deleted")
+                lead_id = int(post_data.get("id"))
+                Lead.objects.filter(id=lead_id).update(completed=True)
 
 
-        if request.POST.get("lead_complete"):
-            post_data = request.POST
+            if request.POST.get("name") == "lead_on_progress":
+                post_data = request.POST
 
-            lead_id = int(post_data.get("lead_complete"))
-            
-            Lead.objects.filter(id=lead_id).update(completed=True)
-            print(Lead.objects.filter(id=lead_id).values())
-  
-            
-            return render(request,'code/tasks.html',context)
+                lead_id = int(post_data.get("id"))
+                Lead.objects.filter(id=lead_id).update(completed=False)
 
-        if request.POST.get("lead_not_completed"):
-            post_data = request.POST
 
-            lead_id = int(post_data.get("lead_not_completed"))
-            Lead.objects.filter(id=lead_id).update(completed=False)
 
-    return render(request,'code/tasks.html',context)
+            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form,"messager":"this works"}
+            return render(request,"code/tasks.html",context)
+        if request.method == "GET":  
+
+            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form}
+            return render(request,"code/tasks.html",context)
+
 
 
 def Edit_Task(request,ID):
@@ -129,7 +146,7 @@ def Edit_Task(request,ID):
 
     context = {"edit_task_form":form,"task_data":task_id}
     
-    # return render(request,"code/edit_task.html",context)
+    return render(request,"code/edit_task.html",context)
 
 
 
