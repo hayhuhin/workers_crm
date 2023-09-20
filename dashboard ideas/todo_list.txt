@@ -26,5 +26,5 @@ ADD:
 tasks:
 add proper names to each tag and function - DONE
 add ajax method to all submits in the task page - DONE
-add proper messages after submitting a form - 
+add proper messages after submitting a form - DONE
 

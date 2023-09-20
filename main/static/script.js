@@ -39,13 +39,13 @@ function department_task_complete_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'department_task_complete',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-        
-    }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
+         
+    },},
 })
 
 };
@@ -61,13 +61,13 @@ function department_task_on_progress_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'department_task_on_progress',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-        
-    }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+         
+    },},
 })
 
 };
@@ -82,13 +82,13 @@ function department_task_delete_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'department_task_delete',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-        
-    }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+         
+    },},
 })
 
 };
@@ -159,13 +159,13 @@ function on_progress_task_ajax (e)  {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'task_on_progress',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-            
-        }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+         
+    },},
     })
 
 };
@@ -181,12 +181,13 @@ function task_delete_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'task_delete',
             id:member_id,
-            
-        },
-        success:function(data){
-            location.reload(true);
-        
-        }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+         
+    },},
 
     })
 }
@@ -207,13 +208,13 @@ function lead_complete_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'lead_complete',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-        
-    }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
+         
+    },},
 })
 
 };
@@ -230,13 +231,13 @@ function lead_on_progress_ajax (e) {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name:'lead_on_progress',
             id:member_id,
-
-        },
-        success:function(data){
-            $('#success').html("as")
-            location.reload(true)
-        
-    }
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+         
+    },},
 })
 
 };
