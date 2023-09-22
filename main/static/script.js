@@ -20,7 +20,7 @@ if (alertTrigger) {
   alertTrigger.addEventListener('click', () => {
     appendAlert('Nice, you triggered this alert message!', 'success')
   })
-}
+};
 
 
 
@@ -164,7 +164,7 @@ function on_progress_task_ajax (e)  {
                     location.reload(); 
                 }, 1500);
                 $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
-    },}
+  },},
 })
 
 };
@@ -185,11 +185,10 @@ function task_delete_ajax (e) {
                     location.reload(); 
                 }, 1500);
                 $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
-    },}
+    },},
+})
 
-    })
-}
-;
+};
 
 
 
@@ -211,7 +210,8 @@ function lead_complete_ajax (e) {
                     location.reload(); 
                 }, 1500);
                 $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
-    },}
+
+    },},
 })
 
 };
@@ -233,7 +233,7 @@ function lead_on_progress_ajax (e) {
                     location.reload(); 
                 }, 1500);
                 $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
-    },}
+    },},
 })
 
 };
