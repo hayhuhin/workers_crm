@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import DepartmentTask,Lead,Task
 from user.models import Employer
 from .forms import CreateLead,CreateTask,EditTaskForm,EditLeadForm
-
+from func_tools.graph_func import graph_percentage_presentation,progress_bar_class
 
 
 @login_required
@@ -17,6 +17,17 @@ def tasks(request):
     #user data
     user = Employer.objects.get(user=request.user)
     
+    comm = ["job_position.task.all()"]      
+    test_instance = progress_bar_class(user_id=1,model=Employer,commands=comm)
+    test_instance.execute_query()
+
+    ############TESTING#############
+    # instance = progress_bar_class(commands=['Employer.objects','job_position.task.all()'])
+    # test = progress_bar(user=f'Employer.objects.get(id={user.id})',additional_commands=['job_position.task.all()'],user_model=request.user,employer_model=Employer)
+    
+
+
+
     employer_department = Employer.objects.get(user=request.user).job_position
 
     employer_tasks = user.task.all()
@@ -24,11 +35,22 @@ def tasks(request):
     employer_leads = user.lead.all()
 
 
+
     #task and lead forms
     add_lead_form = CreateLead()
     add_task_form = CreateTask()
 
-    alert_messages = 'item deleted'
+
+    department_task_graph = graph_percentage_presentation(user,job_position_tasks=True)
+    employer_task_graph = graph_percentage_presentation(user,job_position_tasks=False)
+
+    graph_presentation = {"department_task_graph":str(department_task_graph),"employer_task_graph":str(employer_task_graph)}
+
+
+
+
+
+
 
     #user validation if authenticated and the request.user is equal to the model of the employer
     if str(request.user) == str(user) and request.user.is_authenticated:
@@ -127,7 +149,7 @@ def tasks(request):
             return render(request,"code/tasks.html",context)
         if request.method == "GET":  
 
-            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form}
+            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form,"graph_presentation":graph_presentation}
             return render(request,"code/tasks.html",context)
 
 

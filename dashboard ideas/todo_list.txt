@@ -28,3 +28,8 @@ add proper names to each tag and function - DONE
 add ajax method to all submits in the task page - DONE
 add proper messages after submitting a form - DONE
 
+
+tasks:
+add function that handle progress bar in and can be reused
+add format to all tasks that will be represented
+add hide/show tasks when the windows is too

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'teams',
     'employer_profile',
     'tasks',
+    'func_tools'
     
 ]
 

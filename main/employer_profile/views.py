@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 # from dashboard.models import Job_position,Employer
-from .graph import graph_presentation,graph_queries
+from func_tools.graph import graph_presentation,graph_queries
 
 
 #current path
