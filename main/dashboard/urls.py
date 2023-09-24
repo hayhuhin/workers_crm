@@ -5,11 +5,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('test',dashboard_views.index),
+
     path('dashboard',dashboard_views.dashboard),
-    # path('teams',dashboard_views.teams),
-    path('personal_tasks',dashboard_views.personal_tasks),
-    # path('profile',dashboard_views.profile),
 ]
 
 if settings.DEBUG:

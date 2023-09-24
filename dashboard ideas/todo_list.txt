@@ -23,13 +23,18 @@ ADD:
 1.add a way of representing a lot of leads and tasks inside one page whitout overflaw
 2.
 
-tasks:
+tasks 1:
 add proper names to each tag and function - DONE
 add ajax method to all submits in the task page - DONE
 add proper messages after submitting a form - DONE
 
 
-tasks:
-add function that handle progress bar in and can be reused
-add format to all tasks that will be represented
-add hide/show tasks when the windows is too
+tasks 2:
+add function that handle progress bar in and can be reused - DONE
+fix:lead complete and on progress bar :multiplies its submits again the adds the same task to the window - FIXED
+add format to all tasks that will be represented -  
+add hide/show tasks when the windows is too - 
+
+tasks 3:
+add login required function to each url that the user must be authenticated
+add logic to the home page that will represent the usage of the crm with a description

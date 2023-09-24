@@ -10,8 +10,9 @@ def home(request):
         test = Employer.objects.get(user=request.user)
         return render(request,'code/home.html',{'test':test})
     else:
-        messages.success(request('you must login first and then try to get here'))
         return redirect('/login')
+
+
 
 
 # def login(request):

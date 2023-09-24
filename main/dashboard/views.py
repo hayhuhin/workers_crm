@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse
 import plotly.express as px
 import pandas as pd
 from  pathlib import Path
-
+from django.contrib.auth.decorators import login_required
 
 curr_path = Path.cwd()
 
@@ -12,9 +12,9 @@ curr_path = Path.cwd()
 
 
 # Create your views here.
-def index(request):
-    return render(request,"code/base.html")
 
+
+@login_required
 def dashboard(request):
 
     #all of this code below is only for testing and modifying the frontend
@@ -42,12 +42,4 @@ def dashboard(request):
     context = {'graph_chart':graph_chart,'pie_chart':pie_chart,'line_chart':line_chart,'line_2_chart':line_2_chart}
     return render(request,'code/dashboard.html',context)
 
-
-
-def teams(request):
-
-    return render(request,'code/teams.html',{})
-
-def personal_tasks(request):
-    return render(request,'code/personal_tasks.html',{})
 

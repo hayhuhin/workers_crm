@@ -104,7 +104,7 @@ function add_task_ajax (e)  {
         url: "/tasks",
         data: {
             title: $('#title').val(),
-            content: $('#content').val(),
+            description: $('#description').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name: 'submit_new_task',
 
@@ -235,5 +235,54 @@ function lead_on_progress_ajax (e) {
                 $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
     },},
 })
+
+};
+
+
+function lead_delete_ajax (e) {
+    var member_id = $(this).attr('member_id');
+    e.preventDefault();
+
+    $.ajax({
+        type:'POST',
+        url: "/tasks",
+        data: {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            name:'lead_delete',
+            id:member_id,
+            success: function() { 
+                setTimeout(function(){
+                    location.reload(); 
+                }, 1500);
+                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+    },},
+})
+
+};
+
+
+
+
+
+function add_lead_ajax (e)  {
+    e.preventDefault();
+    $.ajax({
+        type:'POST',
+        url: "/tasks",
+        data: {
+            title:$('#lead_title').val(),
+            description: $('#lead_description').val(),
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            name: 'submit_new_lead',
+            test:'testtest'
+
+
+        },
+        success:function(data){
+            $('#success').html("as")
+            location.reload(true)
+            
+        }
+    })
 
 };

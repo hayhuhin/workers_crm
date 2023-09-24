@@ -5,29 +5,29 @@ from django import forms
 class CreateLead(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["name", "description"]
-        labels = {'name': "Name", "description": "Description"}
+        fields = ["title", "costumer_name","costumer_id","description"]
+        labels = {"title": "Title", "costumer_name":"Costumer Name","costumer_id":"Costumer ID","description": "Description"}
 
 
 class EditLeadForm(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["name", "description"]
-        labels = {'name': "Name", "description": "Description"}
+        fields = ["title", "description"]
+        labels = {'title': "Title","description": "Description"}
 
 
 
 class CreateTask(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["title", "content"]
-        labels = {'title': "Title", "content": "Content"}
+        fields = ["title","description","additional_description"]
+        labels = {'title': "Title","description": "Description", "additional_description":"Additional Description"}
 
 
 
 class EditTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["title", "content","id"]
-        labels = {'title': "Title", "content": "Content","id":"id"}
+        fields = ["title", "description","additional_description"]
+        labels = {'title': "Title", "content": "Content","additional_description":"Additional Description"}
 

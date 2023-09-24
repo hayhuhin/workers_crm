@@ -3,18 +3,21 @@ from django.db import models
 
 
 class Lead(models.Model):
-    name = models.CharField(max_length=50)
+    title = models.CharField(max_length=50)
+    costumer_name = models.CharField(max_length=50,null=True)
+    costumer_id = models.CharField(max_length=50,null=True)
     description = models.TextField(max_length=300)
     created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class Task(models.Model):
     title = models.CharField(max_length=50)
-    content = models.TextField(max_length=350)
+    description = models.TextField(max_length=350)
+    additional_description = models.CharField(max_length=350,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
 
@@ -26,7 +29,8 @@ class Task(models.Model):
 
 class DepartmentTask(models.Model):
     title = models.CharField(max_length=50)
-    content = models.CharField(max_length=350)
+    description = models.CharField(max_length=350)
+    additional_description = models.CharField(max_length=350,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
 

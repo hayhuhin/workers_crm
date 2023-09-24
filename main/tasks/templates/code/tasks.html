@@ -38,7 +38,7 @@
 
   <div class='col'>
     <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
-      <div class='progress-bar' style='width:{{graph_presentation.department_task_graph}}%'>{{graph_presentation.department_task_graph}}</div>
+      <div class='progress-bar' style="width:{{graph_presentation.department_task_graph}}%">{{graph_presentation.department_task_graph}}</div>
     </div>
   </div>
 
@@ -149,8 +149,8 @@
           </div>
 
           <div class='mb-3'>
-            <label for='content' class='col-form-label'>Description</label>
-              {% render_field add_task_form.content type='text' id='content' class='form-control'  %}
+            <label for='description' class='col-form-label'>Description</label>
+              {% render_field add_task_form.description type='text' id='description' class='form-control'  %}
           </div>
 
       </div><!-- end div of the modal-body -->
@@ -272,18 +272,28 @@
             <div class='modal-body text-start'>
     
             <!-- form of adding new lead -->
-              <form method='POST'>
+              <form id='add_lead_submit_form' method='POST'>
                 {% csrf_token %}
     
                 <!-- lead form input fields -->
                 <div class='mb-3'>
-                  <label for='name' class='col-form-label'>Name</label>
-                  {% render_field add_lead_form.name type='text' id='name' class='form-control'  %}
+                  <label for='lead_title' class='col-form-label'>title</label>
+                  {% render_field add_lead_form.title type='text' id='lead_title' class='form-control'  %}
                 </div>
 
                 <div class='mb-3'>
-                  <label for='description' class='col-form-label'>Description</label>
-                  {% render_field add_lead_form.description type='text' id='description' class='form-control'  %}
+                  <label for='costumer_name' class='col-form-label'>Costumer Name</label>
+                  {% render_field add_lead_form.costumer_name type='text' id='costumer_name' class='form-control'  %}
+                </div>
+
+                <div class='mb-3'>
+                  <label for='costumer_id' class='col-form-label'>Costumer ID</label>
+                  {% render_field add_lead_form.costumer_id type='text' id='costumer_id' class='form-control'  %}
+                </div>
+
+                <div class='mb-3'>
+                  <label for='lead_description' class='col-form-label'>Description</label>
+                  {% render_field add_lead_form.description type='text' id='lead_description' class='form-control'  %}
                 </div>
 
               </div><!-- end of 'modal-body' -->
@@ -346,7 +356,8 @@
                     <button name='lead_complete' value='{{lead.id}}' member_id='{{lead.id}}' class='btn btn-primary lead_complete_button'>Complete</button>
                     <a type='button' href="{% url 'edit_lead' lead.id %}" class='btn btn-secondary' name='lead_edit' value='{{lead.id}}' >Edit</a>
                   {% endif %}
-                
+                  <button name='lead_delete' value='{{lead.id}}' member_id='{{lead.id}}' class='btn btn-danger lead_delete_button'>Delete</button>
+
 
 
 
@@ -391,10 +402,19 @@
   $('.task_delete_button').on('click',task_delete_ajax)
 </script>
 <script>
+  $(document).on('submit','#add_lead_submit_form',add_lead_ajax)
+</script>
+
+<script>
   $('.lead_complete_button').on('click',lead_complete_ajax)
 </script>
 <script>
   $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
 </script>
+<script>
+  $('.lead_delete_button').on('click',lead_delete_ajax)
+</script>
+
+
 </div>
 {% endblock content%}
