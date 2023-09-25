@@ -16,12 +16,8 @@ VISUALS:
 3.messaging after submiting forms - unfinished
 
 FIX:
-1.security- research ways to edit cards without exposing the id of the card in the url
-2.
+1.security- research ways to edit cards without exposing the id of the card in the url 
 
-ADD:
-1.add a way of representing a lot of leads and tasks inside one page whitout overflaw
-2.
 
 tasks 1:
 add proper names to each tag and function - DONE
@@ -32,9 +28,16 @@ add proper messages after submitting a form - DONE
 tasks 2:
 add function that handle progress bar in and can be reused - DONE
 fix:lead complete and on progress bar :multiplies its submits again the adds the same task to the window - FIXED
-add format to all tasks that will be represented -  
-add hide/show tasks when the windows is too - 
+add more fields for leads and tasks to all tasks that will be represented -  DONE
+add hide/show tasks when the windows is too large - 
+fix:edit window doesnt work - 
+
+
 
 tasks 3:
-add login required function to each url that the user must be authenticated
+add login_required function to each url that the user must be authenticated
 add logic to the home page that will represent the usage of the crm with a description
+
+
+tasks4:
+add:change the dashboard to be represented much bigger and nice for the client end 

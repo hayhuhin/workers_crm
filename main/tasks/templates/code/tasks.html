@@ -55,8 +55,9 @@
         {% if department_task.completed %}
         <div class='card-header'>Completed</div>
         <div class='card-body text-success'>
-          <h5 class='card-title'>{{department_task.title}}</h5>
-          <p class='card-text'>{{department_task.content}}</p>
+          <h5 class='card-title'><BOLD class='text-info'>Title: </BOLD>{{department_task.title}}</h5>
+          <p class='card-text'><BOLD class='text-info'>Description: </BOLD>{{department_task.description}}</p>
+          <p class='card-text'><BOLD class='text-info'>Additional Description: </BOLD>{{department_task.additional_description}}</p>
         </div><!-- end of card-body-->
 
           <div class='card-footer text-body-secondary'>
@@ -69,8 +70,9 @@
               {% else %}
               <div class='card-header'>On progress</div>
               <div class='card-body'>
-                <h5 class='card-title'>{{department_task.title}}</h5>
-                <p class='card-text'>{{department_task.content}}</p>
+                <h5 class='card-title'><BOLD class='text-info'>Title: </BOLD>{{department_task.title}}</h5>
+                <p class='card-text'><BOLD class='text-info'>Description: </BOLD>{{department_task.description}}</p>
+                <p class='card-text'><BOLD class='text-info'>Additional Description: </BOLD>{{department_task.additional_description}}</p>
               </div><!-- end of card-body-->
       
                 <div class='card-footer text-body-secondary'>
@@ -115,7 +117,7 @@
   </div><!-- col end div-->
   <div class='col'>
     <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
-      <div class='progress-bar' style='width: {{graph_presentation.employer_task_graph}}%'>{{graph_presentation.employer_task_graph}}%</div>
+      <div class='progress-bar' style="width: {{graph_presentation.employer_task_graph}}%">{{graph_presentation.employer_task_graph}}%</div>
     </div>
   </div>
 
@@ -153,6 +155,14 @@
               {% render_field add_task_form.description type='text' id='description' class='form-control'  %}
           </div>
 
+          <div class='mb-3'>
+            <label for='additional_description' class='col-form-label'>Additional Description</label>
+              {% render_field add_task_form.additional_description type='text' id='additional_description' class='form-control'  %}
+          </div>
+
+
+
+
       </div><!-- end div of the modal-body -->
 
         <!-- modal footer section -->
@@ -176,13 +186,14 @@
 
 
 <!-- the cards TASKS -->
+<div id="show_tasks_hidden" hidden>
+
 <div class='container'>
 
-  <div class='row row-cols-1 row-cols-md-4 g-4'>
+    <div class='row row-cols-1 row-cols-md-4 g-4'>
 
     {% for task in employer_tasks %}
-
-      <div class='col'>
+      <div class='col' id='col_id'>
         <div class='card m-1'>
 
           {% if task.completed %}
@@ -197,8 +208,9 @@
 
               {% endif %}
 
-              <h5 class='card-title'>{{ task.title }}</h5>
-              <p class='card-text'>{{ task.content }}</p>
+              <h5 class='card-title'><BOLD class="text-info">Title: </BOLD>{{ task.title }}</h5>
+              <p class='card-text'><BOLD class="text-info">Description: </BOLD>{{ task.description }}</p>
+              <p class='card-text'><BOLD class="text-info">Additional Description: </BOLD>{{ task.additional_description }}</p>
 
             </div><!-- end of 'card-body' -->
 
@@ -241,6 +253,14 @@
     </div><!-- end of 'col' -->
 
   </div><!-- end of 'row row-cols-1 row-cols-md-4 g-4' -->
+
+</div>
+
+<div class="container text-center mt-3">
+  <button class="btn btn-secondary" id="show_tasks">Load More</button>
+</div>
+
+
 
 </div><!-- end of 'container' -->
 
@@ -335,9 +355,10 @@
             <div class='card-body'>
           {% endif %}
 
-              <h5 class='card-title'>{{lead.name}}</h5>
-              <p class='card-text'>{{lead.description}}</p>
-            
+              <h5 class='card-title'><BOLD class="text-info">Title:</BOLD> {{lead.title}}</h5>
+              <p class='card-text'><BOLD class="text-info">Description: </BOLD>{{lead.description}}</p>
+              <p class='card-text'><BOLD class="text-info">Costumer Name: </BOLD>{{lead.costumer_name}}</p>
+              <p class='card-text'><BOLD class="text-info">Costumer ID:</BOLD> {{lead.costumer_id}}</p>
             </div><!-- end of 'card-body' -->
 
           <div class='card-footer text-body-secondary'>
@@ -414,7 +435,9 @@
 <script>
   $('.lead_delete_button').on('click',lead_delete_ajax)
 </script>
-
+<script>
+  $('#show_tasks').on('click',show_tasks)
+</script>
 
 </div>
 {% endblock content%}

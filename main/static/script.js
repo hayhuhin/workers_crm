@@ -105,6 +105,7 @@ function add_task_ajax (e)  {
         data: {
             title: $('#title').val(),
             description: $('#description').val(),
+            additional_description:$('#additional_description').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name: 'submit_new_task',
 
@@ -272,6 +273,8 @@ function add_lead_ajax (e)  {
         data: {
             title:$('#lead_title').val(),
             description: $('#lead_description').val(),
+            costumer_name:$('#costumer_name').val(),
+            costumer_id:$('#costumer_id').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name: 'submit_new_lead',
             test:'testtest'
@@ -286,3 +289,8 @@ function add_lead_ajax (e)  {
     })
 
 };
+
+
+function show_tasks (e) {
+    var b = $('#col_id').each()
+}

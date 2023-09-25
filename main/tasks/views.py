@@ -75,7 +75,7 @@ def tasks(request):
                 post_data = request.POST
                 
 
-                task_record = Task.objects.create(title=post_data.get("title"),description=post_data.get("description"))        
+                task_record = Task.objects.create(title=post_data.get("title"),description=post_data.get("description"),additional_description=post_data.get("additional_description"))        
                 user.task.add(task_record)
 
 
@@ -100,7 +100,7 @@ def tasks(request):
             if request.POST.get("name") == "submit_new_lead":
                 post_data = request.POST
 
-                lead_record = Lead.objects.create(title=post_data.get("title"),description=post_data.get("description"))
+                lead_record = Lead.objects.create(title=post_data.get("title"),description=post_data.get("description"),costumer_name=post_data.get("costumer_name"),costumer_id=post_data.get("costumer_id"))
                 user.lead.add(lead_record)
                 print(40*"%")
 
@@ -139,7 +139,7 @@ def tasks(request):
 
 
 
-            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form,"messager":"this works"}
+            context = {"department_tasks":department_tasks,"employer_tasks":employer_tasks,"employer_tasks_len":len(employer_tasks),"leads":employer_leads,"add_task_form":add_task_form,"add_lead_form":add_lead_form,"messager":"this works"}
             return render(request,"code/tasks.html",context)
         if request.method == "GET":  
 

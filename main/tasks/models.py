@@ -17,7 +17,7 @@ class Lead(models.Model):
 class Task(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField(max_length=350)
-    additional_description = models.CharField(max_length=350,blank=True,null=True)
+    additional_description = models.TextField(max_length=350,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
 
