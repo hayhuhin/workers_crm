@@ -291,6 +291,84 @@ function add_lead_ajax (e)  {
 };
 
 
-function show_tasks (e) {
-    var b = $('#col_id').each()
-}
+
+$(document).ready(function(){
+    var cur = 4;
+    $('.task_col').hide();
+    $('.task_col').slice(0,4).show();
+    $('.load_more_task').click(function(){
+        cur += 4
+        $('.task_col').slice(0,cur).show();
+        // $(this).fadeOut();
+        console.log(cur)
+    });
+
+});
+
+
+
+$(document).ready(function(){
+    var cur = 4;
+    $('.lead_col').hide();
+    $('.lead_col').slice(0,4).show();
+    $('.load_more_lead').click(function(){
+        cur += 4
+        $('.lead_col').slice(0,cur).show();
+        // $(this).fadeOut();
+        console.log(cur)
+    });
+
+});
+
+
+$(document).ready(function(){
+    var cur = 4;
+    $('.department_task_col').hide();
+    $('.department_task_col').slice(0,4).show();
+    $('.load_more_department_task').click(function(){
+        cur += 4
+        $('.department_task_col').slice(0,cur).show();
+        // $(this).fadeOut();
+        console.log(cur)
+    });
+
+});
+
+
+
+
+
+
+
+$('.department_task_complete_button').on('click',department_task_complete_ajax)
+
+
+$('.department_task_on_progress_button').on('click',department_task_on_progress_ajax)
+
+
+$('.department_task_delete_button').on('click',department_task_delete_ajax)
+
+
+$(document).on('submit','#add_task_submit_form',add_task_ajax)
+
+
+$('.task_complete_button').on('click',complete_task_ajax)
+
+
+$('.task_on_progress_button').on('click',on_progress_task_ajax)
+
+
+$('.task_delete_button').on('click',task_delete_ajax)
+
+
+$(document).on('submit','#add_lead_submit_form',add_lead_ajax)
+
+
+
+$('.lead_complete_button').on('click',lead_complete_ajax)
+
+
+$('.lead_on_progress_button').on('click',lead_on_progress_ajax)
+
+
+$('.lead_delete_button').on('click',lead_delete_ajax)
