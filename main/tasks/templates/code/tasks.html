@@ -38,7 +38,7 @@
 
   <div class='col'>
     <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
-      <div class='progress-bar' style="width:{{graph_presentation.department_task_graph}}%">{{graph_presentation.department_task_graph}}</div>
+      <div class='progress-bar' style="width:{{graph_presentation.department_task_graph}}%">{{graph_presentation.department_task_graph}}%</div>
     </div>
   </div>
 
@@ -53,8 +53,8 @@
     <div class='col department_task_col'>
       <div class='card m-1'>
         {% if department_task.completed %}
-        <div class='card-header'>Completed</div>
-        <div class='card-body text-success'>
+        <div class='card-header text-bg-success'>COMPLETED</div>
+        <div class='card-body'>
           <h5 class='card-title'><BOLD class='text-info'>Title: </BOLD>{{department_task.title}}</h5>
           <p class='card-text'><BOLD class='text-info'>Description: </BOLD>{{department_task.description}}</p>
           <p class='card-text'><BOLD class='text-info'>Additional Description: </BOLD>{{department_task.additional_description}}</p>
@@ -202,8 +202,8 @@
 
           {% if task.completed %}
 
-            <div class='card-header text-success'>Completed</div>
-            <div class='card-body text-success'>
+            <div class='card-header text-bg-success'>COMPLETED</div>
+            <div class='card-body'>
 
           {% else %}
 
@@ -352,8 +352,8 @@
         <div class='card m-1'>
 
           {% if lead.completed %}
-            <div class='card-header text-success '>COMPLETED</div>
-            <div class='card-body text-success'>
+            <div class='card-header text-bg-success '>COMPLETED</div>
+            <div class='card-body'>
           {% else %}
             <div class='card-header'>On Progress</div>
             <div class='card-body'>

@@ -12,8 +12,8 @@ class CreateLead(forms.ModelForm):
 class EditLeadForm(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["title", "description"]
-        labels = {'title': "Title","description": "Description"}
+        fields = ["title", "costumer_name","costumer_id","description"]
+        labels = {"title": "Title", "costumer_name":"Costumer Name","costumer_id":"Costumer ID","description": "Description"}
 
 
 

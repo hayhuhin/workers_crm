@@ -8,7 +8,7 @@
     <!-- username field -->
     <div class="mb-3">
       <label for="title" class="form-label">Title</label>
-      {% render_field edit_Lead_form.name type="text" id="title" value=lead_data.name class="form-control" %}
+      {% render_field edit_Lead_form.title type="text" id="title" value=lead_data.title class="form-control" %}
     </div>
     <!-- password field -->
 
@@ -17,6 +17,15 @@
       {% render_field edit_Lead_form.description type="text" id=edit_Lead_form.id placeholder=lead_data.description class="form-control" %}
     </div>
 
+    <div class="mb-3">
+      <label for="{{edit_Lead_form.id}}" class="form-label">costumer name</label>
+      {% render_field edit_Lead_form.costumer_name type="text" id=edit_Lead_form.id placeholder=lead_data.costumer_name class="form-control" %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{edit_Lead_form.id}}" class="form-label">costumer id</label>
+      {% render_field edit_Lead_form.costumer_id type="text" id=edit_Lead_form.id placeholder=lead_data.costumer_id class="form-control" %}
+    </div>
     <!-- submit button -->
     <button class="btn btn-success" id="liveAlertPlaceholder" type="submit" name="test" value="test" >Save</button>
     <a class="btn btn-danger" href='/tasks' type="submit">Cancel</a>
