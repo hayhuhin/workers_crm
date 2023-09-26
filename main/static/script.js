@@ -42,8 +42,8 @@ function department_task_complete_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('Department Task completed successfully', 'success')); 
          
     },},
 })
@@ -64,8 +64,8 @@ function department_task_on_progress_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have changed the Department Task status to "on progress"', 'warning')); 
          
     },},
 })
@@ -85,8 +85,8 @@ function department_task_delete_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have Deleted the Department Task Successfully', 'danger')); 
          
     },},
 })
@@ -133,8 +133,8 @@ function complete_task_ajax (e)  {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('Task completed successfully', 'success')); 
          
     },},
 
@@ -163,8 +163,8 @@ function on_progress_task_ajax (e)  {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have changed the Task status to "on progress"', 'warning')); 
   },},
 })
 
@@ -184,8 +184,8 @@ function task_delete_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have Deleted the Task Successfully', 'danger')); 
     },},
 })
 
@@ -209,8 +209,8 @@ function lead_complete_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'success')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('Lead completed successfully', 'success')); 
 
     },},
 })
@@ -232,8 +232,8 @@ function lead_on_progress_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'warning')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have changed the Lead status to "on progress"', 'warning')); 
     },},
 })
 
@@ -254,8 +254,8 @@ function lead_delete_ajax (e) {
             success: function() { 
                 setTimeout(function(){
                     location.reload(); 
-                }, 1500);
-                $('#liveAlertBtn').html(appendAlert('Nice, you triggered this alert message!', 'danger')); 
+                }, 2000);
+                $('#liveAlertBtn').html(appendAlert('You have Deleted the Lead Successfully', 'danger')); 
     },},
 })
 
@@ -277,7 +277,6 @@ function add_lead_ajax (e)  {
             costumer_id:$('#costumer_id').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             name: 'submit_new_lead',
-            test:'testtest'
 
 
         },
