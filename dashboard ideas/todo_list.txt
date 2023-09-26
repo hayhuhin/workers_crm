@@ -37,8 +37,15 @@ fix:edit window doesnt work - DONE
 
 tasks 3:
 add login_required function to each url that the user must be authenticated - DONE
-add logic to the home page that will represent the usage of the crm with a description - 
+add progress bar to the leads,sided nav bar,appropriate button names,appropriate colors .
+
+
 
 
 tasks4:
 add:change the dashboard to be represented much bigger and nice for the client end 
+
+
+
+task 5:
+add logic to the home page that will represent the usage of the crm with a description - 
