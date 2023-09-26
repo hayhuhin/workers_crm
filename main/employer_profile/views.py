@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
-# from dashboard.models import Job_position,Employer
+from django.contrib.auth.decorators import login_required
 from func_tools.graph import graph_presentation,graph_queries
 
 
@@ -19,7 +19,7 @@ def employer_data_extraction(request):
     request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
     return request_data
 
-
+@login_required
 def profile_page(request):
     #profile page view that represent the employer rank 
     #                       associate data(employers name,

@@ -147,7 +147,7 @@ def tasks(request):
             return render(request,"code/tasks.html",context)
 
 
-
+@login_required
 def Edit_Task(request,ID):
     task_id = Task.objects.get(id=ID)
     form = EditTaskForm(instance=task_id)
@@ -165,7 +165,7 @@ def Edit_Task(request,ID):
     return render(request,"code/edit_task.html",context)
 
 
-
+@login_required
 def Edit_lead(request,ID):
     lead_id = Lead.objects.get(id=ID)
     form = EditLeadForm(instance=lead_id)

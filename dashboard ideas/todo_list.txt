@@ -36,7 +36,7 @@ fix:edit window doesnt work - DONE
 
 
 tasks 3:
-add login_required function to each url that the user must be authenticated - 
+add login_required function to each url that the user must be authenticated - DONE
 add logic to the home page that will represent the usage of the crm with a description - 
 
 
