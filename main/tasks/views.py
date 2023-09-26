@@ -31,9 +31,10 @@ def tasks(request):
 
 
     department_task_graph = graph_percentage_presentation(user,job_position_tasks=True)
-    employer_task_graph = graph_percentage_presentation(user,job_position_tasks=False)
+    employer_task_graph = graph_percentage_presentation(user,personal_tasks=True)
+    lead_graph = graph_percentage_presentation(user,leads=True)
 
-    graph_representation = {"department_task_graph":str(department_task_graph),"employer_task_graph":str(employer_task_graph)}
+    graph_representation = {"department_task_graph":str(department_task_graph),"employer_task_graph":str(employer_task_graph),"lead_graph":str(lead_graph)}
 
 
 

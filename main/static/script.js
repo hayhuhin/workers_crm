@@ -112,7 +112,6 @@ function add_task_ajax (e)  {
 
         },
         success:function(data){
-            $('#success').html("as")
             location.reload(true)
             
         }
@@ -281,7 +280,6 @@ function add_lead_ajax (e)  {
 
         },
         success:function(data){
-            $('#success').html("as")
             location.reload(true)
             
         }
@@ -313,7 +311,6 @@ $(document).ready(function(){
     $('.load_more_lead').click(function(){
         cur += 4
         $('.lead_col').slice(0,cur).show();
-        // $(this).fadeOut();
         console.log(cur)
     });
 

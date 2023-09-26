@@ -8,14 +8,6 @@
 <!-- the html++ bootstrap code here -->
 <div class='container position-relative'style='margin-top:4rem '>
 
-<span id='success'></span>
-
-<!-- the messages alret that pops up after submit a form -->
-
-
-
-<!-- end of the message alert section-->
-
 
 
 <!-- the department tasks section -->
@@ -271,8 +263,13 @@
 </div><!-- end of 'container'style='margin-top:4rem ;' on line 94 -->
 
 
-<!-- the title of the tasks -->
-<div class='container text-end'style='margin-top:4rem ;'>
+
+
+
+<!-- the title of the Leads and LEADS section --> 
+
+
+<div class='container'style='margin-top:4rem ;'>
 <figure class='text-center'>
   <blockquote class='blockquote'>
     <h1>Leads</h1>
@@ -282,7 +279,21 @@
 
 <!-- the add lead modal section-->
 <div class='row m-4'>
+<!-- lead progression bar title -->
+<div class='col-sm-auto'>
+    <p>Lead Progression</p>
+  </div>
+
+<!-- lead progression bar -->
+
   <div class='col'>
+    <div class='progress' role='progressbar' aria-label='Basic example' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>
+      <div class='progress-bar' style="width: {{graph_presentation.lead_graph}}%">{{graph_presentation.lead_graph}}%</div>
+    </div>
+  </div>
+
+<!-- add lead button section -->
+  <div class='col-sm-auto'>
 
     <button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#add_lead_modal' data-bs-whatever='@getbootstrap'>Create New</button>
       <div class='modal fade' id='add_lead_modal' tabindex='-1' aria-labelledby='add_lead_modal_label' aria-hidden='true'>
