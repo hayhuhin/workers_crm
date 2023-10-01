@@ -8,7 +8,7 @@ from  .forms import UserLoginForm
 
 urlpatterns = [
     path('',user_view.home),
-    path('/home',user_view.home),
+    path('home',user_view.home),
     path('',include('django.contrib.auth.urls')),
     path('sign',user_view.sign_up),
     path('login',views.LoginView.as_view(

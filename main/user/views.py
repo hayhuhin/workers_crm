@@ -29,3 +29,5 @@ def sign_up(request):
 
     return render(request,'code/signup.html',{'form':form})
 
+def test(request):
+    return render(request,'code/base_test.html')

@@ -24,6 +24,20 @@ if (alertTrigger) {
 
 
 
+// changes the sided navbar from big to small
+function trigger_small_navbar (e){
+    e.preventDefault();
+    $('#small_off_canvas').attr('class','offcanvas offcanvas-start show');
+    $('#big_off_canvas').attr('class','offcanvas offcanvas-start hide');
+
+}
+
+function trigger_big_navbar (e){
+    e.preventDefault();
+    $('#big_off_canvas').attr('class','offcanvas offcanvas-start show');
+    $('#small_off_canvas').attr('class','offcanvas offcanvas-start hide');
+}
+
 
 //department tasks post handling ajax functions
 
@@ -332,9 +346,9 @@ $(document).ready(function(){
 
 
 
+$('.close_small_navbar').on('click',trigger_big_navbar)
 
-
-
+$('.close_big_navbar').on('click',trigger_small_navbar)
 
 $('.department_task_complete_button').on('click',department_task_complete_ajax)
 
