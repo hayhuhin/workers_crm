@@ -1,94 +1,156 @@
 {% extends 'code/base.html'%} {% block content %}
 <!-- the dashboard title-->
-<div class="container" style="margin-top: 4rem">
-  <figure>
-  <blockquote class="blockquote">
-    <h2>company income</h2>
-  </blockquote>
-  <figcaption class="blockquote-footer">
-    Calculated by sales leads.
-  </figcaption>
-</figure>
 
+
+<div class='container'>
+  <div class="alert alert-info">FOR NOW THIS PAGE ISNT FUNCTIONAL AND ONLY FOR PRESENTATION</div>
+
+
+        <div class="graph m-2 p-3 border border-secondary rounded border-3">
+
+
+        <h3>Graph</h3>
+
+          <div style="width: 100%; height: 30rem">
+          {{ graph_chart|safe }}
+          </div>
+
+    <div class='text-body-secondary mt-3'>
+          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
+          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
+          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
+      <div class='' style='margin-top: 15px'>
+        <small class='text-body-secondary m-1' >10.00.00</small>
+      </div><!-- end of -->
+
+    </div><!-- end of text-body secondery-->
+
+        <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
+        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
+        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
+
+
+</div><!-- end of graph div-->
+
+
+
+
+
+        <div class="graph m-2 p-3 border border-secondary rounded border-3">
+
+
+        <h3>Graph</h3>
+
+          <div style="width: 100%; height: 30rem">
+          {{ line_chart|safe }}
+          </div>
+
+    <div class='text-body-secondary mt-3'>
+          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
+          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
+          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
+      <div class='' style='margin-top: 15px'>
+        <small class='text-body-secondary m-1' >10.00.00</small>
+      </div><!-- end of -->
+
+    </div><!-- end of text-body secondery-->
+
+        <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
+        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
+        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
+
+
+
+
+</div><!-- end of 'container' -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} 
+
+
+
+<div class="container m-5">
+
+  <div class="col">
+
+    <div class="row mb-5"> 
+
+      <figure class="mb-5">
+      <blockquote class="blockquote">
+        <h2>company income</h2>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+        Calculated by sales leads.
+      </figcaption>
+    </figure>
+    
   <!-- dashboard graphs-->
-  <div class="card-group gap-3" style="margin: 4rem 4rem 0rem">
-    <div class="card border-0">
-      <div class="graph-img" style="width: 24rem; height: 20rem">
-        {{ graph_chart|safe }}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">
-          This is a wider card with supporting text below as a natural lead-in
-          to additional content. This content is a little bit longer.
-        </p>
-        <p class="card-text">
-          <small class="text-body-secondary">Last updated 3 mins ago</small>
-        </p>
-      </div>
-    </div>
-    <div class="card border-0">
-      <div class="graph-img" style="width: 24rem; height: 20rem">
-        {{ pie_chart|safe }}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">
-          This card has supporting text below as a natural lead-in to additional
-          content.
-        </p>
-        <p class="card-text">
-          <small class="text-body-secondary">Last updated 3 mins ago</small>
-        </p>
-      </div>
-    </div>
-    <div class="card border-0">
-      <div class="graph-img" style="width: 20-rem; height: 20rem">
-        {{ line_chart|safe }}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">
-          This is a wider card with supporting text below as a natural lead-in
-          to additional content. This card has even longer content than the
-          first to show that equal height action.
-        </p>
-        <p class="card-text">
-          <small class="text-body-secondary">Last updated 3 mins ago</small>
-        </p>
-      </div>
-    </div>
-  </div>
-  <!-- last line chart graph title-->
- <figure>
+         {{ graph_chart|safe }}
+
+
+  </div><!-- end of row div-->
+
+
+
+
+<div class="row mb-5">
+
+  <figure class="mb-5">
+
   <blockquote class="blockquote ">
     <h3>Stock Value</h3>
   </blockquote>
   <figcaption class="blockquote-footer">
-    computed the company's price-to-earnings (P/E) ratio.
+        computed the company's price-to-earnings (P/E) ratio.
   </figcaption>
-</figure>
-    <!-- last line chart graph-->
-    <div class="card border-0">
-      <div class="last_chart" style="height: 450px; margin: 4rem 4rem 0rem">
-        {{line_2_chart|safe}}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">
-          This is a wider card with supporting text below as a natural lead-in
-          to additional content. This card has even longer content than the
-          first to show that equal height action.
-        </p>
-        <p class="card-text">
-          <small class="text-body-secondary">Last updated 3 mins ago</small>
-        </p>
-      </div>
-    </div>
-    {% endblock content %}
+  </figure>
 
-    <div class="last_chart" style="height: 450px; margin: 4rem 4rem 0rem">
-      {{line_2_chart|safe}}
-    </div>
-  </div>
-</div>
+
+        {{ pie_chart|safe }}
+
+</div><!-- end of row div-->
+
+
+
+
+</div><!-- END OF COL DIV-->
+
+
+
+
+
+</div><!-- {% endcomment %}
+{% endblock content %}

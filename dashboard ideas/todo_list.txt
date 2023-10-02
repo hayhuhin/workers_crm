@@ -43,8 +43,8 @@ add progress bar to the leads,sided nav bar,appropriate button names,appropriate
 
 
 tasks4:
-add:change the dashboard to be represented much bigger and nice for the client end 
-
+add:change the dashboard to be represented much bigger and nice for the client end - DONE
+ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) then what to query from the DB - income/outcome/timeline/)
 
 task4.5:
 ADD:change the profile page to look much more updated and nice for the end user
