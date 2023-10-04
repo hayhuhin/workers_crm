@@ -1,0 +1,37 @@
+how to build the graph?
+
+
+
+each user can modify his dashboard presentation(data is not live - query the data once a day and saves the result)
+
+saving queried data:
+1.caching system is needed?
+2.prevent the users from refreshing the query
+
+
+how the user is going to query the DB
+
+1.each user will gain appropriate access to the db via their rank of the department(example: back office employers can acceess managers db)
+2.the user will have limited options to the queries (example:choose table-income/outcome >> **self.user >> choose date: 12/12/12 - 11/11/13)
+3.the user will choose which graph presentation to use 
+
+
+program:
+
+user input >> query the DB >> formating the result to graph input >> saves graph input to html >> response output
+
+django design pattern for this graph feature:
+
+user input :post request 
+>> ** user_input_to_query function **:sending the query to the db model 
+>> db_result proccessed by ** graph_formatting function **
+>> pass graph formating data into graph_to_html function 
+>> return the result to the user frontend .
+
+constraints:
+1.input validation
+2.query limiting
+3.query modifying
+4.user experience tested well
+
+
