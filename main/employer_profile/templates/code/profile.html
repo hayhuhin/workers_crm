@@ -1,28 +1,293 @@
 {% extends 'code/base.html' %}{% block content %} {% load static %}
-<div class="container text-left" style="margin-top: 8rem">
+<div class="container text-left" style="margin-top: 6rem">
 <!-- info section -->
 <!-- info title-->
-<figure class="text-left">
-  <blockquote class="blockquote">
-    <h1>Info</h1>
-  </blockquote>
-</figure>
 
-<!-- info cards-->
-  <div class="row row-cols-1 row-cols-md-4 g-1">
-    <div class="col border border-light border-1">
-      
-        {{ profile|safe }}
 
-      </div> 
+
+<div class="row"> <!-- main row of the page-->
+
+ <div class="col-auto p-5 bg-dark rounded border" >
+
+  <div style="width:400px">
+    {{profile|safe}}
+  </div>
+ </div>
+
+
+ <div class="col px-5 pb-5">
+ <div class="row justify-content-between p-2 bg-dark rounded border" >
+
+    <div class="col-auto">
+     <h3>Latest tasks</h3>
     </div>
-        {{ monthly_graph|safe }}
+    <div class="col-auto">
+    <a class="btn btn-primary" href="/tasks">Go to Tasks Page</a>
+    </div>
 
-        {{ weekly_graph|safe }}
+  <div class="row text-start ms-2" >
+    <div class="border rounded border-1 mb-2" style="background:#323232">
+
+      <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+    </div>
+    <div class="border rounded border-1 mb-2" style="background:#323232">
+      <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+    </div>
+
+    <div class="border rounded border-1 mb-2" style="background:#323232">
+      <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+    </div>
+
+    <div class="border rounded border-1 mb-2" style="background:#323232">
+      <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+    </div>
+  </div>
+</div>
+
+  <div class="row p-4 my-5 bg-dark rounded border" >
+  <h3>Department Requests</h3>
+    <div class="col m-2 border rounded p-3" style="background:#323232">
+
+          <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#ffffff}</style><path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>
+          <h5 class="my-4">HR forms</h5>
+          <p class="text-body-secondary fs-6">- submit HR forms</p>
+    </div>
+
+    <div class="col m-2 border rounded p-3" style="background:#323232">
+
+          <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#ffffff}</style><path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V class=""64z"/></svg>
+          <h4 class="my-4">Department request forms</h4>
+          <p class="text-body-secondary fs-6">- submit HR forms</p>
+    </div>
+
+    <div class="col m-2 border rounded p-3" style="background:#323232">
+
+          <svg xmlns="http://www.w3.org/2000/svg" height="1.25em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#ffffff}</style><path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>
+                <h4 class="my-4">Manager request forms</h4>
+          <p class="text-body-secondary fs-6">- submit HR forms</p>
+    </div>
+  </div>
+
+ </div>
+
+</div><!-- END OF MAIN ROW DIV-->
+
+<div class="row my-5 bg-dark text-capitaliz rounded border">
+  <div class="col p-5 border rounded m-3" >
+  <div class="row">
+    <h3>personal task acomplishment</h3>
+    {{weekly_graph|safe}}
+    </div>
+    <div class="row">
+
+            <h4 class="fw-bold">week overview</h4>
+    <div class="text mb-2 p-1 m-1">- total tasks : <text class="text-body-secondary fs-6">145</text> </div> 
+    <div class="text mb-2 p-1 m-1">- total tasks completed : <text class="text-body-secondary fs-6">140</text> </div>
+    <div class="text mb-2 p-1 m-1">- longest uncomlished task : <text class="text-body-secondary fs-6">60 hrs</text></div>
+    <div class="text mb-2 p-1 m-1">- additional information : <text class="text-body-secondary fs-6">none</text></div>
+  
 
     </div>
   </div>
- </div>
+
+
+  <div class="col p-5 ">
+    <h5 class="pb-5 fw-bold text-uppercase">weekly task acomplishment</h5>
+    <div class="row p-3 border rounded ">
+
+ <table class="table table-md table-hover" style="background-color: white">
+      <thead class=" border-bottom border-secondary">
+        <tr>
+          <th scope="col">Day</th>
+          <th scope="col">total tasks</th>
+          <th scope="col">moved to</th>
+          <th scope="col">completed</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+
+      <tbody class="table-dark">
+        <tr>
+          <th scope="row">saturday</th>
+          <td>10</td>
+          <td>next day</td>
+          <td>9/10</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">sunday</th>
+          <td>6</td>
+          <td>false</td>
+          <td>6/6</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>        
+        <tr>
+          <th scope="row">tuesday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>        
+        <tr>
+          <th scope="row">wednesday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">thursday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">friday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button class="btn btn-secondary"></button>
+  </div><!-- END OF ROW DIV -->
+
+</div><!-- END OF COL DIV -->
+
+
+<div class="row">
+  <div class="col-auto p-3 m-3 rounded border">
+    <div class="row">
+        <h3> monthly task acomplishment </h3> 
+        {{monthly_graph|safe}}
+    </div>
+    
+    <h4 class="fw-bold">month overview</h4>
+    <div class="text mb-2 p-1 m-1">- total tasks : <text class="text-body-secondary fs-6">445</text> </div> 
+    <div class="text mb-2 p-1 m-1">- total tasks completed : <text class="text-body-secondary fs-6">390</text> </div>
+    <div class="text mb-2 p-1 m-1">- longest uncomlished task : <text class="text-body-secondary fs-6">60 hrs</text> </div>
+    <div class="text mb-2 p-1 m-1">- additional information : <text class="text-body-secondary fs-6">none</text></div>
+  
+  </div>
+
+  <div class="col p-5 ">
+    <h5 class="pb-5 fw-bold text-uppercase">monthly task acomplishment</h5>
+    <div class="row p-3 border rounded ">
+
+ <table class="table table-md table-hover" style="background-color: white">
+      <thead class=" border-bottom border-secondary">
+        <tr>
+          <th scope="col">Day</th>
+          <th scope="col">total tasks</th>
+          <th scope="col">moved to</th>
+          <th scope="col">completed</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+
+      <tbody class="table-dark">
+        <tr>
+          <th scope="row">saturday</th>
+          <td>10</td>
+          <td>next day</td>
+          <td>9/10</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">sunday</th>
+          <td>6</td>
+          <td>false</td>
+          <td>6/6</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>        
+        <tr>
+          <th scope="row">tuesday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>        
+        <tr>
+          <th scope="row">wednesday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">thursday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">friday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr>
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr> 
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr> 
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr> 
+        <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr> 
+          <tr>
+          <th scope="row">monday</th>
+          <td>13</td>
+          <td>false</td>
+          <td>10/13</td>
+          <td><button class="btn btn-sm btn-success">view</button></td>
+        </tr> 
+      </tbody>
+    </table>
+
+    <button class="btn btn-secondary"></button>
+  </div><!-- END OF ROW DIV -->
+
+</div><!-- END OF COL DIV -->
+
 </div>
 
 <!-- Lead information -->
@@ -109,4 +374,33 @@
       </div>
     </div>
 
+
+
+ <div class="border rounded border-1 p-2 mb-2" style="background:#4D2DB7"> 
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+
+      <div class="border rounded border-1 p-2 mb-2" style="background:#D83F31">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+
+      <div class="border rounded border-1 p-2 mb-2" style="background:#219C90">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+
+      <div class="border rounded border-1 p-2 mb-2" style="background:#B931FC">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+
+      <div class="border rounded border-1 mb-2" style="background:#FFCC70">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+
+      <div class="border rounded border-1 mb-2" style="background:#8ECDDD">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
+      
+      <div class="border rounded border-1 mb-2" style="background:#FFA1F5">
+        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical</p>
+      </div>
 {% endblock content %}

@@ -1,23 +1,13 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
-from func_tools.graph import graph_presentation,graph_queries
+from func_tools.graph import graph_presentation,graph_queries,employer_data_extraction
 
 
 #current path
 curr_path = Path.cwd()
 
 
-
-def employer_data_extraction(request):
-    first_name = request.user.employer.first_name
-    last_name = request.user.employer.last_name
-    department = request.user.employer.job_position.position
-    rank = request.user.employer.job_position.rank 
-    profile_pic = request.user.employer.profile_pic.url
-
-    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
-    return request_data
 
 @login_required
 def profile_page(request):
@@ -40,14 +30,14 @@ def profile_page(request):
         values = [20, 50, 37, 18]
 
         names = ['week 1', 'week 2', 'week 3', 'week 4']
-        monthly_pie_graph = instance_of_graph_presentation.pie_graph(names=names,values=values)
+        monthly_pie_graph = instance_of_graph_presentation.bar_graph(group=names,value=values)
 
 
 
         # contribution pie graph 
 
-        values=[20, 20, 20, 20, 20]
-        names= ['day 1', 'day 2', 'day 3', 'day 4','day 5']
+        values=[20, 20, 20, 20, 20,13,51]
+        names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
         weekly_donut_graph = instance_of_graph_presentation.donut_graph(values=values,names= names)
 
 
@@ -62,8 +52,8 @@ def profile_page(request):
         weekly_graph_card = instance_of_graph_presentation.graph_card('weekly lead',user_calc=weekly_donut_graph)
 
 
-        graph_queries_inst = graph_queries()
-        graph_queries_inst.task_completion(request.user)
+        graph_queries_instance = graph_queries()
+        graph_queries_instance.task_completion(request.user)
         context = {'profile':profile_card,'monthly_graph':monthly_graph_card,'weekly_graph':weekly_graph_card}
         return render(request,'code/profile.html',context)
 

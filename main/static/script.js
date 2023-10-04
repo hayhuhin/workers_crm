@@ -382,3 +382,4 @@ $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
 
 
 $('.lead_delete_button').on('click',lead_delete_ajax)
+

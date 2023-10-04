@@ -47,7 +47,7 @@ add:change the dashboard to be represented much bigger and nice for the client e
 ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) then what to query from the DB - income/outcome/timeline/)
 
 task4.5:
-ADD:change the profile page to look much more updated and nice for the end user
+ADD:change the profile page to look much more updated and nice for the end user - DONE
 
 
 
