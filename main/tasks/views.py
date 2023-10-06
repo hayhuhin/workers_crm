@@ -182,3 +182,5 @@ def Edit_lead(request,ID):
     context = {"edit_Lead_form":form,"lead_data":lead_id}
     
     return render(request,"code/edit_lead.html",context)
+
+

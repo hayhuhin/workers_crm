@@ -1,10 +1,84 @@
-{% extends 'code/base.html'%} {% block content %}
+{% extends 'code/base.html'%} {% load widget_tweaks %}{% block content %}
 <!-- the dashboard title-->
 
 
 <div class='container'>
   <div class="alert alert-info">FOR NOW THIS PAGE ISNT FUNCTIONAL AND ONLY FOR OVERVIEW</div>
+  <div class="graph" style="margin-bottom:600px">
 
+<div class='col-sm-auto'>
+  <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap'> add new graph </button>
+    <div class='modal fade' id='graph_modal' tabindex='-1' aria-labelledby='graph_modal_label' aria-hidden='true'>
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 class='modal-title fs-5' id='graph_modal_label'>New Task</h1>
+            <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+          </div>
+
+      <!-- form of adding new task --> 
+      <div class='modal-body'>
+
+        <form id='' method='POST'>
+
+          {% csrf_token %}
+
+          <!-- body of the form fields-->
+
+          <div class='mb-3'>
+            <label for='date' class='col-form-label'>Date</label>
+              {% render_field income_form.month type='date' id='date' class='form-control'  %}
+          </div>
+
+          <div class='mb-3'>
+            <label for='amount' class='col-form-label'>Amount</label>
+              {% render_field income_form.amount  id='amount' class='form-control'  %}
+          </div>
+
+
+
+
+      </div><!-- end div of the modal-body -->
+
+        <!-- modal footer section -->
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+          <button type='submit' name='submit_income' value='submit_income' class='btn btn-primary'>Save</button>
+        </div>
+
+      </form>
+
+        </div>
+
+        </div><!-- end of 'modal-content'-->
+
+      </div><!-- end of 'modal-dialog' -->
+    </div><!-- 'modal fade' -->
+
+
+<h2>{{data.amount__sum}}</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
 
         <div class="graph m-2 p-3 border border-secondary rounded border-3">
 

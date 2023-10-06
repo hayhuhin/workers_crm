@@ -35,3 +35,7 @@ constraints:
 4.user experience tested well
 
 
+
+query example:
+>>> i.objects.filter(month__range=("2023-10-01","2023-11-01")).all().aggregate(Sum('amount'))
+{'amount__sum': 3000}

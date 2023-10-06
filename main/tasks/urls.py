@@ -9,4 +9,5 @@ urlpatterns = [
     path('edit-task/<int:ID>',tasks_view.Edit_Task,name='edit_task'),
     path('edit-lead/<int:ID>',tasks_view.Edit_lead,name='edit_lead'),
 
+
 ]
