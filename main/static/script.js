@@ -345,6 +345,16 @@ $(document).ready(function(){
 });
 
 
+function fill_db () {
+
+    var opt_choosed = $(this).attr('name')
+    console.log(opt_choosed);
+    $('#database').attr('value',opt_choosed);
+
+};
+
+
+//selected_data
 
 $('.close_small_navbar').on('click',trigger_big_navbar)
 
@@ -383,3 +393,21 @@ $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
 
 $('.lead_delete_button').on('click',lead_delete_ajax)
 
+// $('.db').on('click',fill_db)
+
+// $('.graph_choose').on('click',fill_graph)
+$('.selected_graph').change(function (e) {
+
+    var opt_choosed = e.target.value;
+    $('#graph_option').attr('value',opt_choosed);
+    console.log(opt_choosed)
+
+});
+
+$('.selected_data').change(function (e) {
+
+    var opt_choosed = e.target.value;
+    $('#data_option').attr('value',opt_choosed);
+    console.log(opt_choosed)
+
+});

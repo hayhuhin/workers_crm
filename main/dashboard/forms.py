@@ -2,9 +2,21 @@ from django import forms
 from .models import Income
 
 
-class IncomeForm(forms.ModelForm):
-    class Meta:
-        model = Income
-        fields = ["month", "amount",]
-        labels = {"month": "Month", "amount":"Amount"}
+class IncomeForm(forms.Form):
+
+    start_date = forms.DateField()
+    end_date = forms.DateField()
+    # db = forms.CharField(max_length=100)
+    db = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={'hidden': 'hidden'})
+    )
+    graph = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={'hidden': 'hidden'})
+    )
+
+
+    # fields = ["start_date","end_date","db"]
+    # labels = {"start_date":"start date","end_date":"end date","db":"data base"}
 

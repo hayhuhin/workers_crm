@@ -14,6 +14,13 @@ class Income(models.Model):
 
     #all of this code below is only for testing and modifying the frontend
 
+class Outcome(models.Model):
+    month = models.DateField()
+    amount = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.month} -- {self.amount}"
+
 
 
 class CompanyWorth:

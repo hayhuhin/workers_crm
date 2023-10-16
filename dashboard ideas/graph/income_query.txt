@@ -1,0 +1,56 @@
+
+data = [
+Income(month='2023-10-7',amount=1000),
+Income(month='2023-11-7',amount=1000),
+Income(month='2023-12-7',amount=1000),
+Income(month='2024-1-7',amount=1000),
+Income(month='2024-2-7',amount=1000),
+Income(month='2024-3-7',amount=1000),
+Income(month='2024-4-7',amount=1000),
+Income(month='2024-5-7',amount=1000),
+Income(month='2024-6-7',amount=1000),
+Income(month='2024-7-7',amount=1000),
+Income(month='2024-8-7',amount=1000),
+Income(month='2024-9-7',amount=1000),
+Income(month='2024-10-7',amount=1000),
+Income(month='2024-11-7',amount=1000),
+Income(month='2024-12-7',amount=1000),
+Income(month='2025-1-7',amount=1000),
+Income(month='2025-2-7',amount=1000),
+Income(month='2025-3-7',amount=1000),
+Income(month='2025-4-7',amount=1000),
+Income(month='2025-5-7',amount=1000)
+]
+
+
+
+data = [
+Outcome(month='2023-10-7',amount=1000),
+Outcome(month='2023-11-7',amount=1000),
+Outcome(month='2023-12-7',amount=1000),
+Outcome(month='2024-1-7',amount=1000),
+Outcome(month='2024-2-7',amount=1000),
+Outcome(month='2024-3-7',amount=1000),
+Outcome(month='2024-4-7',amount=1000),
+Outcome(month='2024-5-7',amount=1000),
+Outcome(month='2024-6-7',amount=1000),
+Outcome(month='2024-7-7',amount=1000),
+Outcome(month='2024-8-7',amount=1000),
+Outcome(month='2024-9-7',amount=1000),
+Outcome(month='2024-10-7',amount=1000),
+Outcome(month='2024-11-7',amount=1000),
+Outcome(month='2024-12-7',amount=1000),
+Outcome(month='2025-1-7',amount=1000),
+Outcome(month='2025-2-7',amount=1000),
+Outcome(month='2025-3-7',amount=1000),
+Outcome(month='2025-4-7',amount=1000),
+Outcome(month='2025-5-7',amount=1000)
+]
+
+
+
+
+query example:
+>>> i.objects.filter(month__range=("2023-10-01","2023-11-01")).all().aggregate(Sum('amount'))
+{'amount__sum': 3000}
+

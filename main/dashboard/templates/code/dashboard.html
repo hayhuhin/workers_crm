@@ -26,15 +26,49 @@
           <!-- body of the form fields-->
 
           <div class='mb-3'>
-            <label for='date' class='col-form-label'>Date</label>
-              {% render_field income_form.month type='date' id='date' class='form-control'  %}
+            <label for='date' class='col-form-label'>Start Date</label>
+              {% render_field income_form.start_date type='date' id='date' class='form-control'  %}
           </div>
 
           <div class='mb-3'>
-            <label for='amount' class='col-form-label'>Amount</label>
-              {% render_field income_form.amount  id='amount' class='form-control'  %}
+            <label for='date' class='col-form-label'>End Date</label>
+              {% render_field income_form.end_date type='date' id='date' class='form-control'  %}
           </div>
 
+            {% comment %} <label for='db' class='col-form-label'>data base</label> {% endcomment %}
+
+          <div class='col' ><!-- ###-->
+
+          <div class='mb-3'>
+
+          </div> <!-- end of mb-3 class-->
+            <div class="mb-3 row">
+            <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
+                <div class="col-sm-auto">
+
+                  <select class="form-select selected_data" aria-label="Default select example">
+                    <option selected class="income" value="income" name="income">Income</option>
+                    <option class="outcome" value="outcome" name="outcome">Outcome</option>
+                  </select>
+
+                {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' %}
+            </div>
+            </div>
+
+            <div class="row">
+
+              <label for="graph_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
+                <div class="col-sm-auto">
+
+            <select class="form-select selected_graph" aria-label="Default select example">
+              <option selected class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
+              <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
+            </select>
+              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option'%}
+            </div>
+
+          </div>
+          </div><!-- end of col div#### -->
 
 
 

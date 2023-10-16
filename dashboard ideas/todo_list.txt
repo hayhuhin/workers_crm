@@ -44,6 +44,8 @@ add progress bar to the leads,sided nav bar,appropriate button names,appropriate
 
 tasks4:
 add:change the dashboard to be represented much bigger and nice for the client end - DONE
+
+<<< on work >>>
 ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) 
 >>then what to query from the DB - income/outcome/timeline/) - more details in graph_builder.txt 
 

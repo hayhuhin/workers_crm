@@ -1,6 +1,16 @@
 import plotly.express as px
 import pandas as pd
 from pathlib import Path
+import calendar
+import datetime
+
+
+#TESTING 
+# from dashboard.models import Income
+# from django.db.models import Sum
+
+
+
 # from dashboard.models import Position_responsabilities
 
 class graph_presentation(object):
@@ -17,6 +27,12 @@ class graph_presentation(object):
         graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor= 'rgba(0, 0, 0, 0)',margin=dict(l=50,r=20,t=20,b=100))
 
         graph_fig.update_traces(textfont_size=12)
+
+        graph_fig.update_xaxes(
+          tickangle=-45,#the angle of the presentation
+          dtick="M1", # sets minimal interval to month
+          tickformat="%d.%m.%Y", # the date format you want 
+)
 
 
         if to_html:
@@ -48,6 +64,7 @@ class graph_presentation(object):
         pie_fig = px.pie(values=values,names=names,template=self.template)
         pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
         pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
+
 
         if to_html:
             graph = pie_fig.to_html()
@@ -190,3 +207,44 @@ def employer_data_extraction(request):
 
     request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
     return request_data
+
+
+
+start = "2024-10-01"
+end = "2024-10-30"
+
+
+
+def sum_month(start,db,db_func):
+    
+    start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
+    print(start_date)
+    end = start_date.replace(day = calendar.monthrange(start_date.year, start_date.month)[1])
+
+    all_months_test = db.objects.filter(month__range=(start_date,end)).all().values_list().aggregate(db_func('amount'))
+
+    date_list = str(start_date) + " - " + str(end)
+    summary_list = all_months_test['amount__sum']
+
+    return date_list,summary_list
+
+def sum_date_by_range(start_date,end_date,db,db_func):
+  months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
+
+  unique_year_month_set = set()
+  for month in months_query_set:
+      unique_year_month_set.add((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
+  
+  # print(unique_year_month_set)
+
+  sum_by_period = []
+  full_summary = []
+  for unique_date in unique_year_month_set:
+  
+    calculated_period_sum = sum_month(unique_date,db,db_func)
+    sum_by_period.append(calculated_period_sum[0])
+    full_summary.append(calculated_period_sum[1])
+
+
+  # return sum_by_period
+  return full_summary,sum_by_period

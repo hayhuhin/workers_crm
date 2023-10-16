@@ -18,7 +18,7 @@ how the user is going to query the DB
 
 program:
 
-user input >> query the DB >> formating the result to graph input >> saves graph input to html >> response output
+user input >> query the DB >> save the graph data >>formating the result to graph input >> saves graph input to html >> response output
 
 django design pattern for this graph feature:
 
@@ -36,6 +36,3 @@ constraints:
 
 
 
-query example:
->>> i.objects.filter(month__range=("2023-10-01","2023-11-01")).all().aggregate(Sum('amount'))
-{'amount__sum': 3000}
