@@ -1,4 +1,5 @@
 from django.db import models
+from dashboard.models import Employer
 
 #models here
 
@@ -20,6 +21,12 @@ class Outcome(models.Model):
 
     def __str__(self):
         return f"{self.month} -- {self.amount}"
+
+
+class GraphRecord(models.Model):
+    employer = models.ForeignKey(Employer,on_delete=models.CASCADE)
+    record = models.DateTimeField(auto_created=True)
+    graph_months = models.
 
 
 

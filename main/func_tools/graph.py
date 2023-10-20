@@ -216,6 +216,7 @@ end = "2024-10-30"
 
 
 def sum_month(start,db,db_func):
+    """ gets the start date then Sum all amounts that is exists in this started month"""
     
     start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
     print(start_date)
@@ -228,7 +229,10 @@ def sum_month(start,db,db_func):
 
     return date_list,summary_list
 
+
+
 def sum_date_by_range(start_date,end_date,db,db_func):
+  """ calculates the whole range of months and returns two lists of summary by months and list of the months themselves"""
   months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
 
   unique_year_month_set = set()
@@ -248,3 +252,68 @@ def sum_date_by_range(start_date,end_date,db,db_func):
 
   # return sum_by_period
   return full_summary,sum_by_period
+
+
+
+
+def save_the_graph(graph_html):
+    """saves the graph query and users detailes in log file 
+        return: the graph html 
+    """
+    #TODO add the write&read into file later
+    user_data = []
+    return graph_html
+    
+
+class GraphHandler:
+    """ graph handler takes the users input saves it for reusage and have methods that return graph representation as html """
+    def __init__(self,user,db:list,db_func:list,last_save):
+        self.user = user
+        self.last_save = last_save
+        # self.start_date = self.start_date()
+        # self.end_date = self.end_date()
+        self.db = db 
+        self.db_func = db_func
+
+    def graph_log(self,graph_html):
+        """ in the future will save the data in log folder with log file of graph repr and the user that used it"""
+        
+        return graph_html
+        
+    def last_save(self):
+        user = None
+        databases = None
+        functions = None
+        _repr = None
+
+    def sum_by_range(self,start_date,end_date):
+        self.start_date(start_date)
+        self.end_date(end_date)
+
+        graph_data_lists = sum_date_by_range(start_date,end_date,self.db[0],self.db_func[0])
+
+        graph_repr_inst = graph_presentation()
+        graph_repr_inst.bar_graph(group=graph_data_lists[1],value=graph_data_lists[0],path="/")
+
+        return graph_repr_inst
+
+
+
+
+
+    def start_date(self,start):
+      if start:
+        return start
+      else:
+          return self.default_view_repr
+
+
+    def end_date(self,end):
+        if end :
+          return end
+        else:
+            return self.default_view_repr
+
+    def default_view_repr(self):
+        """returns default graph repr when there is no data present"""
+        pass

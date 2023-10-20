@@ -5,3 +5,34 @@ ending date
 data base
 
 
+
+1.save the created data for each user.
+2.fix the visuals
+3.add functionallity to the graph buttons(refresh query(up to 5 times,edit the query,remove graph))
+4.add lne graph option (not only the bar graph)
+5.the presentation must be sorted by years
+
+
+important changes
+
+the users graph data must be save in the db
+
+db fields:
+1.FK to the employer
+2.graph record with DateField
+3.graph months
+4.graph amount
+
+
+how to do it ?
+1.users input saves the data in the db with ajax manipulation
+2.each user have the option to choose his graph repr
+3.
+
+
+Q?
+how to display 
+
+return render will have function inside one of the attr that checks for graph db records and will display accordingly the data
+
+>>post request :  graph query >> class that queries the DB and records it >> the recorded db query will be represented in the frontend.
