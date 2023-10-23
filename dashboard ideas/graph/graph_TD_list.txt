@@ -17,17 +17,16 @@ important changes
 
 the users graph data must be save in the db
 
-db fields:
-1.FK to the employer
-2.graph record with DateField
-3.graph months
-4.graph amount
+no sql db fields:
+1.graph record with DateField
+2.graph months
+3.graph amount
 
 
 how to do it ?
 1.users input saves the data in the db with ajax manipulation
 2.each user have the option to choose his graph repr
-3.
+
 
 
 Q?
@@ -36,3 +35,55 @@ how to display
 return render will have function inside one of the attr that checks for graph db records and will display accordingly the data
 
 >>post request :  graph query >> class that queries the DB and records it >> the recorded db query will be represented in the frontend.
+
+the record itself is saved and quered as nosql db because
+i have to store graph data as lists 
+
+questions:
+1.how to migrate mongodb into the django project -
+a.the db will be stored in the cloud or in the vps db 
+b.the django app will perform CRUD functions with a python library "pymongo"
+
+2.the structure of the keys in the db
+3.how iam inserting and getting the data from the db
+4.what is the django convenient way of using nosql db
+5.how good the performance of using the db
+
+
+users_graph_example_dict:
+
+{
+    user_id:"1",
+    user_name:"vala",
+    graph_records : {
+        records:{
+            1000:{
+                created_at:YYYY-MM-DD,
+                x:[1,2,3,4,5],
+                y:["a","b","c","d","e"]
+            },
+            1001:{
+                created_at:YYYY-MM-DD,
+                x:[1,2,3,4,5],
+                y:["a","b","c","d","e"]
+            },
+            1002:{
+                created_at:YYYY-MM-DD,
+                x:[1,2,3,4,5],
+                y:["a","b","c","d","e"]
+            }
+        }
+    }
+}
+
+steps:
+1.find the specific user.
+2.enter the graph_records >> records >> latest_one by the last index.
+
+class creation:
+the class will handle :
+1.connection to the server
+2.CRUD operations
+3.methods that returns the desired data in a dict structure 
+
+unit testing required for all possible fail cases while using the class methods
