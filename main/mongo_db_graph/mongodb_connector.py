@@ -4,42 +4,6 @@ from pymongo.mongo_client import MongoClient
 
 uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
 
-# # Create a new client and connect to the server
-client = MongoClient(uri)
-db = client["test"]
-
-j = "gr"
-
-# col = db[j]
-# col.find({})
-# # Send a ping to confirm a successful connection
-# # try:
-# #     client.admin.command('ping')
-# #     print("Pinged your deployment. You successfully connected to MongoDB!")
-# # except Exception as e:
-# #     print(e)
-
-
-
-# #in the future will be connected to the cloud or vps server
-
-# #this is a simple beta test for handling the nosql data
-
-# db = client["test"]
-
-# #1.find the user
-
-# result = db.gr.find({"user_name":"vala"})
-
-# for res in result:
-#     #getting the graph records
-#     records = res["graph_records"]["records"]
-
-#     #getting the last update of the graph
-#     last = list(records)[-1]
-
-#     #the last update:
-#     last_record = records[last]
 
 
 
@@ -56,50 +20,169 @@ class mongodb_constructor:
         self.db = self.client[self.db_name]
         
 
-    def write_data(self,collection_name:str,write_data):
-        """ write method that creates collection if doesnt exists and writes 
+    def add_record(self,many:False,collection_name:str,new_record:dict,user:str):
+        """ add method that creates collection if doesnt exists and writes 
             data into the collection
         """
         self.collection_name = collection_name
-        self.db.get_collection(name=self.collection_name).insert_many(write_data)
+        # self.db.get_collection(name=self.collection_name).insert_many(write_data)
 
-        print("the data is inserted into the collection")
+        query = {"user_name": user}
+        projection = {"graph_records.records": 1, "_id": 0}
+        sort = [("graph_records.records", 1)]
 
-    
+        #this gives me the option to see the keys of the graph_records.records
+        records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
+        
+        #the record that saved last in the db
+        prev_record = list(records)[-1]
+
+        #the new record that will be created
+        new_record_name = str(int(prev_record)+1)
+
+
+
+        #bellow section is responsible for formating the new record 
+
+        query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+        #the format of the new data
+        new_record_query = {
+            "$set":{
+                f"graph_records.records.{new_record_name}":new_record
+            }
+        }
+
+        #the final result that will save the added record in the mongo db database
+        final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+
+        print(f"the record is added successfully. record number : {new_record_name}")
+
+
+
+    def remove_records(self,collection_name:str,user:str,record_number:str):
+        """this method can remove records with the record number"""
+
+        self.collection_name = collection_name
+
+        query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+        #this to see the amount of records and check if the record exists
+        projection = {"graph_records.records": 1, "_id": 0}
+        sort = [("graph_records.records", 1)]
+        records = list(self.db.get_collection(self.collection_name).find(query_filter, projection).sort(sort))[0]["graph_records"]["records"]
+
+        #this checking if the records exists or not        
+        if record_number not in records.keys():
+            print("this record is wrong ")
+            print(f"this is the records : {records.keys()}")
+
+        else:
+
+        #the format of the new data
+            new_record_query = {
+                "$unset":{
+                    f"graph_records.records.{record_number}":1
+                },
+
+            }
+
+            #the final result that will save the added record in the mongo db database
+            final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+
+            
+            print(records)
+
+
+
+
     def find_data(self,collection_name:str,data):
+        """thid method is for testing or checking the data 
+            the syntax is the same as with pymongo querying
+        """
+
+
         self.collection_name = collection_name
 
         self.quered_data = self.db.get_collection(self.collection_name)
 
         find_result = self.quered_data.find(data)
 
-        return find_result
+        print("\n\nfind result ******************")
+        print("\n{}".format(find_result[0]))
+        print("\nfind result ********************")
+
+    
+
+
+    def get_record(self,collection_name:str,user_name:str,record_count:int):
+        """method should return specific users x,y records of the graph
+            ARGS:
+                collection_name:the mongo db collection name as a string
+                user_name:the specific user that we want to extract record from
+                record_count:how many records to extract from the new to old .
+
+            return:
+                returns list of dicts with the records number as a key and the x and y as a value
+                with a date data.
+        """
+
+        collection = self.db[collection_name]
+
+        # Define the query, projection, and sort
+        query = {"user_name": user_name}
+        projection = {"graph_records.records": 1, "_id": 0}
+        sort = [("graph_records.records", 1)]
+
+        # Execute the query
+        records_amount = len(list(collection.find(query, projection).sort(sort))[0]["graph_records"]["records"])
+
+        #validating that the record count is not higher or smaller then the amount of records
+        if record_count > records_amount or record_count <= 0:
+            print(f"you inserted {record_count} and this user has only {records_amount} records . please insert a valid number")
+            return None
+
+        else:
+            pipe_line = [
+                        {
+                            "$match": {"user_name": user_name}},
+                            {"$project": {
+                                "user_name": 1,
+                                "lastrecords": {
+                                    "$slice": [
+                                        {
+                                            "$map": {
+                                                "input": {"$objectToArray": "$graph_records.records"},
+                                                "as": "record",
+                                                "in": {
+                                                    "k": "$$record.k",
+                                                    "v": "$$record.v"
+                                                }
+                                            }
+                                        },
+                                        -record_count
+                                    ]
+                                }
+                            }
+                        }
+                        ]
+            
+
+            aggregated_data = self.db.gr.aggregate(pipeline=pipe_line)
+
+            # return aggregated_data
+            for items in aggregated_data:
+                return items["lastrecords"]
 
 
 
-test_class = mongodb_constructor(uri,"test")
 
 
-my_data = [
-    {
-        "name":"vala",
-        "l_name":"lev",
-        "age":25,
-        "data":{
-            "1":[1,2,3,4],
-            "2":[0,9,8,7]
-        }
-    }
-]
-
-# test_class.create_collection(collection_name="gaga",data=my_data)
-r = {}
-res22 = test_class.find_data(collection_name="gr",data=r)
 
 
 my_new_data = [{
-    "user_id":"2",
-    "user_name":"ben",
+    "user_id":"3",
+    "user_name":"david",
     "graph_records" : {
         "records":{
             "1000":{
@@ -123,11 +206,22 @@ my_new_data = [{
 
 
 
-# test_class.write_data(collection_name="gr",write_data=my_new_data)
+test_class = mongodb_constructor(uri,"test")
+# add_record_test = test_class.extract_record("gr","david",2)
 
-# res = test_class.find_data("gr",{})
 
-# for i in res:
-#     print(i)
-# # for k in res22:
-# #     print(k) 
+
+test_dict = {
+    "created_at":"YYYY-MM-DD",
+    "x":[1,1,1,1],
+    "y":["q","w","e","r"]
+}
+
+
+test_class.remove_records(collection_name="gr",user="david",record_number="1001")
+
+
+test_class.find_data(collection_name="gr",data={})
+
+
+
