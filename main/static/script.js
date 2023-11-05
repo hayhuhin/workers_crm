@@ -289,7 +289,6 @@ function add_lead_ajax (e)  {
             costumer_name:$('#costumer_name').val(),
             costumer_id:$('#costumer_id').val(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            name: 'submit_new_lead',
 
 
         },
@@ -302,6 +301,66 @@ function add_lead_ajax (e)  {
 };
 
 
+function add_graph_ajax (e)  {
+    // Get the CSRF token from the cookie
+var csrftoken = getCookie('csrftoken');
+
+// Make the AJAX request
+$.ajax({
+    type: "POST",
+    url: "/dashboard",
+    data: {
+        csrfmiddlewaretoken: csrftoken, // Include the CSRF token
+        start_date: $("#start_date").val(),
+        end_date: $("#end_date").val(),
+        db:$("#data_option"),
+        graph:$("#graph_option"),
+        // name:$("#add_graph_data")
+        // Include other data fields as needed
+    },
+    success: function (data) {
+        setTimeout(function(){
+            location.reload(); 
+        }, 2000); 
+        // Handle the response from the server
+        // Display success or error messages to the user
+    },
+    error: function (xhr) {
+        // Handle errors
+    }
+});
+
+// Function to get the CSRF token from the cookie
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = $.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+};
+
+
+
+// start_date = forms.DateField()
+// end_date = forms.DateField()
+// # db = forms.CharField(max_length=100)
+// db = forms.CharField(
+//     max_length=100,
+//     widget=forms.TextInput(attrs={'hidden': 'hidden'})
+// )
+// graph = forms.CharField(
+//     max_length=100,
+//     widget=forms.TextInput(attrs={'hidden': 'hidden'})
+// )
 
 $(document).ready(function(){
     var cur = 4;
@@ -392,6 +451,10 @@ $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
 
 
 $('.lead_delete_button').on('click',lead_delete_ajax)
+
+$('.add_graph_button').on('click',add_graph_ajax)
+
+
 
 // $('.db').on('click',fill_db)
 

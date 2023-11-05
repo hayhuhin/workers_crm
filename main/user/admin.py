@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group,User
 from .models import Employer,Department
 from tasks.models import Lead,DepartmentTask,Task
-from dashboard.models import Income
+from dashboard.models import Income,GraphPermission
 
 admin.site.unregister(Group)
 
@@ -24,4 +24,6 @@ admin.site.register(Lead)
 admin.site.register(Task)
 admin.site.register(DepartmentTask)
 admin.site.register(Income)
+admin.site.register(GraphPermission)
+
 

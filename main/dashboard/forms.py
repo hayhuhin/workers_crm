@@ -2,7 +2,7 @@ from django import forms
 from .models import Income
 
 
-class IncomeForm(forms.Form):
+class AddGraphForm(forms.Form):
 
     start_date = forms.DateField()
     end_date = forms.DateField()

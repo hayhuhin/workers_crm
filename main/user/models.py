@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User 
 from django.db.models.signals import post_save
 from tasks.models import Lead,Task,DepartmentTask
+from dashboard.models import GraphPermission
 
 
 
@@ -16,8 +17,9 @@ class Employer(models.Model):
     job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
     lead = models.ManyToManyField(Lead)
     task = models.ManyToManyField(Task)
+    graph_permission = models.ManyToManyField(GraphPermission)
 
-    
+
 
 
     def __str__(self):

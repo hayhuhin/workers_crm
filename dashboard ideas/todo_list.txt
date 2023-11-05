@@ -48,6 +48,15 @@ add:change the dashboard to be represented much bigger and nice for the client e
 <<< on work >>>
 ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) 
 >>then what to query from the DB - income/outcome/timeline/) - more details in graph_builder.txt 
+to do:
+1.add fields to the form :
+    a.position of the graph - must be added in the mongodb 
+    b.title of the graph - 
+    c.sub-title - 
+
+
+2.create edit and remove graph functionallity in the dashboard page 
+
 
 
 
@@ -56,5 +65,7 @@ ADD:change the profile page to look much more updated and nice for the end user 
 
 
 
+
 task 5:
 add logic to the home page that will represent the usage of the crm with a description - 
+

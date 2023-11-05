@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
-from func_tools.graph import graph_presentation,graph_queries,employer_data_extraction
+from func_tools.graph import graph_presentation,graph_queries,employer_data_info
 
 
 #current path
@@ -16,7 +16,7 @@ def profile_page(request):
     #                       last name,position.etc..)
     
     #function that gets users name,lastname,position,rank and saved as dict
-    request_data = employer_data_extraction(request)
+    request_data = employer_data_info(request)
 
 
 

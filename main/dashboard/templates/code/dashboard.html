@@ -19,7 +19,7 @@
       <!-- form of adding new task --> 
       <div class='modal-body'>
 
-        <form id='' method='POST'>
+        <form method='POST'>
 
           {% csrf_token %}
 
@@ -27,15 +27,13 @@
 
           <div class='mb-3'>
             <label for='date' class='col-form-label'>Start Date</label>
-              {% render_field income_form.start_date type='date' id='date' class='form-control'  %}
+              {% render_field income_form.start_date type='date' id='graph_start_date' class='form-control'  %}
           </div>
 
           <div class='mb-3'>
             <label for='date' class='col-form-label'>End Date</label>
-              {% render_field income_form.end_date type='date' id='date' class='form-control'  %}
+              {% render_field income_form.end_date type='date' id='graph_end_date' class='form-control'  %}
           </div>
-
-            {% comment %} <label for='db' class='col-form-label'>data base</label> {% endcomment %}
 
           <div class='col' ><!-- ###-->
 
@@ -47,8 +45,12 @@
                 <div class="col-sm-auto">
 
                   <select class="form-select selected_data" aria-label="Default select example">
-                    <option selected class="income" value="income" name="income">Income</option>
-                    <option class="outcome" value="outcome" name="outcome">Outcome</option>
+                    <option selected class="select_one" name="select">Select One</option>
+                    <option class="income" 
+                    value="income" id="choosed_db" name="income">Income</option>
+                    <option class="outcome" value="outcome" 
+                    id="choosed_db"
+                    name="outcome">Outcome</option>
                   </select>
 
                 {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' %}
@@ -61,7 +63,8 @@
                 <div class="col-sm-auto">
 
             <select class="form-select selected_graph" aria-label="Default select example">
-              <option selected class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
+              <option selected class="select" value="select" name="bar_graph">Select One</option>
+              <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
               <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
             </select>
               {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option'%}
@@ -70,14 +73,12 @@
           </div>
           </div><!-- end of col div#### -->
 
-
-
       </div><!-- end div of the modal-body -->
 
         <!-- modal footer section -->
         <div class='modal-footer'>
           <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-          <button type='submit' name='submit_income' value='submit_income' class='btn btn-primary'>Save</button>
+          <button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary add_graph_button'>Save</button>
         </div>
 
       </form>
@@ -111,7 +112,7 @@
 
 
 
-
+{% for graph in graph_chart%}
   </div>
 
         <div class="graph m-2 p-3 border border-secondary rounded border-3">
@@ -120,7 +121,7 @@
         <h3>Graph</h3>
 
           <div style="width: 100%; height: 30rem">
-          {{ graph_chart|safe }}
+          {{ graph|safe }}
           </div>
 
     <div class='text-body-secondary mt-3'>
@@ -133,14 +134,19 @@
 
     </div><!-- end of text-body secondery-->
 
+        <form method="POST">
+        {% csrf_token %}
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
+        </form>
         <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
         <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
 
+{% endfor %}
 
 </div><!-- end of graph div-->
 
-
+</div>
+{% comment %} 
 
 
 
@@ -218,7 +224,7 @@
         <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
         <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
 
-</div>
+</div> {% endcomment %}
 
 
 

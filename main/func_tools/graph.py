@@ -14,12 +14,36 @@ import datetime
 # from dashboard.models import Position_responsabilities
 
 class graph_presentation(object):
+    """graph class that using the plotly.express and pandas .
+       class is used for returning plotly graphs in much easier and cleaner way
+       each method is returning graph as image or html
+    """
     def __init__(self,presentation='card'):
         self.presentation = presentation
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
+
+    def graph_options(self,graph_type,group:list,values:list,path=None,to_html=True):
+        """method that gives you the option to choose which grap to represent by the graph_type
+           arg that must be the same as the name of the func (example:"graph_type")
+        """
+        if graph_type == self.bar_graph.__name__:
+            return self.bar_graph(group=group,value=values,path=path,to_html=to_html)
+        if graph_type == self.pie_graph.__name__:
+            return self.pie_graph(group=group,value=values,path=path,to_html=to_html)
+        if graph_type == self.donut_graph.__name__:
+            return self.donut_graph(group=group,value=values,path=path,to_html=to_html)
+
     
     def bar_graph(self,group:list,value:list,path=None,to_html=True):
+        """this method return the bar graph 
+            args:
+              group: most of the time its the x line on the graphs
+              value: its the y line on the graphs
+              path: only used to_html=False and saving the pic in specified path
+              to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+        """
+
         data_frame = pd.DataFrame(dict(group=group,value=value))
 
         graph_fig = px.bar(data_frame,x='group',y='value',template=self.template,width=600)
@@ -42,22 +66,14 @@ class graph_presentation(object):
         return graph
 
 
-
-
-# fig = px.scatter(df, x="total_bill", y="tip", facet_col="sex",
-#                  width=800, height=400)
-
-# fig.update_layout(
-#     margin=dict(l=20, r=20, t=20, b=20),
-#     paper_bgcolor="LightSteelBlue",
-# )
-
-
-
-
-
-
     def pie_graph(self,values:list,names:list,path='',to_html=True):
+        """this method return the pie graph 
+            args:
+              group: most of the time its the x line on the graphs
+              value: its the y line on the graphs
+              path: only used to_html=False and saving the pic in specified path
+              to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+        """
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
 
 
@@ -74,6 +90,13 @@ class graph_presentation(object):
 
 
     def donut_graph(self,values:list,names:list,path="",to_html=True):
+        """this method return the donut graph 
+            args:
+              group: most of the time its the x line on the graphs
+              value: its the y line on the graphs
+              path: only used to_html=False and saving the pic in specified path
+              to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+        """
         path = str(self.currant_path) +"/employer_profile/static/employer/images/donut.png"
 
         donut_fig = px.pie(values = values,template=self.template,
@@ -161,7 +184,7 @@ class graph_presentation(object):
         
         return card_html
     
-    
+
     def graph_card(self,user_data,user_calc):
         """returns html card with the graph data that recieved from users queries"""
 
@@ -183,13 +206,12 @@ class graph_presentation(object):
 
 
 
-
 class graph_queries:
     def __init__(self):
         self.data = []
     
     def task_completion(self,user):
-      # task = Position_responsabilities.objects.get(id=2)
+      """method printing the task completion of the specific user"""
       task = 'radco'
       users_task_objects = user.employer.job_position
       record = users_task_objects
@@ -197,8 +219,10 @@ class graph_queries:
       print(test_record)
 
 
+#this function are used as helpers later in the graph_calculator class
 
-def employer_data_extraction(request):
+def employer_data_info(request):
+    """method returning dict with the user information"""
     first_name = request.user.employer.first_name
     last_name = request.user.employer.last_name
     department = request.user.employer.job_position.position
@@ -209,17 +233,13 @@ def employer_data_extraction(request):
     return request_data
 
 
-
-start = "2024-10-01"
-end = "2024-10-30"
-
-
-
 def sum_month(start,db,db_func):
-    """ gets the start date then Sum all amounts that is exists in this started month"""
+    """sums all records inside the same month and returning two lists :
+       one list with the dates another with the summary of all the records inside the same month
+    """
     
     start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
-    print(start_date)
+    # print(start_date)
     end = start_date.replace(day = calendar.monthrange(start_date.year, start_date.month)[1])
 
     all_months_test = db.objects.filter(month__range=(start_date,end)).all().values_list().aggregate(db_func('amount'))
@@ -232,7 +252,11 @@ def sum_month(start,db,db_func):
 
 
 def sum_date_by_range(start_date,end_date,db,db_func):
-  """ calculates the whole range of months and returns two lists of summary by months and list of the months themselves"""
+  """method that returns two lists:
+  1.with the summ of all the records in the same month
+  2.with the all months and years
+  """
+
   months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
 
   unique_year_month_set = set()
@@ -241,64 +265,42 @@ def sum_date_by_range(start_date,end_date,db,db_func):
   
   # print(unique_year_month_set)
 
-  sum_by_period = []
+  period = []
   full_summary = []
   for unique_date in unique_year_month_set:
   
     calculated_period_sum = sum_month(unique_date,db,db_func)
-    sum_by_period.append(calculated_period_sum[0])
+    period.append(calculated_period_sum[0])
     full_summary.append(calculated_period_sum[1])
 
 
   # return sum_by_period
-  return full_summary,sum_by_period
+  return full_summary,period
 
 
 
-
-def save_the_graph(graph_html):
-    """saves the graph query and users detailes in log file 
-        return: the graph html 
-    """
-    #TODO add the write&read into file later
-    user_data = []
-    return graph_html
     
-
-class GraphHandler:
-    """ graph handler takes the users input saves it for reusage and have methods that return graph representation as html """
+class GraphCalculator:
+    """ graph calculater can 
+    """
     def __init__(self,user,db:list,db_func:list,last_save):
         self.user = user
         self.last_save = last_save
-        # self.start_date = self.start_date()
-        # self.end_date = self.end_date()
         self.db = db 
         self.db_func = db_func
+
 
     def graph_log(self,graph_html):
         """ in the future will save the data in log folder with log file of graph repr and the user that used it"""
         
         return graph_html
-        
-    def last_save(self):
-        user = None
-        databases = None
-        functions = None
-        _repr = None
+
 
     def sum_by_range(self,start_date,end_date):
-        self.start_date(start_date)
-        self.end_date(end_date)
+        #TODO add much more functionality to this method that can return the data in more ways
 
         graph_data_lists = sum_date_by_range(start_date,end_date,self.db[0],self.db_func[0])
-
-        graph_repr_inst = graph_presentation()
-        graph_repr_inst.bar_graph(group=graph_data_lists[1],value=graph_data_lists[0],path="/")
-
-        return graph_repr_inst
-
-
-
+        return graph_data_lists
 
 
     def start_date(self,start):
@@ -317,3 +319,16 @@ class GraphHandler:
     def default_view_repr(self):
         """returns default graph repr when there is no data present"""
         pass
+    
+
+
+# class GraphPermissionCheck:
+#     def __init__(self,user,db,db_func):
+        
+#         self.user = user
+#         self.db = db 
+#         self.db_function = db_func
+
+    # def run_permission_check(self):
+        
+        

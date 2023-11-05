@@ -1,129 +1,149 @@
 from django.shortcuts import render,redirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import IncomeForm
+from .forms import AddGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
-import calendar
-from func_tools.graph import sum_month,sum_date_by_range,graph_presentation,save_the_graph,GraphHandler
+from func_tools.graph import GraphCalculator,graph_presentation
+from mongo_db_graph.mongodb_connector import mongodb_constructor
+import time
+from user.models import Employer
+
 
 curr_path = Path.cwd()
 
 
 
-
-
-
 # Create your views here.
-
+# user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = ""
 
 @login_required
 def dashboard(request):
 
+    #database user specific instance
+    employer_db_inst = Employer.objects.get(user=request.user)
 
-    graph_handler = GraphHandler(user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = "")
+    #this dict will have data of the graph later
+    graph_chart = []
+
+    #class that have methods and can query the sqlite for all the records of the db
+    graph_calculator = GraphCalculator( user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = "")
+
+    #the graph html representation class
+    graph_repr = graph_presentation()
+
+    #this class have CRUD methods that save the graph data into the mongodb
+    mongodb_handler = mongodb_constructor(uri="mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2",db_name="test")
+
+    #this method of class mongodb_handler that getting the specified record
+    #TODO add later some way to get the record count from the user
+
+    # mongodb_getting_data = mongodb_handler.get_record(collection_name="gr",user_name=str(request.user),record_count=2)
+
+
+    #gets the users all records from the mongodb 
+    record_amount = employer_db_inst.graph_permission.all().values("record_amount")[0]
 
 
 
-    # graph_presentation_instance = graph_presentation()
-    income_form = IncomeForm()
-    databases = ["Income","Outcome"]
-    saved_graph = None
 
-    if request.method == "POST":
-        post_data = request.POST
-        form_inst = IncomeForm(request.POST)
+    #####################testing in the get method section #############################
 
-        if form_inst.is_valid():
-            start = form_inst.cleaned_data.get("start_date")
-            end = form_inst.cleaned_data.get("end_date")
-            db = form_inst.cleaned_data.get("db")
-            graph = form_inst.cleaned_data.get("graph")
 
+    # mongodb_handler.remove_records("gr","ben",record_number="*",delete_all=True)
+    ####################################################################################
+
+
+
+    #* this section is querying the mongo db for records and saves the graphs as a dict of keys and values
+    #* the key is the graph_name and the value is the html(with plotly lib) of the graph
+
+    #this method gives me this specific user all records
+    total_records = mongodb_handler.user_all_records(user=str(request.user),collection_name="gr")
+
+    #this method will be used always when the page refreshing and query the mongodb for data
+    mongodb_getting_data = mongodb_handler.get_record(collection_name="gr",user_name=str(request.user),record_count=total_records)
+
+
+
+    #checking if there is any data at all from the mongodb query
+    if mongodb_getting_data:
+        #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
+        #save it as html
+        for graph in mongodb_getting_data:
+
+
+            graph_html = graph_repr.graph_options(graph_type=graph["v"]["graph_type"],group=graph["v"]["x"],values=graph["v"]["y"])
+
+            #TODO add a list of dicts with all the graphs so i can iterate in the html template
             
-            graph_repr = graph_handler.sum_by_range(start,end)
 
-            # if db.lower() == "income":#TODO add another function or class that handle another parts
-                
-            #     # data = Income.objects.filter(month__range=(start,end)).all().aggregate(Sum('amount'))
-            #     sum_query_dict = sum_date_by_range(start,end,Income,Sum)
-            #     graph_output_html = graph_presentation_instance.bar_graph(group=sum_query_dict[1],value=sum_query_dict[0],path="/")
+            #this is the graph chart list that pushed to the html template with its graph data
+            graph_chart.append(graph_html)
 
 
+    #instance of  "add graph form"
+    income_form = AddGraphForm()
 
 
-            # if db.lower() == "outcome":
-            #     # data = Outcome.objects.filter(month__range=(start,end)).all().aggregate(Sum('amount'))
-            #     sum_query_dict = sum_date_by_range(start,end,Outcome,Sum)
-            #     graph_output_html = graph_presentation_instance.bar_graph(group=sum_query_dict[1],value=sum_query_dict[0],path="/")
-
-            #     saved_graph = save_the_graph(graph_output_html)
+    #! only for testing for now (later it will be queried and represented)
+    databases = ["Income","Outcome"]
 
 
-            context = {'databases':databases,'income_form':income_form,'graph_chart':graph_repr}
-            return render(request,'code/dashboard.html',context)
+    #checking if the request method is POST
+    if request.method == "POST":
 
 
-    month_data = []
-    amount_data = []
-    full_amount_list = []
-    unique_month = set()
+        #only used as a shortcut to get the request.post data as "post_data"
+        post_data = request.POST
 
 
+        #this sectiong is only if the post request comming from the add graph form
+        if request.POST.get("add_graph_data") == "add_graph_data":
 
-    # data = Income.objects.filter(month__range=("2024-10-01","2025-10-01")).all().values_list()
+            #filling the AddGraphForm with the request.POST data from the user
+            form_inst = AddGraphForm(request.POST)
 
-
-    # for _,date,amount in data.order_by("month"):
-
-    #     the_month = date
-    #     last_day_of_the_month = the_month.replace(day = calendar.monthrange(the_month.year, the_month.month)[1])
-    #     full_amount = Income.objects.filter(month__range=(the_month,last_day_of_the_month)).all().annotate(Sum('amount'))
-        
-    #     # print(full_amount,"---",the_month,last_day_of_the_month)
-    #     full_amount_list.append(full_amount)
-    #     unique_month.add(date.strftime("%Y-%m"))
-    #     month_data.append(date.strftime("%Y-%m"))
-    #     amount_data.append(amount)
-
- 
-#     df = pd.DataFrame(dict(
-#     months = month_data,
-#     income = amount_data))
+            #checking the validity of the form (no injection etc...)
+            if form_inst.is_valid():
 
 
-#     graph_fig = px.bar(df, x = 'months', y = 'income')
-#     graph_fig.update_xaxes(
-#     tickangle=-45,#the angle of the presentation
-#     dtick="M1", # sets minimal interval to month
-#     tickformat="%d.%m.%Y", # the date format you want 
-# )
-#     test_graph = graph_fig.to_html()
+                #simple form data for later usage
+                user = request.user
+                start = form_inst.cleaned_data.get("start_date")
+                end = form_inst.cleaned_data.get("end_date")
+                db = form_inst.cleaned_data.get("db")
+                graph_type = form_inst.cleaned_data.get("graph")
 
 
-
-    # test = px.line(x = month_data,
-    #           y = amount_data)
-    
-    # test.update_xaxes(
-    #     tickangle=-45,#the angle of the presentation
-    #     dtick="M1", # sets minimal interval to month
-    #     tickformat="%d.%m.%Y", # the date format you want 
-    # )
-
-    # test_line = test.to_html()
+                #this is the calculation of the data and returning it as 2 lists with x and y
+                graph_data = graph_calculator.sum_by_range(start_date=start,end_date=end)
 
 
-        # print(type(i[2]))
-        # string = ((i[0]).strftime("%Y-%m-%d"))
-        # print(type(i[0]))
-        # month_data.append(string)
+                #getting the time for the new_record that will be added to the mongodb record
+                gmtime_dict = time.gmtime()
+                time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dict[3]}:{gmtime_dict[4]}")
 
-    
+                #the new record that will be added to the mongodb 
+                new_record = {
+                    "graph_type":graph_type,
+                    "date" : time_now,
+                    "x":graph_data[1],
+                    "y":graph_data[0]
+                    }
+
+                #this the record that added to the collection in the mongodb 
+                #! if after submiting the form the user refreshing the page it will add the same record again
+                #! must be fixed
+                mongodb_added_record = mongodb_handler.add_record(collection_name="gr",user=str(request.user),new_record=new_record,max_record_amount=int(record_amount["record_amount"]))
+
+                    
+        # here its still the post method
+        context = {'databases':databases,'income_form':income_form,"graph_chart":graph_chart}
+        return render(request,'code/dashboard.html',context)
 
 
-
-    context = {'databases':databases,'income_form':income_form,'graph_chart':saved_graph}
+    context = {'databases':databases,'income_form':income_form,'graph_chart':graph_chart}
     return render(request,'code/dashboard.html',context)
 
 

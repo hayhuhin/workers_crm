@@ -57,6 +57,7 @@ users_graph_example_dict:
     user_name:"vala",
     graph_records : {
         records:{
+            graph_position:1,
             1000:{
                 created_at:YYYY-MM-DD,
                 x:[1,2,3,4,5],
@@ -92,3 +93,44 @@ REMINDER:
 need to modify the insert data method - DONE
 need to add delete method - DONE
 need to delete the test data that i have inserted in david users collection - DONE
+
+
+now new steps to get the representation of the graph
+
+classes i have :
+1.mongodb constructor that can do CRUD operations and can store graph data
+2.graph_representation that accepts the data and returns an html that represented in the page
+
+steps that i have to do:
+
+1.the data that i accept from the user must be stored in the mongodb 
+2.every time the page reloads the data quiried from the mongodb and represented by the graph_repr class
+3.
+
+
+
+change the graph_calculator to represent the data as dict :
+{
+    date : "YYYY-MM-DD",
+    x : [],
+    y : []
+}
+
+
+{
+    user_id:"1",
+    user_name:"vala",
+    graph_records : {
+        records:{
+            1000:{
+                created_at:YYYY-MM-DD,
+                x:[1,2,3,4,5],
+                y:["a","b","c","d","e"]
+            },
+            1001:{
+                created_at:YYYY-MM-DD,
+                x:[1,2,3,4,5],
+                y:["a","b","c","d","e"]
+            }
+    }
+}

@@ -15,6 +15,7 @@ class Income(models.Model):
 
     #all of this code below is only for testing and modifying the frontend
 
+
 class Outcome(models.Model):
     month = models.DateField()
     amount = models.IntegerField()
@@ -49,3 +50,16 @@ class CompanyWorth:
         else:
             raise ValueError
         
+
+class GraphPermission(models.Model):
+    graph_amount = models.IntegerField(default=4)
+    record_amount = models.IntegerField(default=7)
+
+    description = "Graph Permission"
+
+    def __str__(self):
+        return self.description
+        
+
+
+    
