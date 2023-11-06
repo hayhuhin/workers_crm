@@ -5,13 +5,68 @@ import calendar
 import datetime
 
 
-#TESTING 
-# from dashboard.models import Income
-# from django.db.models import Sum
+#? helper function that will be used later inside the class
+
+def employer_data_info(request):
+    """method returning dict with the user information"""
+    first_name = request.user.employer.first_name
+    last_name = request.user.employer.last_name
+    department = request.user.employer.job_position.position
+    rank = request.user.employer.job_position.rank 
+    profile_pic = request.user.employer.profile_pic.url
+
+    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
+    return request_data
+
+
+def sum_month(start,db,db_func):
+    """sums all records inside the same month and returning two lists :
+       one list with the dates another with the summary of all the records inside the same month
+    """
+    
+    start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
+    # print(start_date)
+    end = start_date.replace(day = calendar.monthrange(start_date.year, start_date.month)[1])
+
+    all_months_test = db.objects.filter(month__range=(start_date,end)).all().values_list().aggregate(db_func('amount'))
+
+    date_list = str(start_date) + " - " + str(end)
+    summary_list = all_months_test['amount__sum']
+
+    return date_list,summary_list
+
+
+def sum_date_by_range(start_date,end_date,db,db_func):
+  """method that returns two lists:
+  1.with the summ of all the records in the same month
+  2.with the all months and years
+  """
+
+  months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
+
+  unique_year_month_set = set()
+  for month in months_query_set:
+      unique_year_month_set.add((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
+  
+  # print(unique_year_month_set)
+
+  period = []
+  full_summary = []
+  for unique_date in unique_year_month_set:
+  
+    calculated_period_sum = sum_month(unique_date,db,db_func)
+    period.append(calculated_period_sum[0])
+    full_summary.append(calculated_period_sum[1])
+
+
+  # return sum_by_period
+  return full_summary,period
 
 
 
-# from dashboard.models import Position_responsabilities
+#?graph classes that will do some of the functionality in the website
+
+
 
 class graph_presentation(object):
     """graph class that using the plotly.express and pandas .
@@ -33,6 +88,8 @@ class graph_presentation(object):
             return self.pie_graph(group=group,value=values,path=path,to_html=to_html)
         if graph_type == self.donut_graph.__name__:
             return self.donut_graph(group=group,value=values,path=path,to_html=to_html)
+        if graph_type == self.line_graph.__name__:
+            return self.line_graph(values=values,names=group,path=path,to_html=to_html)
 
     
     def bar_graph(self,group:list,value:list,path=None,to_html=True):
@@ -76,7 +133,6 @@ class graph_presentation(object):
         """
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
 
-
         pie_fig = px.pie(values=values,names=names,template=self.template)
         pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
         pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
@@ -86,6 +142,29 @@ class graph_presentation(object):
             graph = pie_fig.to_html()
         else:
             graph = pie_fig.write_image(path)
+        return graph
+
+    def line_graph(self,values:list,names:list,path='',to_html=True):
+        
+
+        #! examples 
+        # df = px.data.gapminder().query("country=='Canada'")
+        # fig = px.line(df, x="year", y="lifeExp", title='Life expectancy in Canada')
+        # fig.show()
+
+
+
+
+        path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
+        line_fig = px.line(y=values,x=names,template=self.template)
+        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        line_fig.update_traces(textfont_size=12,text='percent+label')
+
+
+        if to_html:
+            graph = line_fig.to_html()
+        else:
+            graph = line_fig.write_image(path)
         return graph
 
 
@@ -198,87 +277,6 @@ class graph_presentation(object):
         return card_html
     
 
-    def test(self):
-      """test method that creates an instance and prints the html output of the graphs"""
-      instance = graph_presentation(calculations='calc')
-      data = instance.user_card({'username':'test user','user_position':'test team','picture':'employer/images/photo.png'})
-      print(data)
-
-
-
-class graph_queries:
-    def __init__(self):
-        self.data = []
-    
-    def task_completion(self,user):
-      """method printing the task completion of the specific user"""
-      task = 'radco'
-      users_task_objects = user.employer.job_position
-      record = users_task_objects
-      test_record = task
-      print(test_record)
-
-
-#this function are used as helpers later in the graph_calculator class
-
-def employer_data_info(request):
-    """method returning dict with the user information"""
-    first_name = request.user.employer.first_name
-    last_name = request.user.employer.last_name
-    department = request.user.employer.job_position.position
-    rank = request.user.employer.job_position.rank 
-    profile_pic = request.user.employer.profile_pic.url
-
-    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
-    return request_data
-
-
-def sum_month(start,db,db_func):
-    """sums all records inside the same month and returning two lists :
-       one list with the dates another with the summary of all the records inside the same month
-    """
-    
-    start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
-    # print(start_date)
-    end = start_date.replace(day = calendar.monthrange(start_date.year, start_date.month)[1])
-
-    all_months_test = db.objects.filter(month__range=(start_date,end)).all().values_list().aggregate(db_func('amount'))
-
-    date_list = str(start_date) + " - " + str(end)
-    summary_list = all_months_test['amount__sum']
-
-    return date_list,summary_list
-
-
-
-def sum_date_by_range(start_date,end_date,db,db_func):
-  """method that returns two lists:
-  1.with the summ of all the records in the same month
-  2.with the all months and years
-  """
-
-  months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
-
-  unique_year_month_set = set()
-  for month in months_query_set:
-      unique_year_month_set.add((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
-  
-  # print(unique_year_month_set)
-
-  period = []
-  full_summary = []
-  for unique_date in unique_year_month_set:
-  
-    calculated_period_sum = sum_month(unique_date,db,db_func)
-    period.append(calculated_period_sum[0])
-    full_summary.append(calculated_period_sum[1])
-
-
-  # return sum_by_period
-  return full_summary,period
-
-
-
     
 class GraphCalculator:
     """ graph calculater can 
@@ -320,15 +318,3 @@ class GraphCalculator:
         """returns default graph repr when there is no data present"""
         pass
     
-
-
-# class GraphPermissionCheck:
-#     def __init__(self,user,db,db_func):
-        
-#         self.user = user
-#         self.db = db 
-#         self.db_function = db_func
-
-    # def run_permission_check(self):
-        
-        

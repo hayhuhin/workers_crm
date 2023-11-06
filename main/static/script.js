@@ -304,7 +304,6 @@ function add_lead_ajax (e)  {
 function add_graph_ajax (e)  {
     // Get the CSRF token from the cookie
 var csrftoken = getCookie('csrftoken');
-
 // Make the AJAX request
 $.ajax({
     type: "POST",
@@ -315,20 +314,14 @@ $.ajax({
         end_date: $("#end_date").val(),
         db:$("#data_option"),
         graph:$("#graph_option"),
-        // name:$("#add_graph_data")
-        // Include other data fields as needed
+        
     },
-    success: function (data) {
-        setTimeout(function(){
-            location.reload(); 
-        }, 2000); 
-        // Handle the response from the server
-        // Display success or error messages to the user
-    },
-    error: function (xhr) {
-        // Handle errors
-    }
-});
+}),location.href = location.href
+
+
+
+
+
 
 // Function to get the CSRF token from the cookie
 function getCookie(name) {
@@ -344,9 +337,7 @@ function getCookie(name) {
         }
     }
     return cookieValue;
-}
-
-};
+}};
 
 
 

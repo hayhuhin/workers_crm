@@ -117,19 +117,19 @@
 
         <div class="graph m-2 p-3 border border-secondary rounded border-3">
 
-
+        <p>{{ graph.graph_data.v }}</p>
         <h3>Graph</h3>
 
           <div style="width: 100%; height: 30rem">
-          {{ graph|safe }}
+          {{ graph.graph_html|safe }}
           </div>
 
     <div class='text-body-secondary mt-3'>
-          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
-          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
+          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>{{graph.graph_data.v.graph_type}}</h5>
+          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>{{ graph.graph_data.v.graph_type }}</p>
+          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>record number: {{graph.graph_data.k}}</p>
       <div class='' style='margin-top: 15px'>
-        <small class='text-body-secondary m-1' >10.00.00</small>
+        <small class='text-body-secondary m-1' >{{graph.graph_data.v.date}}</small>
       </div><!-- end of -->
 
     </div><!-- end of text-body secondery-->

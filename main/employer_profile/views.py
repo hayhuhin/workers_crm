@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
-from func_tools.graph import graph_presentation,graph_queries,employer_data_info
+from func_tools.graph import graph_presentation,employer_data_info
 
 
 #current path
@@ -52,8 +52,8 @@ def profile_page(request):
         weekly_graph_card = instance_of_graph_presentation.graph_card('weekly lead',user_calc=weekly_donut_graph)
 
 
-        graph_queries_instance = graph_queries()
-        graph_queries_instance.task_completion(request.user)
+        # graph_queries_instance = graph_queries()
+        # graph_queries_instance.task_completion(request.user)
         context = {'profile':profile_card,'monthly_graph':monthly_graph_card,'weekly_graph':weekly_graph_card}
         return render(request,'code/profile.html',context)
 
@@ -88,6 +88,6 @@ def profile_page(request):
 
 
         context = {"teams_completion_monthly":teams_completion_monthly}
-        graph_queries_inst = graph_queries()
-        graph_queries_inst.task_completion(request.user)
+        # graph_queries_inst = graph_queries()
+        # graph_queries_inst.task_completion(request.user)
         return render(request,'code/profile.html',context)
