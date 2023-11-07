@@ -50,6 +50,8 @@ def dashboard(request):
     # mongodb_handler.remove_records("gr","ben",record_number="*",delete_all=True)
 
 
+    #! uncomment this if you want to see a repr of the user data
+    # mongodb_handler.find_data("gr",{"user_name":str(request.user)})
     #!###################################################################################
 
 
@@ -99,6 +101,7 @@ def dashboard(request):
 
             #filling the AddGraphForm with the request.POST data from the user
             form_inst = AddGraphForm(request.POST)
+            print(f"the requested post data is:{request.POST}")
 
             #checking the validity of the form (no injection etc...)
             if form_inst.is_valid():
@@ -106,10 +109,12 @@ def dashboard(request):
 
                 #simple form data for later usage
                 user = request.user
+                graph_title = form_inst.cleaned_data.get("graph_title")
+                graph_description = form_inst.cleaned_data.get("graph_description")
+                graph_type = form_inst.cleaned_data.get("graph")
+                db = form_inst.cleaned_data.get("db")
                 start = form_inst.cleaned_data.get("start_date")
                 end = form_inst.cleaned_data.get("end_date")
-                db = form_inst.cleaned_data.get("db")
-                graph_type = form_inst.cleaned_data.get("graph")
 
 
                 #this is the calculation of the data and returning it as 2 lists with x and y
@@ -122,8 +127,10 @@ def dashboard(request):
 
                 #the new record that will be added to the mongodb 
                 new_record = {
+                    "graph_title":graph_title,
+                    "graph_description":graph_description,
                     "graph_type":graph_type,
-                    "date" : time_now,
+                    "created_at" : time_now,
                     "x":graph_data[1],
                     "y":graph_data[0]
                     }
@@ -136,10 +143,16 @@ def dashboard(request):
                 return HttpResponseRedirect('/dashboard')
 
 
+        #* this if statement is for edit post method
+        if request.POST.get("edit_graph_data") == "edit_graph_data":
+            
+            return HttpResponseRedirect("/dashboard")
+
                     
         #? here its response in the post scope
         context = {'databases':databases,'income_form':income_form,"graph_chart":graph_chart}
         return render(request,'code/dashboard.html',context)
+
 
     #? here its the response in the get scope
     context = {'databases':databases,'income_form':income_form,'graph_chart':graph_chart}

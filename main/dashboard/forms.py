@@ -4,6 +4,8 @@ from .models import Income
 
 class AddGraphForm(forms.Form):
 
+    graph_title = forms.CharField(max_length=50,initial="Graph")
+    graph_description = forms.CharField(max_length=300,initial="No Description")
     start_date = forms.DateField()
     end_date = forms.DateField()
     # db = forms.CharField(max_length=100)
@@ -16,7 +18,4 @@ class AddGraphForm(forms.Form):
         widget=forms.TextInput(attrs={'hidden': 'hidden'})
     )
 
-
-    # fields = ["start_date","end_date","db"]
-    # labels = {"start_date":"start date","end_date":"end date","db":"data base"}
 

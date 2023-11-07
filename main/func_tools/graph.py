@@ -157,7 +157,7 @@ class graph_presentation(object):
 
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
         line_fig = px.line(y=values,x=names,template=self.template)
-        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)")
         line_fig.update_traces(textfont_size=12,text='percent+label')
 
 

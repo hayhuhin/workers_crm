@@ -24,6 +24,15 @@
           {% csrf_token %}
 
           <!-- body of the form fields-->
+          <div class='mb-3'>
+            <label for='graph_title' class='col-form-label'>Graph Title</label>
+              {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}
+          </div>
+
+          <div class='mb-3'>
+            <label for='graph_description' class='col-form-label'>Graph Description</label>
+              {% render_field income_form.graph_description type='text' id='graph_description' class='form-control'  %}
+          </div>
 
           <div class='mb-3'>
             <label for='date' class='col-form-label'>Start Date</label>
@@ -118,16 +127,15 @@
         <div class="graph m-2 p-3 border border-secondary rounded border-3">
 
         <p>{{ graph.graph_data.v }}</p>
-        <h3>Graph</h3>
+        <h3>{{graph.graph_data.v.graph_title}}</h3>
 
           <div style="width: 100%; height: 30rem">
           {{ graph.graph_html|safe }}
           </div>
 
     <div class='text-body-secondary mt-3'>
-          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>{{graph.graph_data.v.graph_type}}</h5>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>{{ graph.graph_data.v.graph_type }}</p>
-          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>record number: {{graph.graph_data.k}}</p>
+          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>{{ graph.graph_data.v.graph_description }}</p>
+          <p class=''><BOLD class="text-light-emphasis">Created At </BOLD>{{graph.graph_data.v.created_at}}</p>
       <div class='' style='margin-top: 15px'>
         <small class='text-body-secondary m-1' >{{graph.graph_data.v.date}}</small>
       </div><!-- end of -->

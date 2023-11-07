@@ -310,10 +310,12 @@ $.ajax({
     url: "/dashboard",
     data: {
         csrfmiddlewaretoken: csrftoken, // Include the CSRF token
+        graph_title:$("#graph_title").val(),
+        graph_description:$("#graph_description").val(),
+        graph:$("#graph_option"),
         start_date: $("#start_date").val(),
         end_date: $("#end_date").val(),
         db:$("#data_option"),
-        graph:$("#graph_option"),
         
     },
 }),location.href = location.href

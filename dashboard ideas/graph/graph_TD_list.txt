@@ -1,36 +1,55 @@
 
-FIELDS:
-starting date 
-ending date 
-data base
-
-
-
-1.save the created data for each user.
-2.fix the visuals
+1.save the created data for each user. - DONE
+2.fix the visuals - DONE
 3.add functionallity to the graph buttons(refresh query(up to 5 times,edit the query,remove graph))
-4.add lne graph option (not only the bar graph)
-5.the presentation must be sorted by years
-
-
-important changes
-
-the users graph data must be save in the db
+4.add line graph option (not only the bar graph) - DONE
+5.the presentation must be sorted by years - DONE
 
 no sql db fields:
-1.graph record with DateField
-2.graph months
-3.graph amount
+user specific data
+graph records :{
+                    graph number:{
+                        graph_title,
+                        graph_description,
+                        graph_type,
+                        graph created_at,
+                        graph months,
+                        graph amount
+                                }
+            }
+
+example of the fields in the mongodb:
+{
+    '_id': ObjectId('653a0779c0792e707a004472'),
+    'user_id': '2',
+    'user_name': 'ben',
+    'graph_records': {
+        'records': {
+            '000': {
+                'graph_title':'comp income',
+                'graph_description':'some data that for now is not important',
+                'graph_type': 'bar_graph',
+                'date': '2023-11-6. 14:42',
+                'x': ['2023-11-01 - 2023-11-30', '2023-12-01 - 2023-12-31', '2023-10-01 - 2023-10-31'],
+                'y': [1000, 3040, 50000]},
+
+             '1': {
+                'graph_type': 'line_graph',
+                'date': '2023-11-6. 14:44',
+                'x': ['2023-11-01 - 2023-11-30', '2023-12-01 - 2023-12-31', '2023-10-01 - 2023-10-31'],
+                'y': [1000, 3040, 50000]
+                }
+                }}}
 
 
-how to do it ?
-1.users input saves the data in the db with ajax manipulation
-2.each user have the option to choose his graph repr
+Graph edit section:
 
 
 
-Q?
-how to display 
+
+<<end of graph edit section >>
+
+
 
 return render will have function inside one of the attr that checks for graph db records and will display accordingly the data
 
@@ -50,32 +69,6 @@ b.the django app will perform CRUD functions with a python library "pymongo"
 5.how good the performance of using the db
 
 
-users_graph_example_dict:
-
-{
-    user_id:"1",
-    user_name:"vala",
-    graph_records : {
-        records:{
-            graph_position:1,
-            1000:{
-                created_at:YYYY-MM-DD,
-                x:[1,2,3,4,5],
-                y:["a","b","c","d","e"]
-            },
-            1001:{
-                created_at:YYYY-MM-DD,
-                x:[1,2,3,4,5],
-                y:["a","b","c","d","e"]
-            },
-            1002:{
-                created_at:YYYY-MM-DD,
-                x:[1,2,3,4,5],
-                y:["a","b","c","d","e"]
-            }
-        }
-    }
-}
 
 steps:
 1.find the specific user.
