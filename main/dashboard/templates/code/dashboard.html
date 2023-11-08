@@ -146,94 +146,111 @@
         {% csrf_token %}
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
         </form>
-        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
+        <button  name='edit_graph' value={{graph.graph_data.k}} class='btn btn-secondary ' member_id='' id='edit_graph'>Edit Graph</button>
         <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
 
-{% endfor %}
+{% comment %} {% endfor %} {% endcomment %}
 
 </div><!-- end of graph div-->
 
 </div>
-{% comment %} 
 
-
-
-        <div class="graph m-2 p-3 border border-secondary rounded border-3">
-
-
-        <h3>Graph</h3>
-
-          <div style="width: 100%; height: 30rem">
-          {{ line_chart|safe }}
+<!--#################################################################################################-->
+                                      <!-- TEST TEST TEST-->
+<div class='col-sm-auto'>
+  <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> edit graph </button>
+    <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 class='modal-title fs-5' id='graph_edit_modal_label'>edit graph</h1>
+            <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
           </div>
 
-    <div class='text-body-secondary mt-3'>
-          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
-          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
-      <div class='' style='margin-top: 15px'>
-        <small class='text-body-secondary m-1' >10.00.00</small>
-      </div><!-- end of -->
+      <!-- form of adding new task --> 
+      <div class='modal-body'>
 
-    </div><!-- end of text-body secondery-->
+        <form method='POST'>
 
-        <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
-        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
-        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
+          {% csrf_token %}
 
-
-
-</div>
- <div class="graph m-2 p-3 border border-secondary rounded border-3">
-
-
-        <h3>Graph</h3>
-
-          <div style="width: 100%; height: 30rem">
-          {{ pie_chart|safe }}
+          <!-- body of the form fields-->
+          <div class='mb-3'>
+            <label for='graph_title' class='col-form-label'>Graph Title</label>
+            <p>{{graph.graph_data.v.graph_title}}</p>
+              {% render_field edit_graph_form.graph_title type='title' id='graph_title' class='form-control' value=graph.graph_data.v.graph_title %}
           </div>
 
-    <div class='text-body-secondary mt-3'>
-          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
-          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
-      <div class='' style='margin-top: 15px'>
-        <small class='text-body-secondary m-1' >10.00.00</small>
-      </div><!-- end of -->
-
-    </div><!-- end of text-body secondery-->
-
-        <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
-        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
-        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
-
-</div>
-
- <div class="graph m-2 p-3 border border-secondary bg-dark rounded border-3">
-
-
-        <h3>Graph</h3>
-
-          <div style="width: 100%; height: 30rem">
-          {{ line_2_chart|safe }}
+          <div class='mb-3'>
+            <label for='graph_description' class='col-form-label'>Graph Description</label>
+              {% render_field edit_graph_form.graph_description type='text' id='graph_description' class='form-control' value=graph.graph_data.v.graph_description %}
           </div>
 
-    <div class='text-body-secondary mt-3'>
-          <h5 class=''><BOLD class="text-light-emphasis">Title: </BOLD>tete</h5>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>tetetete</p>
-          <p class=''><BOLD class="text-light-emphasis">Additional Description: </BOLD>sasasa</p>
-      <div class='' style='margin-top: 15px'>
-        <small class='text-body-secondary m-1' >10.00.00</small>
-      </div><!-- end of -->
+          <div class='mb-3'>
+            <label for='date' class='col-form-label'>Start Date</label>
+            <p>the previus start date was : {{graph.graph_data.v.x|last }}</p>
+              {% render_field edit_graph_form.start_date type='date' id='graph_start_date' class='form-control'  %}
+          </div>
 
-    </div><!-- end of text-body secondery-->
+          <div class='mb-3'>
+            <label for='date' class='col-form-label'>End Date</label>
+              <p>the previus end date was : {{graph.graph_data.v.x|first }}</p>
+              {% render_field edit_graph_form.end_date type='date' id='graph_end_date' class='form-control'  %}
+          </div>
 
-        <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
-        <button  name='' class='btn btn-secondary ' member_id='' id=''>Edit Graph</button>
-        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
+          <div class='col' ><!-- ###-->
 
-</div> {% endcomment %}
+          <div class='mb-3'>
 
+          </div> <!-- end of mb-3 class-->
+            <div class="mb-3 row">
+            <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
+                <div class="col-sm-auto">
+
+                  <select class="form-select selected_data" aria-label="Default select example">
+                    <option selected class="select_one" name="select">Select One</option>
+                    <option class="income" 
+                    value="income" id="choosed_db" name="income">Income</option>
+                    <option class="outcome" value="outcome" 
+                    id="choosed_db"
+                    name="outcome">Outcome</option>
+                  </select>
+
+                {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' %}
+            </div>
+            </div>
+
+            <div class="row">
+
+              <label for="graph_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
+                <div class="col-sm-auto">
+
+            <select class="form-select selected_graph" aria-label="Default select example">
+              <option selected class="select" value="select" name="bar_graph">Select One</option>
+              <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
+              <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
+            </select>
+              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option'%}
+            </div>
+
+          </div>
+          </div><!-- end of col div#### -->
+
+      </div><!-- end div of the modal-body -->
+
+        <!-- modal footer section -->
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+          <button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary add_graph_button'>Save</button>
+        </div>
+
+      </form>
+
+        </div>
+
+        </div><!-- end of 'modal-content'-->
+<!--#################################################################################################-->
+{% endfor %}
 
 
 </div><!-- end of 'container' -->

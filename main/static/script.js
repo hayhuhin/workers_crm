@@ -342,19 +342,52 @@ function getCookie(name) {
 }};
 
 
+//testtesttesttest
 
-// start_date = forms.DateField()
-// end_date = forms.DateField()
-// # db = forms.CharField(max_length=100)
-// db = forms.CharField(
-//     max_length=100,
-//     widget=forms.TextInput(attrs={'hidden': 'hidden'})
-// )
-// graph = forms.CharField(
-//     max_length=100,
-//     widget=forms.TextInput(attrs={'hidden': 'hidden'})
-// )
 
+function adit_graph (e)  {
+    // Get the CSRF token from the cookie
+var csrftoken = getCookie('csrftoken');
+// Make the AJAX request
+$.ajax({
+    type: "POST",
+    url: "/dashboard",
+    data: {
+        csrfmiddlewaretoken: csrftoken, // Include the CSRF token
+        graph_title:$("#graph_title").val(),
+        graph_description:$("#graph_description").val(),
+        graph:$("#graph_option"),
+        start_date: $("#start_date").val(),
+        end_date: $("#end_date").val(),
+        db:$("#data_option"),
+        
+    },
+}),location.href = location.href
+
+
+
+
+
+
+// Function to get the CSRF token from the cookie
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = $.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}};
+
+
+
+//testtesttesttest
 $(document).ready(function(){
     var cur = 4;
     $('.task_col').hide();

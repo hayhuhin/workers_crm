@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm
+from .forms import AddGraphForm,EditGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph import GraphCalculator,graph_presentation
@@ -72,8 +72,8 @@ def dashboard(request):
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
         for graph in mongodb_getting_data:
-
-
+            
+            
             graph_html = graph_repr.graph_options(graph_type=graph["v"]["graph_type"],group=graph["v"]["x"],values=graph["v"]["y"])  
 
             #this is the graph chart list that pushed to the html template with its graph data
@@ -82,6 +82,9 @@ def dashboard(request):
 
     #instance of  "add graph form"
     income_form = AddGraphForm()
+
+    #instance of a "edit graph form"
+    edit_graph_form = EditGraphForm()
 
 
     #! only for testing for now (later it will be queried and represented)
@@ -148,14 +151,14 @@ def dashboard(request):
             
             return HttpResponseRedirect("/dashboard")
 
-                    
+        print(request.POST)
         #? here its response in the post scope
         context = {'databases':databases,'income_form':income_form,"graph_chart":graph_chart}
         return render(request,'code/dashboard.html',context)
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,'income_form':income_form,'graph_chart':graph_chart}
+    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'graph_chart':graph_chart}
     return render(request,'code/dashboard.html',context)
 
 
