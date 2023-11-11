@@ -3,6 +3,7 @@ blinker==1.6.2
 Django==4.2.3
 django-shortcuts==1.6
 django-widget-tweaks==1.5.0
+dnspython==2.4.2
 kaleido==0.2.1
 mysql-connector-python==8.1.0
 numpy==1.25.2
@@ -11,7 +12,7 @@ pandas==2.0.3
 Pillow==10.0.0
 plotly==5.16.0
 protobuf==4.21.12
-pymongo==3.6.0
+pymongo==4.5.0
 python-dateutil==2.8.2
 pytz==2023.3
 six==1.16.0
