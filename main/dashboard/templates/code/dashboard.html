@@ -146,111 +146,125 @@
         {% csrf_token %}
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
         </form>
-        <button  name='edit_graph' value={{graph.graph_data.k}} class='btn btn-secondary ' member_id='' id='edit_graph'>Edit Graph</button>
-        <button type='button'  name='' class='btn btn-danger' member_id='' id=''>Remove Graph</button>
+        <button type='button'  name='remove_graph' class='btn btn-danger' value={{graph.graph_data.k}} member_id='' id=''>Remove Graph</button>
 
-{% comment %} {% endfor %} {% endcomment %}
 
-</div><!-- end of graph div-->
 
-</div>
+        <!-- THIS IS THE MODAL SECTION THAT HAVE THE CONTROL OVER THE EDIT BUTTON -->
+
+        <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
+
+          <div class='col-sm-auto'>
+              <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
+                <div class='modal-dialog'>
+                  <div class='modal-content'>
+                    <div class='modal-header'>
+                      <h1 class='modal-title fs-5' id='graph_edit_modal_label'>edit graph</h1>
+                      <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                    </div>
+
+                <!-- form of adding new task --> 
+                <div class='modal-body'>
+
+                  <form method='POST' class="edit-graph-form" data-form-id="{{graph.graph_data.k}}">
+
+                    {% csrf_token %}
+
+                    <!-- body of the form fields-->
+
+                    <!-- graph title -->
+                    <div class='mb-3'>
+                      <label for='graph_title' class='col-form-label'>Graph Title</label>
+                        {% render_field edit_graph_form.graph_title type='title' id=graph.graph_data.k class='form-control' value=graph.graph_data.v.graph_title %}
+                    </div>
+                    <!-- end of graph title -->
+
+                    <!-- graph description-->
+                    <div class='mb-3'>
+                      <label for='graph_title' class='col-form-label'>Graph Description</label>
+                        {% render_field edit_graph_form.graph_description type='title' id='graph_description_{{graph.graph_data.k}}' class='form-control' value=graph.graph_data.v.graph_description %}
+                    </div>
+                    <!-- end of graph description-->
+
+                    <!-- start of start_date-->
+                    <div class='mb-3'>
+                      <label for='graph_title' class='col-form-label'>Start Date</label>
+                      <p>previous date was : {{graph.graph_data.v.x|last}}</p>
+                        {% render_field edit_graph_form.start_date type='date' id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                    </div>
+                    <!-- end of start_date div -->
+
+                    <!-- start of the end_date div-->
+                      <div class='mb-3'>
+                        <label for='graph_title' class='col-form-label'>End Date</label>
+                        <p>previous date was : {{graph.graph_data.v.x|first}}</p>
+                        {% render_field edit_graph_form.end_date type='date' id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                    </div>
+                    <!-- end of the end_date div-->
+
+                    <!-- test of the options section-->
+                  <div class="mb-3 row">
+                  <label for="data_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
+                    <div class="col-sm-auto">
+                      {% comment %} <select class="form-select selected_edit_graph" aria-label="Default select example">
+                        <option selected class="select" value="select" name="bar_graph">Select One</option>
+                        <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
+                        <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
+                      </select> {% endcomment %}
+                        {% render_field edit_graph_form.graph type='text' class='form-control-plaintext' id='graph_edit_option'%}
+                      </div>
+                    </div> 
+                      
+                    <!-- test of the options section-->
+
+                    <!-- edit database div -->
+                      <div class="mb-3 row">
+                      <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
+                          <div class="col-sm-auto">
+                            {% comment %} <select class="form-select selected_edit_data" aria-label="Default select example">
+                              <option selected class="select_one" name="select">Select One</option>
+                              <option class="income" 
+                                value="income" id="choosed_db" name="income">Income</option>
+                              <option class="outcome" value="outcome" 
+                                id="choosed_db"
+                                name="outcome">Outcome</option>
+                              </select> {% endcomment %}
+
+                            {% render_field edit_graph_form.db type='text' class='form-control-plaintext' id='data_edit_option' %}
+                          </div>
+                      </div><!-- end of the database div--> 
+
+
+                <!-- test test test test test -->
+
+                {% render_field edit_graph_form.graph_id type='text' value=graph.graph_data.k %}
+
+                <!-- test test test test test -->
+
+                </div><!-- end div of the modal-body -->
+
+                
+
+                  <!-- modal footer section -->
+                  <div class='modal-footer'>
+                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                    <button type='submit' name='edit_graph_data' value='edit_graph_data' class='btn btn-primary edit_graph_button'>Save</button>
+                  </div>
+
+
+                  </div>
+                </form>
+              </div><!-- end of 'modal-content'-->
+
+            </div><!-- end of graph div-->
+
+        </div>
+
 
 <!--#################################################################################################-->
                                       <!-- TEST TEST TEST-->
-<div class='col-sm-auto'>
-  <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> edit graph </button>
-    <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
-      <div class='modal-dialog'>
-        <div class='modal-content'>
-          <div class='modal-header'>
-            <h1 class='modal-title fs-5' id='graph_edit_modal_label'>edit graph</h1>
-            <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-          </div>
-
-      <!-- form of adding new task --> 
-      <div class='modal-body'>
-
-        <form method='POST'>
-
-          {% csrf_token %}
-
-          <!-- body of the form fields-->
-          <div class='mb-3'>
-            <label for='graph_title' class='col-form-label'>Graph Title</label>
-            <p>{{graph.graph_data.v.graph_title}}</p>
-              {% render_field edit_graph_form.graph_title type='title' id='graph_title' class='form-control' value=graph.graph_data.v.graph_title %}
-          </div>
-
-          <div class='mb-3'>
-            <label for='graph_description' class='col-form-label'>Graph Description</label>
-              {% render_field edit_graph_form.graph_description type='text' id='graph_description' class='form-control' value=graph.graph_data.v.graph_description %}
-          </div>
-
-          <div class='mb-3'>
-            <label for='date' class='col-form-label'>Start Date</label>
-            <p>the previus start date was : {{graph.graph_data.v.x|last }}</p>
-              {% render_field edit_graph_form.start_date type='date' id='graph_start_date' class='form-control'  %}
-          </div>
-
-          <div class='mb-3'>
-            <label for='date' class='col-form-label'>End Date</label>
-              <p>the previus end date was : {{graph.graph_data.v.x|first }}</p>
-              {% render_field edit_graph_form.end_date type='date' id='graph_end_date' class='form-control'  %}
-          </div>
-
-          <div class='col' ><!-- ###-->
-
-          <div class='mb-3'>
-
-          </div> <!-- end of mb-3 class-->
-            <div class="mb-3 row">
-            <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
-                <div class="col-sm-auto">
-
-                  <select class="form-select selected_data" aria-label="Default select example">
-                    <option selected class="select_one" name="select">Select One</option>
-                    <option class="income" 
-                    value="income" id="choosed_db" name="income">Income</option>
-                    <option class="outcome" value="outcome" 
-                    id="choosed_db"
-                    name="outcome">Outcome</option>
-                  </select>
-
-                {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' %}
-            </div>
-            </div>
-
-            <div class="row">
-
-              <label for="graph_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
-                <div class="col-sm-auto">
-
-            <select class="form-select selected_graph" aria-label="Default select example">
-              <option selected class="select" value="select" name="bar_graph">Select One</option>
-              <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
-              <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
-            </select>
-              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option'%}
-            </div>
-
-          </div>
-          </div><!-- end of col div#### -->
-
-      </div><!-- end div of the modal-body -->
-
-        <!-- modal footer section -->
-        <div class='modal-footer'>
-          <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-          <button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary add_graph_button'>Save</button>
-        </div>
-
-      </form>
-
-        </div>
-
-        </div><!-- end of 'modal-content'-->
 <!--#################################################################################################-->
-{% endfor %}
+    {% endfor %}
 
 
 </div><!-- end of 'container' -->

@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect,HttpResponseRedirect
+from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
 from .forms import AddGraphForm,EditGraphForm
@@ -72,6 +72,7 @@ def dashboard(request):
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
         for graph in mongodb_getting_data:
+
             
             
             graph_html = graph_repr.graph_options(graph_type=graph["v"]["graph_type"],group=graph["v"]["x"],values=graph["v"]["y"])  
@@ -91,8 +92,11 @@ def dashboard(request):
     databases = ["Income","Outcome"]
 
 
+
     #checking if the request method is POST
     if request.method == "POST":
+        print(request.POST)
+
 
 
         #only used as a shortcut to get the request.post data as "post_data"
@@ -148,10 +152,56 @@ def dashboard(request):
 
         #* this if statement is for edit post method
         if request.POST.get("edit_graph_data") == "edit_graph_data":
-            
-            return HttpResponseRedirect("/dashboard")
+                
+                #this is the instance of the edit graph form with the request.post user data
+                edit_form_inst = EditGraphForm(request.POST)
 
-        print(request.POST)
+                #this validates that the data is clean
+                if edit_form_inst.is_valid():
+
+                    #form data for later usage
+                    edit_user = request.user
+                    edit_graph_id = edit_form_inst.cleaned_data.get("graph_id")
+                    edit_graph_title = edit_form_inst.cleaned_data.get("graph_title")
+                    edit_graph_description = edit_form_inst.cleaned_data.get("graph_description")
+                    edit_graph_type = edit_form_inst.cleaned_data.get("graph")
+                    edit_db = edit_form_inst.cleaned_data.get("db")
+                    edit_start = edit_form_inst.cleaned_data.get("start_date")
+                    edit_end = edit_form_inst.cleaned_data.get("end_date")
+
+                    #calculates the x and the y of the graph and returns it as two lists
+                    edit_graph_data = graph_calculator.sum_by_range(start_date=edit_start,end_date=edit_end)
+                    
+                    
+                    #showing the current time- its for user graph creation show
+                    gmtime_dict = time.gmtime()
+                    edit_time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dict[3]}:{gmtime_dict[4]}")
+
+
+
+                    edited_data = {
+                         "graph_title":edit_graph_title,
+                         "graph_description":edit_graph_description,
+                         "graph_type":edit_graph_type,
+                         "created_at":edit_time_now,
+                         "x":edit_graph_data[1],
+                         "y":edit_graph_data[0]
+                    }
+                    final = mongodb_handler.edit_record(collection_name="gr",user=str(edit_user),record_id=edit_graph_id,new_data=edited_data)
+                    # mongodb_handler.find_data(collection_name="gr",data={"user_name":"ben"})
+
+            
+                    return HttpResponseRedirect("/dashboard")
+                
+                #this is if the form is not valid
+                else:
+                     #? later it will display an error page 
+                     return HttpResponse("invalid form")
+                
+                    
+                    
+
+
         #? here its response in the post scope
         context = {'databases':databases,'income_form':income_form,"graph_chart":graph_chart}
         return render(request,'code/dashboard.html',context)

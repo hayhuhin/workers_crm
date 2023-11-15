@@ -34,6 +34,25 @@ class mongodb_constructor:
         return 7
 
 
+    def edit_record(self,collection_name:str,user,record_id:str,new_data:dict):
+        self.collection_name = collection_name
+        query = {"user_name": user}
+        projection = {"graph_records.records": 1, "_id": 0}
+        sort = [("graph_records.records", 1)]
+        query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+        #the format of the new data
+
+        new_record_query = {
+            "$set":{
+                f"graph_records.records.{record_id}":new_data
+            }
+        }
+
+        result = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+        print(f"record: {record_id} is updated successfully")
+
+
     def add_record(self,max_record_amount,collection_name:str,new_record:dict,user:str,many_records=False):
         """ add method that creates collection if doesnt exists and writes 
             data into the collection

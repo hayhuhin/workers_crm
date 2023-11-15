@@ -345,45 +345,53 @@ function getCookie(name) {
 //testtesttesttest
 
 
-function adit_graph (e)  {
-    // Get the CSRF token from the cookie
-var csrftoken = getCookie('csrftoken');
-// Make the AJAX request
-$.ajax({
-    type: "POST",
-    url: "/dashboard",
-    data: {
-        csrfmiddlewaretoken: csrftoken, // Include the CSRF token
-        graph_title:$("#graph_title").val(),
-        graph_description:$("#graph_description").val(),
-        graph:$("#graph_option"),
-        start_date: $("#start_date").val(),
-        end_date: $("#end_date").val(),
-        db:$("#data_option"),
-        
-    },
-}),location.href = location.href
+// function edit_graph_ajax (e)  {
+//     e.preventDefault();
+
+//     var csrftoken = getCookie('csrftoken');
+//     var form_id = $(this).data("form-id");
+//     // Make the AJAX request
+//     // console.log($(this).find("#graph_title").val())
+
+//     $.ajax({
+//         type: "POST",
+//         url: "/dashboard",
+//         data: {
+//             csrfmiddlewaretoken: csrftoken, 
+//             graph_title:$(this).find("#graph_title_"+form_id).val(),
+//             // graph_description:$(this).find("#graph_description_"+form_id).val(),
+//             // // graph:$(this).find("graph_option"),
+//             // start_date: $(this).find("#graph_start_date_"+form_id).val(),
+//             // end_date: $(this).find("#graph_end_date_"+form_id).val(),
+//             // // db:$(this).find("data_option"),
+            
+//         },
+//     }),location.href = location.href
 
 
 
 
 
 
-// Function to get the CSRF token from the cookie
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = $.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}};
+//     // Function to get the CSRF token from the cookie
+//     function getCookie(name) {
+//         var cookieValue = null;
+//         if (document.cookie && document.cookie !== '') {
+//             var cookies = document.cookie.split(';');
+//             for (var i = 0; i < cookies.length; i++) {
+//                 var cookie = $.trim(cookies[i]);
+//                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
+//                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                     break;
+//                 }
+//             }
+//         }
+//         return cookieValue;
+//     }};
+
+
+
+
 
 
 
@@ -440,6 +448,7 @@ function fill_db () {
 
 
 //selected_data
+// $(document).on('submit','#add_task_submit_form',edit_graph)
 
 $('.close_small_navbar').on('click',trigger_big_navbar)
 
@@ -478,8 +487,11 @@ $('.lead_on_progress_button').on('click',lead_on_progress_ajax)
 
 $('.lead_delete_button').on('click',lead_delete_ajax)
 
-$('.add_graph_button').on('click',add_graph_ajax)
 
+// $('.edit-graph-form').on('submit',edit_graph_ajax)
+
+
+$('.add_graph_button').on('click',add_graph_ajax)
 
 
 // $('.db').on('click',fill_db)
@@ -489,6 +501,26 @@ $('.selected_graph').change(function (e) {
 
     var opt_choosed = e.target.value;
     $('#graph_option').attr('value',opt_choosed);
+    console.log(opt_choosed)
+
+});
+
+
+
+$('.selected_edit_graph').change(function (e) {
+
+    var opt_choosed = e.target.value;
+
+    $('#graph_edit_option').attr('Defaultvalue',opt_choosed);
+    console.log($('#graph_edit_option').attr('value',opt_choosed));
+    console.log(opt_choosed)
+
+});
+
+$('.selected_edit_data').change(function (e) {
+
+    var opt_choosed = e.target.value;
+    $('#data_edit_option').attr('value',opt_choosed);
     console.log(opt_choosed)
 
 });

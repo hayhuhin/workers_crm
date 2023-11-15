@@ -25,12 +25,23 @@ class EditGraphForm(forms.Form):
     graph_description = forms.CharField(max_length=300)
     start_date = forms.DateField()
     end_date = forms.DateField()
+    graph_id = forms.CharField(max_length=10,widget=forms.TextInput(attrs={"hidden":"hidden","class":"vala_id"}))
 
-    db = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'hidden': 'hidden'})
-    )
-    graph = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'hidden': 'hidden'})
+
+    db_options = [
+        ("income","Income"),
+        ("outcome","Outcome")]
+    
+    graph_options = [
+        ("bar_graph","Bar graph"),
+        ("line_graph","Line Graph")]
+
+    db = forms.ChoiceField(choices=db_options)
+        # widget=forms.TextInput(attrs={'style':'visibility: hidden; position: absolute;'}),
+
+    graph = forms.ChoiceField(choices=graph_options
+        # max_length=100,
+        # widget=forms.TextInput(attrs={'hidden':'hidden'}),
+
+
     )
