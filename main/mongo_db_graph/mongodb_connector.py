@@ -59,20 +59,21 @@ class mongodb_constructor:
         """
         self.collection_name = collection_name
 
-
-
         query = {"user_name": user}
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
 
-
+# [0]["graph_records"]["records"]
         #this gives me the option to see the keys of the graph_records.records
+        print("*********************************")
+        print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
+        print(len((list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])))
+        print("*********************************")
         records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
 
         #this checking the users permission and its record capacity approved
         #and return integer of the records approved
         self.capacity_approved = max_record_amount
-        print(len(records))
 
 
         if len(records) >= self.capacity_approved:
@@ -85,7 +86,7 @@ class mongodb_constructor:
         if len(records) ==  0:
 
             #the new record that will be created
-            new_record_name = "000"
+            new_record_name = "0"
 
             #bellow section is responsible for formating the new record 
 
@@ -139,13 +140,18 @@ class mongodb_constructor:
         query = {"user_name": user}
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
+        if list(self.db.get_collection(self.collection_name).find(query,projection)):
+            records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
 
-        records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
-
-        if return_int:
-            return len(records)
+            if return_int:
+                return len(records)
+            
+            else:
+                return records
         else:
+            records = []
             return records
+
 
     def remove_records(self,collection_name:str,user:str,record_number:str,delete_all=False):
         """this method can remove records with the record number"""
@@ -193,6 +199,27 @@ class mongodb_constructor:
         
 
 
+    def user_exists(self,collection_name:str,user:str):
+        query_filter = {
+            "user_name":user
+        }
+        user_found = list(self.db.get_collection(collection_name).find(query_filter))
+        
+
+        if user_found:
+            return True
+        if not user_found:
+
+            new_user_data = {
+                "user_name":user,
+                "graph_records" : {
+                    "records":{}
+                }
+            }
+            new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
+            new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
+            return new_user_data_insertion
+
 
 
     def find_data(self,collection_name:str,data):
@@ -232,11 +259,19 @@ class mongodb_constructor:
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
 
+        records_amount = 0
+
         # Execute the query
+        
+        if record_count == 0:
+            return None
+
         records_amount = len(list(collection.find(query, projection).sort(sort))[0]["graph_records"]["records"])
 
+ 
         #validating that the record count is not higher or smaller then the amount of records
         if record_count > records_amount or record_count <= 0:
+
             print(f"you inserted {record_count} and this user has only {records_amount} records . please insert a valid number")
             return None
 

@@ -110,7 +110,7 @@ change the graph_calculator to represent the data as dict :
 }
 
 
-{
+
     user_id:"1",
     user_name:"vala",
     graph_records : {
@@ -127,3 +127,7 @@ change the graph_calculator to represent the data as dict :
             }
     }
 }
+
+
+mongodb connector tasks:
+create method that checks if the user exists or hes new and create for him the mongodb record

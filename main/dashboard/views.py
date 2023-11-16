@@ -34,7 +34,9 @@ def dashboard(request):
     graph_repr = graph_presentation()
 
     #this class have CRUD methods that save the graph data into the mongodb
-    mongodb_handler = mongodb_constructor(uri="mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2",db_name="test")
+    windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    mongodb_handler = mongodb_constructor(uri=windows_uri,db_name="test")
 
 
     #gets the users all records from the mongodb 
@@ -59,9 +61,15 @@ def dashboard(request):
     #* this section is querying the mongo db for records and saves the graphs as a dict of keys and values
     #* the key is the graph_name and the value is the html(with plotly lib) of the graph
 
-    #this method gives me this specific user all records
-    total_records = mongodb_handler.user_all_records(user=str(request.user),collection_name="gr")
+    ######################################
+    #this section will have a method that checking if the user exists already or not and add a simple first data into the db
+    res = mongodb_handler.user_exists(collection_name="gr",user=str(request.user))
 
+    ######################################
+
+
+    #this method gives me this specific user all records
+    total_records = mongodb_handler.user_all_records(user=str(request.user),collection_name="gr",return_int=True)
     #this method will be used always when the page refreshing and query the mongodb for data
     mongodb_getting_data = mongodb_handler.get_record(collection_name="gr",user_name=str(request.user),record_count=total_records)
 
@@ -141,6 +149,13 @@ def dashboard(request):
                     "x":graph_data[1],
                     "y":graph_data[0]
                     }
+
+                ######################################
+                #this section will have a method that checking if the user exists already or its new
+                res = mongodb_handler.user_exists(collection_name="gr",user=str(request.user))
+
+                ######################################
+
 
                 #this the record that added to the collection in the mongodb 
                 mongodb_added_record = mongodb_handler.add_record(collection_name="gr",user=str(request.user),new_record=new_record,max_record_amount=int(record_amount["record_amount"]))
