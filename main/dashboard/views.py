@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import AddGraphForm,EditGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
-from func_tools.graph import GraphCalculator,graph_presentation
-from mongo_db_graph.mongodb_connector import mongodb_constructor
+from func_tools.graph import GraphCalculator,GraphRepresantation
+from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
 from user.models import Employer
 
@@ -24,25 +24,24 @@ def dashboard(request):
     #database user specific instance
     employer_db_inst = Employer.objects.get(user=request.user)
 
-    #this dict will have data of the graph later
-    graph_chart = []
 
     #class that have methods and can query the sqlite for all the records of the db
     graph_calculator = GraphCalculator( user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = "")
 
-    #the graph html representation class
-    graph_repr = graph_presentation()
-
     #this class have CRUD methods that save the graph data into the mongodb
     windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
     mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mongodb_handler = mongodb_constructor(uri=windows_uri,db_name="test")
+    mongodb_handler = MongoDBConstructor(uri=windows_uri,db_name="test")
+    
+    #the graph html representation class
+    graph_repr = GraphRepresantation()
 
+
+    #this dict will have data of the graph later
+    graph_chart = []
 
     #gets the users all records from the mongodb 
     record_amount = employer_db_inst.graph_permission.all().values("record_amount")[0]
-
-
 
 
     #####################!testing in the get method section #############################
@@ -104,8 +103,6 @@ def dashboard(request):
     #checking if the request method is POST
     if request.method == "POST":
         print(request.POST)
-
-
 
         #only used as a shortcut to get the request.post data as "post_data"
         post_data = request.POST

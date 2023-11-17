@@ -8,7 +8,7 @@ uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS
 
 
 
-class mongodb_constructor:
+class MongoDBConstructor:
     """class that connecting to the local mongodb and perform CRUD operations 
         with a help of methods that checking the users record permission
     """
@@ -341,7 +341,7 @@ my_new_data = [{
 
 
 
-test_class = mongodb_constructor(uri,"test")
+test_class = MongoDBConstructor(uri,"test")
 # add_record_test = test_class.extract_record("gr","david",2)
 
 

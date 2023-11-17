@@ -68,7 +68,7 @@ def sum_date_by_range(start_date,end_date,db,db_func):
 
 
 
-class graph_presentation(object):
+class GraphRepresantation(object):
     """graph class that using the plotly.express and pandas .
        class is used for returning plotly graphs in much easier and cleaner way
        each method is returning graph as image or html

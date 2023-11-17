@@ -1,7 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
-from func_tools.graph import graph_presentation,employer_data_info
+from func_tools.graph import GraphRepresantation,employer_data_info
 
 
 #current path
@@ -23,7 +23,7 @@ def profile_page(request):
     #the higher user rank the higher privileges the user have
     if request_data['job_rank'] <= 300 and request_data['job_rank'] > 200:
         #graph html builder(combine the graph representation with html)
-        instance_of_graph_presentation = graph_presentation()
+        instance_of_graph_presentation = GraphRepresantation()
         
 
         # contribution pie graph 

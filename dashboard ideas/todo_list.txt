@@ -42,27 +42,28 @@ add progress bar to the leads,sided nav bar,appropriate button names,appropriate
 
 
 
-tasks4:
+tasks 4:
 add:change the dashboard to be represented much bigger and nice for the client end - DONE
 
-<<< on work >>>
-ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) 
->>then what to query from the DB - income/outcome/timeline/) - more details in graph_builder.txt 
-to do:
+task 5
+ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) - DONE
+>>then what to query from the DB - income/outcome/timeline/) - more details in graph_builder.txt - DONE
 
-1.add fields to the form :
+
+add fields to the add graph form :
     a.title of the graph - DONE
     b.sub-title - DONE
 
-
-create edit graph functionallity
+create edit graph functionallity - DONE
+<< working on >>
 create remove graph functionallity in the dashboard page 
 
 
 
+<< on hold >>
+task 6:
+ADD:change the profile page to look much more updated and nice for the end user - 
 
-task4.5:
-ADD:change the profile page to look much more updated and nice for the end user - DONE
 
 
 

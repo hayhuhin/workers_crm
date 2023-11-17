@@ -6,19 +6,18 @@ each user can modify his dashboard presentation(data is not live - query the dat
 
 saving queried data:
 1.caching system is needed?
-2.prevent the users from refreshing the query
+2.prevent the users from refreshing the query 
 
 
 how the user is going to query the DB
 
-1.each user will gain appropriate access to the db via their rank of the department(example: back office employers can acceess managers db)
-2.the user will have limited options to the queries (example:choose table-income/outcome >> **self.user >> choose date: 12/12/12 - 11/11/13)
-3.the user will choose which graph presentation to use 
+1.each user will gain appropriate access to the db via their rank of the department(example: back office employers can acceess managers db) - the access is added inside a sql graph permission table
+2.the user will have limited options to the queries (example:choose table-income/outcome >> **self.user >> choose date: 12/12/12 - 11/11/13) - handled by the sql graph permission table
+3.the user will choose which graph presentation to use - handled by the graph representation class
 
 
 program:
-
-user input >> query the DB >> save the graph data >>formating the result to graph input >> saves graph input to html >> response output
+user input >> validates the input >> query the sql db for permission >>query the no sql db >> save the graph data >>formating the result to graph input >> saves graph input to html >> response output
 
 django design pattern for this graph feature:
 
@@ -34,5 +33,4 @@ constraints:
 3.query modifying
 4.user experience tested well
 
-
-
+the proccess is continued in the graph_todolist.txt file.
