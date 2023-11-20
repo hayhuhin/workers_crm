@@ -107,7 +107,10 @@ class GraphRepresantation(object):
 
 
         #,margin=dict(l=50,r=20,t=20,b=100)
-        graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor= 'rgba(0, 0, 0, 0)')
+        graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+)
 
 
 
@@ -126,7 +129,7 @@ class GraphRepresantation(object):
 
 
         if to_html:
-            graph = graph_fig.to_html()
+            graph = graph_fig.to_html(config={'displayModeBar': True})
         else:
             graph = graph_fig.write_image(path)
         return graph
@@ -148,7 +151,7 @@ class GraphRepresantation(object):
 
 
         if to_html:
-            graph = pie_fig.to_html()
+            graph = pie_fig.to_html(config={'displayModeBar': True})
         else:
             graph = pie_fig.write_image(path)
         return graph
@@ -166,12 +169,12 @@ class GraphRepresantation(object):
 
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
         line_fig = px.line(y=values,x=names,template=self.template)
-        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)")
+        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)",modebar={'bgcolor':'rgba(0, 0, 0, 0)'},)
         line_fig.update_traces(textfont_size=12,text='percent+label')
 
 
         if to_html:
-            graph = line_fig.to_html()
+            graph = line_fig.to_html(config={'displayModeBar': True})
         else:
             graph = line_fig.write_image(path)
         return graph
@@ -198,7 +201,7 @@ class GraphRepresantation(object):
         #text position and the font size udjustments
         donut_fig.update_traces(textfont_size=12,textinfo='percent+label')#textposition="outside",
         if to_html:
-            graph = donut_fig.to_html()
+            graph = donut_fig.to_html(config={'displayModeBar': True})
         
         else:
             graph = donut_fig.write_image(path)

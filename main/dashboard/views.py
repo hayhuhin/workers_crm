@@ -31,7 +31,7 @@ def dashboard(request):
     #this class have CRUD methods that save the graph data into the mongodb
     windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
     mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mongodb_handler = MongoDBConstructor(uri=windows_uri,db_name="test")
+    mongodb_handler = MongoDBConstructor(uri=mac_uri,db_name="test")
     
     #the graph html representation class
     graph_repr = GraphRepresantation()

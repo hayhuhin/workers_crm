@@ -1,6 +1,14 @@
-{% extends 'code/base.html'%} {% load widget_tweaks %}{% block content %}
+{% extends 'code/base.html'%} {% load widget_tweaks %}
 <!-- the dashboard title-->
 
+
+{% block title %}
+    <a class="nav-link active" data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap' href="#">Add New Graph</a>
+    <a class="nav-link active" href="#">Change Graph Position</a>
+    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+{% endblock title %}
+
+{% block content %}
 <div class='container p-4'>
   <div class='border border-secondary rounded border-1' style="background:#212529;">
 
@@ -13,7 +21,6 @@
             Limit Information
           </a>
 
-      
       <div style="min-height: 120px;">
         <div class="collapse collapse" id="info_collapse_id">
           <div class="card card-body w-50">
@@ -24,17 +31,9 @@
       </div>
     </div>
 </div>
-  <!-- this is the space between the top and the graph-->
-  
-<div class="mt-4 border border-secondary rounded border-1" style="background:#212529;">
-  <div class='m-3'>
-    <h3 class=''>Graph Tools</h3>
-    <p>this are the graph tools that you can use.for now there are only two </p>
-      <button type='button' class='btn btn-success btn-sm text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap'> add new graph </button>
-      <button type='button' class='btn btn-success btn-sm text-uppercase'> Change Graph position </button>
-  </div>
 
-</div>
+      
+  <!-- this is the space between the top and the graph-->
 
 <div class="graph" style="margin-bottom:100px">
 
@@ -388,3 +387,4 @@
 
 </div><!-- {% endcomment %}
 {% endblock content %}
+

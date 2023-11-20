@@ -16,9 +16,39 @@
 
 <body style="background:#323232">
 
+<!-- THIS IS THE TOP NAVBAR -->
+<div class="position-fixed w-100">
+  <div class="border border-secondary rounded border-1" style="background:#212529">
+    <div class="" style="margin-left:14rem">
+
+    <nav class="navbar navbar-expand-lg ">
+      <div class="container-fluid" style="background:#212529">
+          <div class="navbar-nav">
+          <div class="row">
+              <div class="col-auto align-bottom">
+                <a class="nav-link active" href="#">Hi {{request.user.employer.user_name}},{{request.user.employer.last_name}}</a>
+              </div>
+              <div class="col">
+                <img src="/media/{{ request.user.employer.profile_pic }}" style="width:45px;height:45px;margin-right:8rem"  class="rounded-circle" alt="...">
+              </div>
+            </div>
+            {% block title %}
+            {% endblock title %}
+          </div>
+        </div>
+      </div>
+    </nav>
+<!-- END OF THE TOP NAVBAR-->
+
+
+    </div>
+  </div>
+</div>
 
 
 <div class="row">
+
+
 <div class="col-2">
 
 
@@ -194,12 +224,14 @@
 
 
 </div><!-- end of col div-->
-<div class="col-9">
+<div class="col-9 mt-5">
 <div class="container">
 <div class="position-absolute align-self-center col-lg-9">
   <div id="liveAlertPlaceholder"></div>
+  </div>
 </div>
-</div>
+
+
     {% block content %}
 
     {% endblock content %}
@@ -208,8 +240,6 @@
 
 
 </div><!-- end of row div-->
-
-
 
   </body>
       <script 
