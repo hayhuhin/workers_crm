@@ -103,9 +103,18 @@ class GraphRepresantation(object):
 
         data_frame = pd.DataFrame(dict(group=group,value=value))
 
-        graph_fig = px.bar(data_frame,x='group',y='value',template=self.template,width=600)
+        graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
 
-        graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor= 'rgba(0, 0, 0, 0)',margin=dict(l=50,r=20,t=20,b=100))
+
+        #,margin=dict(l=50,r=20,t=20,b=100)
+        graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor= 'rgba(0, 0, 0, 0)')
+
+
+
+        # path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
+        # line_fig = px.line(y=values,x=names,template=self.template)
+        # line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)")
+        # line_fig.update_traces(textfont_size=12,text='percent+label')
 
         graph_fig.update_traces(textfont_size=12)
 

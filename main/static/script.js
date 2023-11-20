@@ -395,6 +395,7 @@ function getCookie(name) {
 
 
 
+
 //testtesttesttest
 $(document).ready(function(){
     var cur = 4;
@@ -446,6 +447,23 @@ function fill_db () {
 
 };
 
+
+function trigger_delete (e) {
+    var del_id = $(this).attr('value')
+    e.preventDefault();
+    console.log(del_id)
+
+    $.ajax({
+        type:'DELETE',
+        url: "/dashboard",
+        data: {
+            graph_id:$('value').val(),
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+    },
+});
+};
+
+// $('.test_delete').on('click',trigger_delete)
 
 //selected_data
 // $(document).on('submit','#add_task_submit_form',edit_graph)

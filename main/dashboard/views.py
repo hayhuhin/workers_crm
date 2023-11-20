@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph import GraphCalculator,GraphRepresantation
@@ -94,6 +94,9 @@ def dashboard(request):
     #instance of a "edit graph form"
     edit_graph_form = EditGraphForm()
 
+    #delete graph form class instance
+    delete_graph_form = DeleteGraphForm()
+
 
     #! only for testing for now (later it will be queried and represented)
     databases = ["Income","Outcome"]
@@ -103,6 +106,21 @@ def dashboard(request):
     #checking if the request method is POST
     if request.method == "POST":
         print(request.POST)
+
+        if request.POST.get("remove_graph") == "remove_graph":
+            form_inst = DeleteGraphForm(request.POST)
+            if form_inst.is_valid():
+                graph_id = form_inst.cleaned_data.get("graph_id")
+                mongodb_handler.remove_records(collection_name="gr",user=str(request.user),record_number=str(graph_id))
+
+                return HttpResponseRedirect("/dashboard")
+            
+            if not form_inst.is_valid():
+                return redirect("the form is invalid")
+
+
+
+
 
         #only used as a shortcut to get the request.post data as "post_data"
         post_data = request.POST
@@ -211,7 +229,8 @@ def dashboard(request):
                      return HttpResponse("invalid form")
                 
                     
-                    
+    if request.method == "DELETE":
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 
         #? here its response in the post scope
@@ -220,7 +239,7 @@ def dashboard(request):
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'graph_chart':graph_chart}
+    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'graph_chart':graph_chart}
     return render(request,'code/dashboard.html',context)
 
 

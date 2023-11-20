@@ -55,10 +55,14 @@ add fields to the add graph form :
     b.sub-title - DONE
 
 create edit graph functionallity - DONE
-<< working on >>
-create remove graph functionallity in the dashboard page 
 
 
+create remove graph functionallity in the dashboard page - DONE
+
+<<working on >>
+make the dashboard page look much better 
+FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD
+FIX:
 
 << on hold >>
 task 6:

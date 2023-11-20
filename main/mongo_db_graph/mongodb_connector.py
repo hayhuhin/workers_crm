@@ -63,7 +63,7 @@ class MongoDBConstructor:
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
 
-# [0]["graph_records"]["records"]
+
         #this gives me the option to see the keys of the graph_records.records
         print("*********************************")
         print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
@@ -163,6 +163,7 @@ class MongoDBConstructor:
         #this to see the amount of records and check if the record exists
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
+        # [0]["graph_records"]["records"]
         records = list(self.db.get_collection(self.collection_name).find(query_filter, projection).sort(sort))[0]["graph_records"]["records"]
 
         if delete_all == False:

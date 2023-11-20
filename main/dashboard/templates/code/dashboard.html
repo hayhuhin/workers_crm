@@ -1,13 +1,44 @@
 {% extends 'code/base.html'%} {% load widget_tweaks %}{% block content %}
 <!-- the dashboard title-->
 
+<div class='container p-4'>
+  <div class='border border-secondary rounded border-1' style="background:#212529;">
 
-<div class='container'>
-  <div class="alert alert-info">FOR NOW THIS PAGE ISNT FUNCTIONAL AND ONLY FOR OVERVIEW</div>
-  <div class="graph" style="margin-bottom:600px">
+    <div class="m-3">
+      <h1>Dashboard</h1>
+        <p>This is the dashboard page where you can create to yourself graph represantations out of the bussiness income or outcome data .
+          his data is not live and you can click the 'refresh query' button to query the database again.
+        </p>
+          <a class="position-relative" data-bs-toggle="collapse" data-bs-target="#info_collapse_id" aria-expanded="false" aria-controls="info_collapse_id">
+            Limit Information
+          </a>
+
+      
+      <div style="min-height: 120px;">
+        <div class="collapse collapse" id="info_collapse_id">
+          <div class="card card-body w-50">
+            Please note that you have limit for graph creation and refresh query amount.
+            <BOLD>!if you need more graphs in your page you have to contact your supervisor for more access</BOLD>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+  <!-- this is the space between the top and the graph-->
+  
+<div class="mt-4 border border-secondary rounded border-1" style="background:#212529;">
+  <div class='m-3'>
+    <h3 class=''>Graph Tools</h3>
+    <p>this are the graph tools that you can use.for now there are only two </p>
+      <button type='button' class='btn btn-success btn-sm text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap'> add new graph </button>
+      <button type='button' class='btn btn-success btn-sm text-uppercase'> Change Graph position </button>
+  </div>
+
+</div>
+
+<div class="graph" style="margin-bottom:100px">
 
 <div class='col-sm-auto'>
-  <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap'> add new graph </button>
     <div class='modal fade' id='graph_modal' tabindex='-1' aria-labelledby='graph_modal_label' aria-hidden='true'>
       <div class='modal-dialog'>
         <div class='modal-content'>
@@ -100,33 +131,12 @@
     </div><!-- 'modal fade' -->
 
 
-<h2>{{data.amount__sum}}</h2>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% for graph in graph_chart%}
   </div>
 
-        <div class="graph m-2 p-3 border border-secondary rounded border-3">
+        <div class="graph m-2 p-3 border border-secondary rounded border-3" style="background:#212529">
 
-        <p>{{ graph.graph_data.v }}</p>
+
         <h3>{{graph.graph_data.v.graph_title}}</h3>
 
           <div style="width: 100%; height: 30rem">
@@ -142,17 +152,19 @@
 
     </div><!-- end of text-body secondery-->
 
-        <form method="POST">
-        {% csrf_token %}
+      <form method="POST">
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
-        </form>
-        <button type='button'  name='remove_graph' class='btn btn-danger' value={{graph.graph_data.k}} member_id='' id=''>Remove Graph</button>
+        {% csrf_token %}
+        <button type='submit'  name='remove_graph' class='btn btn-danger' value='remove_graph'>Remove Graph</button>
+        {% render_field delete_graph_form.graph_id value=graph.graph_data.k %}
+        <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
+        <button type='button' class='btn btn-success text-uppercase"'> Export CSV </button>
+      </form>
 
 
 
         <!-- THIS IS THE MODAL SECTION THAT HAVE THE CONTROL OVER THE EDIT BUTTON -->
 
-        <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
 
           <div class='col-sm-auto'>
               <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
@@ -267,7 +279,24 @@
     {% endfor %}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </div><!-- end of 'container' -->
+
+<h1>Hello World</h1>
+</div>
 
 
 

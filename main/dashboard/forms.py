@@ -45,3 +45,6 @@ class EditGraphForm(forms.Form):
 
 
     )
+
+class DeleteGraphForm(forms.Form):
+    graph_id = forms.IntegerField(widget=forms.HiddenInput())
