@@ -70,7 +70,7 @@ ADD:export CSV and Import CSV - in the import must be a option to watch without 
     1.export CSV - DONE
     2.import CSV
 <<working on >>
-migrate into the django the mongodb database
+migrate into the django the mongodb database - CANCELED : not needed because the pymongo suits my right needs
 ADD:change graph position - DONE
 ADD:another bar/line for comparing 
 ADD:smaller presentation example: 2 or 4 graphs together

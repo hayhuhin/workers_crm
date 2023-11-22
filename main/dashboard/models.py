@@ -3,6 +3,9 @@ from django.db import models
 
 #models here
 
+
+
+
 class Income(models.Model):
     # amount = models.IntegerField(default=0,null=True)
     month = models.DateField()
