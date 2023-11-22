@@ -59,19 +59,26 @@ create edit graph functionallity - DONE
 
 create remove graph functionallity in the dashboard page - DONE
 
-<<working on >>
+<< on hold >>
 make the dashboard page look much better 
 FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD
 FIX:
 
-<< on hold >>
 task 6:
 ADD:change the profile page to look much more updated and nice for the end user - 
-
+ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
+    1.export CSV - DONE
+    2.import CSV
+<<working on >>
+migrate into the django the mongodb database
+ADD:change graph position - DONE
+ADD:another bar/line for comparing 
+ADD:smaller presentation example: 2 or 4 graphs together
 
 
 
 
 task 5:
 add logic to the home page that will represent the usage of the crm with a description - 
+
 

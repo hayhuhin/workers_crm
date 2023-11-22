@@ -5,7 +5,7 @@ from .models import Income
 class AddGraphForm(forms.Form):
 
     graph_title = forms.CharField(max_length=50,initial="Graph")
-    graph_description = forms.CharField(max_length=300,initial="No Description")
+    graph_description = forms.CharField(initial="No Description")
     start_date = forms.DateField()
     end_date = forms.DateField()
     # db = forms.CharField(max_length=100)
@@ -48,3 +48,10 @@ class EditGraphForm(forms.Form):
 
 class DeleteGraphForm(forms.Form):
     graph_id = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class ChangeGraphPosition(forms.Form):
+    src_graph_id = forms.IntegerField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    dst_graph_id = forms.IntegerField(max_value=8)
+
+

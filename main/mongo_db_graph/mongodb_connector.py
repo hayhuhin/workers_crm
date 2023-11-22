@@ -22,6 +22,7 @@ class MongoDBConstructor:
         #this is the specific db 
         self.db = self.client[self.db_name]
 
+        self.db_gr_query = self.db["gr"]
         
 
     def user_permission_records(self,user):
@@ -33,6 +34,106 @@ class MongoDBConstructor:
         #testing phase - will return small number 
         return 7
 
+    def switch_records(self,collection_name:str,user:str,current_graph_id,requested_position):
+        """ this method gets the users current record position and id and switching the places of the records positions.
+            example:user_ben :{
+                                record_1:data,
+                                record_2:data,
+                                record_3:data,
+                                }
+            each record placed in the same order as it will be represented in the web so 
+            to change the position we need to take for example record_3 and switch it with 1-
+            record_3 puts himself like this:
+            record_3:data,
+            record_2:data,
+            record_1:data
+            and add another key and value of the graph position in the web
+        """
+        self.collection_name = collection_name
+        query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+        #this is the current graph position and the current graph id
+        src_graph_position_cursor = self.db.get_collection(self.collection_name).find(query_filter,{f"graph_records.records.{current_graph_id}.position":1})
+        for graph_data in src_graph_position_cursor:
+            src_graph_position = (graph_data["graph_records"]["records"][str(current_graph_id)]["position"])
+        src_graph_id = current_graph_id
+
+        #this changes the current graph id to the requested graph position
+        src_record_change = {
+        "$set": {
+            f"graph_records.records.{src_graph_id}.position":requested_position
+        }}
+        # self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+
+
+        #this changes the requested graph position to the current (switching the current and the requested places)
+        dst_graph_position = requested_position
+        dst_graph_id = self.find_graphID_by_position(collection_name=collection_name,user=user,position_value=requested_position)
+        dst_record_change = {
+            "$set":{
+                f"graph_records.records.{dst_graph_id}.position":int(src_graph_position)
+            }
+        }
+
+        #this two lines are updating the database with the new positions
+        self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
+        self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+
+
+
+    def find_graphID_by_position(self,collection_name:str,user:str,position_value):
+        """this method will search the graph id by its position value inside each graph
+            it does a loop that iterates over the graph records(max graph records for now is 7)
+            the complexity is a o(n+1)
+            the 2 because it have nested for loop tha iterates only once and then enters the second for loop 
+        """
+        self.collection_name = collection_name
+        query_user_filter = {"user_name":user}
+        
+        # Construct the query
+        query = {
+            "graph_records.records":1
+        }
+
+        # Execute the query
+        result = self.db_gr_query.find(query_user_filter,query)
+
+        #first for loop loops only twice over the mongodb cursor object
+        for items in result:
+
+            #here it iterates over the dict and searching for the graph id by the matching position value
+            for record_id in items["graph_records"]["records"]:
+                if items["graph_records"]["records"][record_id]["position"] == position_value:
+                    found_id = record_id
+                    return found_id
+
+
+                # else:
+                #     print(items["graph_records"]["records"][record_id]["position"])
+            
+
+        # for i in aggregated_data:
+        #     print(i)
+    
+    def export_csv_data(self,collection_name:str,user:str,graph_id):
+        """this method returns the specific data needed to be exported the by the user """
+        user_filter = {"user_name":user}
+        projection = {f"graph_records.records.{graph_id}":1,"_id":0}
+
+        records_projection = self.db_gr_query.find(user_filter,projection)
+
+# [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
+
+        titles = []
+        content = []
+        for data in records_projection:
+            titles.append((data["graph_records"]["records"][str(graph_id)]).keys())
+            content.append((data["graph_records"]["records"][str(graph_id)]).values())
+
+        return list(titles[0]),list(content[0])
+        # return titles,content
+
+
 
     def edit_record(self,collection_name:str,user,record_id:str,new_data:dict):
         self.collection_name = collection_name
@@ -41,8 +142,8 @@ class MongoDBConstructor:
         sort = [("graph_records.records", 1)]
         query_filter = {"user_name":user} #query filter to get the data of the specific user
 
-        #the format of the new data
 
+        #the format of the new data
         new_record_query = {
             "$set":{
                 f"graph_records.records.{record_id}":new_data
@@ -66,8 +167,8 @@ class MongoDBConstructor:
 
         #this gives me the option to see the keys of the graph_records.records
         print("*********************************")
-        print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
-        print(len((list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])))
+        # print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
+        # print(len((list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])))
         print("*********************************")
         records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
 
@@ -87,15 +188,31 @@ class MongoDBConstructor:
 
             #the new record that will be created
             new_record_name = "0"
+            
 
             #bellow section is responsible for formating the new record 
 
+
             query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+
+
+            #if its new record so its the first graph position
+            position = 1
+
+            #its the first time that the user dont have records it will create record number
+            # and a graph_position that shows us where it represented in the web-page
+            # position_data = {"$set":{"graph_records.position":position}}
+            # #this is the query to the mongodb database to add the position key and value
+            # self.db.get_collection(self.collection_name).update_one(query_filter,position_data)
+            new_record['position'] = position
+
+
 
             #the format of the new data
             new_record_query = {
                 "$set":{
-                    f"graph_records.records.{new_record_name}":new_record
+                    f"graph_records.records.{new_record_name}":new_record,
                 }
             }
 
@@ -105,7 +222,8 @@ class MongoDBConstructor:
             print(f"the record is added successfully. record number : {new_record_name}")
  
 
-        else:
+        
+        else:#this section is if the user already have records in the database 
 
 
             #the record that saved last in the db
@@ -114,8 +232,13 @@ class MongoDBConstructor:
             #the new record that will be created
             new_record_name = str(int(prev_record)+1)
 
-
-
+            #the position will always be len(records) + 1 besause the add graph will be added to the end
+            #of the page by default
+            position = len(records)+1
+            # user_filter = {"user_name":user}
+            # position_data = {"$set":{"graph_records.position":position}}
+            # self.db.get_collection(self.collection_name).update_one(user_filter,position_data)
+            new_record["position"] = position
             #bellow section is responsible for formating the new record 
 
             query_filter = {"user_name":user} #query filter to get the data of the specific user
@@ -177,7 +300,7 @@ class MongoDBConstructor:
             #the format of the new data
                 new_record_query = {
                     "$unset":{
-                        f"graph_records.records.{record_number}":1
+                        f"graph_records.records.{record_number}":1,
                     },
 
                 }
@@ -192,7 +315,8 @@ class MongoDBConstructor:
 
                 new_record_query = {
                 "$unset":{
-                    f"graph_records.records.{record_number}":1
+                    # f"graph_records.records.{record_number}":1,
+                    "graph_records":""
                 },}
 
                 final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
@@ -206,15 +330,33 @@ class MongoDBConstructor:
         }
         user_found = list(self.db.get_collection(collection_name).find(query_filter))
         
-
+        #if user exists
+        #! important that ill add another validation that the users exists but without the record and it will add the record
         if user_found:
+            #if user have the records
+
+            # records_found = list(self.db.get_collection(collection_name).find(query_filter{"graph_records":""}))
+            # print(records_found)
+            # if records_found:
             return True
+            # else:
+            #     new_user_data = {
+            #     "user_name":user,
+            #     "graph_records" : {
+                    
+            #     }
+            # }
+            #     new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
+            #     new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
+            #     return new_user_data_insertion
+
+        
         if not user_found:
 
             new_user_data = {
                 "user_name":user,
-                "graph_records" : {
-                    "records":{}
+                "graph_records" : {"records":{}
+                    
                 }
             }
             new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
@@ -278,34 +420,53 @@ class MongoDBConstructor:
 
         else:
             pipe_line = [
-                        {
-                            "$match": {"user_name": user_name}},
-                            {"$project": {
-                                "user_name": 1,
-                                "lastrecords": {
-                                    "$slice": [
-                                        {
-                                            "$map": {
-                                                "input": {"$objectToArray": "$graph_records.records"},
-                                                "as": "record",
-                                                "in": {
-                                                    "k": "$$record.k",
-                                                    "v": "$$record.v"
-                                                }
-                                            }
-                                        },
-                                        -record_count
-                                    ]
-                                }
+    {
+        "$match": {"user_name": user_name}
+    },
+    {
+        "$project": {
+            "user_name": 1,
+            "lastrecords": {
+                "$slice": [
+                    {
+                        "$map": {
+                            "input": {"$objectToArray": "$graph_records.records"},
+                            "as": "record",
+                            "in": {
+                                "k": "$$record.k",
+                                "v": "$$record.v"
                             }
                         }
-                        ]
+                    },
+                    -record_count
+                ]
+            }
+        }
+    },
+    {
+        "$unwind": "$lastrecords"
+    },
+    {
+        "$sort": {
+            "lastrecords.v.position": 1  # Sort by the keys (assuming they are strings representing numbers)
+        }
+    },
+    {
+        "$group": {
+            "_id": "$_id",
+            "user_name": {"$first": "$user_name"},
+            "lastrecords": {"$push": "$lastrecords"}
+        }
+    }
+]
             
 
             aggregated_data = self.db.gr.aggregate(pipeline=pipe_line)
 
             # return aggregated_data
             for items in aggregated_data:
+
+
                 return items["lastrecords"]
 
 

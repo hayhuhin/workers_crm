@@ -3,13 +3,20 @@
 
 
 {% block title %}
-    <a class="nav-link active" data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap' href="#">Add New Graph</a>
-    <a class="nav-link active" href="#">Change Graph Position</a>
-    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+    <a class="nav-link close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline" data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap' href="#">Add New Graph</a>
+    <a class="nav-link close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline">Import Graph CSV</a>
 {% endblock title %}
 
 {% block content %}
-<div class='container p-4'>
+<div class='container p-4 pt-5'>
   <div class='border border-secondary rounded border-1' style="background:#212529;">
 
     <div class="m-3">
@@ -32,7 +39,19 @@
     </div>
 </div>
 
-      
+
+
+
+
+<!-- THIS IS THE GRAPHS REPRESENTATION OF THE USER -->
+<!-- IN THE FUTURE THIS WILL BE CHEKED OR MODIFIED BY THE USER -->
+
+
+
+
+
+
+
   <!-- this is the space between the top and the graph-->
 
 <div class="graph" style="margin-bottom:100px">
@@ -133,7 +152,7 @@
 {% for graph in graph_chart%}
   </div>
 
-        <div class="graph m-2 p-3 border border-secondary rounded border-3" style="background:#212529">
+        <div class="graph m-2 p-3 my-5 border border-secondary rounded border-1" style="background:#212529">
 
 
         <h3>{{graph.graph_data.v.graph_title}}</h3>
@@ -156,8 +175,10 @@
         {% csrf_token %}
         <button type='submit'  name='remove_graph' class='btn btn-danger' value='remove_graph'>Remove Graph</button>
         {% render_field delete_graph_form.graph_id value=graph.graph_data.k %}
-        <button type='button' class='btn btn-success text-uppercase"' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
-        <button type='button' class='btn btn-success text-uppercase"'> Export CSV </button>
+        <button type='button' class='btn btn-success text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
+        <button type='submit' class='btn btn-success text-uppercase' name='export_csv'value='export_csv'> Export CSV </button>
+         <button type='button' class='btn btn-success text-uppercase' data-bs-toggle='modal' data-bs-target='#change_position_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Change Position</button>
+
       </form>
 
 
@@ -193,7 +214,7 @@
                     <!-- graph description-->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Graph Description</label>
-                        {% render_field edit_graph_form.graph_description type='title' id='graph_description_{{graph.graph_data.k}}' class='form-control' value=graph.graph_data.v.graph_description %}
+                        {% render_field edit_graph_form.graph_description type='text' id='graph_description_{{graph.graph_data.k}}' class='form-control' value=graph.graph_data.v.graph_description %}
                     </div>
                     <!-- end of graph description-->
 
@@ -270,6 +291,60 @@
             </div><!-- end of graph div-->
 
         </div>
+      </div>
+
+
+          <div class='col-sm-auto'>
+              <div class='modal' id='change_position_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='change_position_modal_label' aria-hidden='true'>
+                <div class='modal-dialog'>
+                  <div class='modal-content'>
+                    <div class='modal-header'>
+                      <h1 class='modal-title fs-5' id='change_position_modal_label'>edit graph</h1>
+                      <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                    </div>
+
+                <!-- form of adding new task --> 
+                <div class='modal-body'>
+
+                  <form method='POST' class="change-position-form" data-form-id="{{graph.graph_data.k}}">
+
+                    {% csrf_token %}
+
+                    <!-- body of the form fields-->
+
+                    <!-- graph src id -->
+                    <div class='mb-3'>
+                      <label for='graph_title' class='col-form-label'>Graph current Position</label>
+                        <p>{{ graph.graph_data.v.position }}</p>
+                        {% render_field change_position_form.src_graph_id type='title' id=graph.graph_data.k class='form-control' value=graph.graph_data.k %}
+                    </div>
+                    <!-- end of graph title -->
+
+                    <!-- graph new position-->
+                    <div class='mb-3'>
+                      <label for='graph_title' class='col-form-label'>New Position</label>
+                        {% render_field change_position_form.dst_graph_id type='title' id=graph.graph_data.k class='form-control'%}
+                    </div>
+
+                <!-- test test test test test -->
+
+
+                <!-- test test test test test -->
+
+                </div><!-- end div of the modal-body -->
+
+                
+
+                  <!-- modal footer section -->
+                  <div class='modal-footer'>
+                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                    <button type='submit' name='change_position_graph' value='change_position_graph' class='btn btn-primary '>Save</button>
+                  </div>
+
+
+                  </div>
+                </form>
+              </div><!-- end of 'modal-content'-->
 
 
 <!--#################################################################################################-->
@@ -282,19 +357,8 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 </div><!-- end of 'container' -->
 
-<h1>Hello World</h1>
 </div>
 
 

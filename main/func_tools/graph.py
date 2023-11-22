@@ -110,6 +110,9 @@ class GraphRepresantation(object):
         graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
                                 plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                 modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                bargap=0.2,
+                                bargroupgap=0.2,
+                                # width=300
 )
 
 

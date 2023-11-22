@@ -1,13 +1,15 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph import GraphCalculator,GraphRepresantation
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
 from user.models import Employer
+import csv
+import io
 
 
 curr_path = Path.cwd()
@@ -43,12 +45,15 @@ def dashboard(request):
     #gets the users all records from the mongodb 
     record_amount = employer_db_inst.graph_permission.all().values("record_amount")[0]
 
+    # test = mongodb_handler.find_graphID_by_position(collection_name="gr",user=str(request.user),position_value=1)
+    # print(test)
+    
 
     #####################!testing in the get method section #############################
 
 
     #! uncomment this and refresh the dashboard page to delete all ben records
-    # mongodb_handler.remove_records("gr","ben",record_number="*",delete_all=True)
+    # mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
 
 
     #! uncomment this if you want to see a repr of the user data
@@ -80,12 +85,15 @@ def dashboard(request):
         #save it as html
         for graph in mongodb_getting_data:
 
+    
+
             
             
             graph_html = graph_repr.graph_options(graph_type=graph["v"]["graph_type"],group=graph["v"]["x"],values=graph["v"]["y"])  
 
             #this is the graph chart list that pushed to the html template with its graph data
             graph_chart.append({"graph_data":graph,"graph_html":graph_html})
+
 
 
     #instance of  "add graph form"
@@ -96,6 +104,18 @@ def dashboard(request):
 
     #delete graph form class instance
     delete_graph_form = DeleteGraphForm()
+
+    change_positon_form = ChangeGraphPosition()
+
+    values=[20, 20, 20, 20, 20,13,51]
+    names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
+    weekly_donut_graph = graph_repr.donut_graph(values=values,names= names)
+    weekly_donut_graph2 = graph_repr.donut_graph(values=values,names= names)
+    weekly_pie_graph = graph_repr.pie_graph(values=values,names=names)
+
+    weekly_graph_card = graph_repr.graph_card('weekly lead',user_calc=weekly_donut_graph)
+    weekly_graph_card2 = graph_repr.graph_card('weekly lead',user_calc=weekly_donut_graph2)
+    weekly_pie_card = graph_repr.graph_card('weekly lead',user_calc=weekly_pie_graph)
 
 
     #! only for testing for now (later it will be queried and represented)
@@ -227,10 +247,36 @@ def dashboard(request):
                 else:
                      #? later it will display an error page 
                      return HttpResponse("invalid form")
-                
+        if request.POST.get("change_position_graph") == "change_position_graph":
+            form_inst = ChangeGraphPosition(request.POST)
+
+
+            if form_inst.is_valid():
+                current_graph_id = form_inst.cleaned_data.get('src_graph_id')
+                new_graph_position = form_inst.cleaned_data.get('dst_graph_id')
+                mongodb_handler.switch_records(collection_name="gr",user=str(request.user),current_graph_id=current_graph_id,requested_position=new_graph_position)
+                return HttpResponseRedirect("/dashboard")
+
+            else:
+                return HttpResponse("the form is invalid")
+
+
+        #! later add here form validation 
+        if request.POST.get("export_csv") == "export_csv":
+            data = [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
+            graph_id = request.POST.get("graph_id")
+            graph_csv_model_data = mongodb_handler.export_csv_data(collection_name="gr",user=str(request.user),graph_id='True')
+            csv_data = generate_csv([graph_csv_model_data[0],graph_csv_model_data[1]])
+
+            # print(graph_csv_model_data)
+            response = HttpResponse(csv_data,content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="graph_1_data.csv"'
+            return response
+
                     
     if request.method == "DELETE":
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print("the requested method is DELETE")
+
 
 
         #? here its response in the post scope
@@ -239,7 +285,13 @@ def dashboard(request):
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'graph_chart':graph_chart}
+    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'change_position_form':change_positon_form,'graph_chart':graph_chart}
     return render(request,'code/dashboard.html',context)
 
 
+def generate_csv(graph_data):
+    # Your data source (replace this with your data retrieval logic)
+    csv_data = io.StringIO()
+    csv_writer = csv.writer(csv_data)
+    csv_writer.writerows(graph_data)
+    return csv_data.getvalue()
