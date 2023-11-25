@@ -68,15 +68,17 @@ task 6:
 ADD:change the profile page to look much more updated and nice for the end user - 
 ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
     1.export CSV - DONE
+    <<working on >>
     2.import CSV
-<<working on >>
 migrate into the django the mongodb database - CANCELED : not needed because the pymongo suits my right needs
 ADD:change graph position - DONE
 ADD:another bar/line for comparing 
 ADD:smaller presentation example: 2 or 4 graphs together
 
 
-
+#MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
+https://docs.djangoproject.com/en/4.2/topics/security/#user-uploaded-content-security
+ITS THE FILE HANDLING AND SECURITY
 
 task 5:
 add logic to the home page that will represent the usage of the crm with a description - 

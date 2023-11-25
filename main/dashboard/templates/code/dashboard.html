@@ -8,16 +8,69 @@
                     link-body-emphasis 
                     link-offset-2
                     link-underline" data-bs-toggle='modal' data-bs-target='#graph_modal' data-bs-whatever='@getbootstrap' href="#">Add New Graph</a>
+
     <a class="nav-link close_small_navbar 
                     icon-link
                     link-body-emphasis 
                     link-offset-2
-                    link-underline">Import Graph CSV</a>
+                    link-underline"
+                    data-bs-toggle='modal' data-bs-target='#import_csv_modal' data-bs-whatever='@getbootstrap' href="#"
+                    >Import Graph CSV</a>
+                    </form>
+
 {% endblock title %}
 
 {% block content %}
 <div class='container p-4 pt-5'>
   <div class='border border-secondary rounded border-1' style="background:#212529;">
+
+
+
+
+
+
+
+
+
+<!-- this is the import modal section -->
+<div class='col-sm-auto'>
+    <div class='modal fade' id='import_csv_modal' tabindex='-1' aria-labelledby='import_csv_modal_label' aria-hidden='true'>
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 class='modal-title fs-5' id='import_csv_modal_label'>New Task</h1>
+            <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+          </div>
+
+      <!-- form of adding new task --> 
+      <div class='modal-body'>
+
+        <form method='POST' enctype="multipart/form-data">
+
+          {% csrf_token %}
+
+          <!-- body of the form fields-->
+
+            {%render_field import_csv_form.csv_file %}
+
+
+        </div><!-- end div of the modal-body -->
+
+        <!-- modal footer section -->
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button class="btn btn-primary" type="submit" name="import_csv_file" value="import_csv_file">Import</button>
+        </div>
+
+      </form>
+
+        </div>
+
+        </div><!-- end of 'modal-content'-->
+
+      </div><!-- end of 'modal-dialog' -->
+    </div><!-- 'modal fade' -->
+
 
     <div class="m-3">
       <h1>Dashboard</h1>

@@ -1,4 +1,5 @@
-
+import random 
+import string
 #handle DB querying from the arguments passed to the function
 
 
@@ -42,3 +43,4 @@ def graph_percentage_presentation(user_model,job_position_tasks=False,personal_t
 
         return round(percentage_done)
     
+

@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph import GraphCalculator,GraphRepresantation
+from func_tools.file_validation import FileValidator
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
 from user.models import Employer
@@ -106,6 +107,8 @@ def dashboard(request):
     delete_graph_form = DeleteGraphForm()
 
     change_positon_form = ChangeGraphPosition()
+
+    import_csv_form = ImportCSVForm()
 
     values=[20, 20, 20, 20, 20,13,51]
     names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
@@ -263,7 +266,6 @@ def dashboard(request):
 
         #! later add here form validation 
         if request.POST.get("export_csv") == "export_csv":
-            data = [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
             graph_id = request.POST.get("graph_id")
             graph_csv_model_data = mongodb_handler.export_csv_data(collection_name="gr",user=str(request.user),graph_id='True')
             csv_data = generate_csv([graph_csv_model_data[0],graph_csv_model_data[1]])
@@ -272,6 +274,15 @@ def dashboard(request):
             response = HttpResponse(csv_data,content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="graph_1_data.csv"'
             return response
+
+        if request.POST.get("import_csv_file") == "import_csv_file":
+            form_inst = ImportCSVForm(request.POST,request.FILES)
+            if form_inst.is_valid():
+                csv_file = request.FILES['csv_file']
+                validation_proccess = FileValidator(csv_file,2)
+                validation_proccess.run_proccess()
+            else:
+                return HttpResponse("file form is invalid")
 
                     
     if request.method == "DELETE":
@@ -285,7 +296,7 @@ def dashboard(request):
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,'income_form':income_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'change_position_form':change_positon_form,'graph_chart':graph_chart}
+    context = {'databases':databases,'income_form':income_form,'import_csv_form':import_csv_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'change_position_form':change_positon_form,'graph_chart':graph_chart}
     return render(request,'code/dashboard.html',context)
 
 
