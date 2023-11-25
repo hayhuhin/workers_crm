@@ -61,7 +61,7 @@ create remove graph functionallity in the dashboard page - DONE
 
 << on hold >>
 make the dashboard page look much better 
-FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD
+FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD + change the method to use timestamps 
 FIX:
 
 task 6:

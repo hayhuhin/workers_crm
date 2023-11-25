@@ -1,5 +1,7 @@
 import csv
 import datetime
+import re
+import json
 
 
             # class AddGraphForm(forms.Form):
@@ -39,9 +41,66 @@ class FileValidator:
 
                 #this calling the csv_constructor method that accepts the file object and returning a text data
                 constructed_data = self.csv_constructor(self.file)
-                self.mongodb_field_validator(form_type="graph",data=constructed_data)
+                validated = self.mongodb_field_validator(form_type="graph",data=constructed_data)
 
-                #this method checking the keys validation of the file
+                if validated:
+                    #* inside the x,y its a string that containts the list
+                    #*below method transforms it from string to list
+
+                    data_x = []
+                    data_y = []
+                    constructed_data["x"] = constructed_data["x"].split(",")
+
+
+                    constraints = ["[","]"," "]
+                    end_string = [","]
+
+                    counter = 0
+                    data = []
+                    string = ""
+                    index = 0
+                    last_index_y = len(constructed_data["y"])
+                    for index in range(len(constructed_data["y"])):
+                        print(counter)
+                        
+                        if constructed_data["y"][index] in constraints:
+                            continue
+                        else:
+                            if constructed_data["y"][index] in end_string or index >= (last_index_y-1):
+                                data.append(int(string))
+                                string = ""
+                            else:
+                                string += constructed_data["y"][index]
+                                print(string)
+                                counter += 1
+
+                    constructed_data["y"] = data
+                    print(len(constructed_data["y"]))
+                    print(last_index_y-1)
+                    print(index)
+                    print(data)
+                    # print(index)
+                    # print(len(constructed_data["y"])-1)
+
+                    last_index_x = len(constructed_data["x"])-1
+                    # last_index_y = len(constructed_data["y"])-1
+  
+
+                    constructed_data["x"][0] = constructed_data["x"][0].replace("[","")    
+                    constructed_data["x"][last_index_x] = constructed_data["x"][last_index_x].replace("]","")    
+                    # print(constructed_data["y"])
+
+                    # constructed_data["y"][0] = constructed_data["y"][0].replace("[","")  
+                    # constructed_data["y"][last_index_y] = constructed_data["x"][last_index_y].replace("]","")
+                    
+                    # return constructed_data
+                
+
+
+
+                else:
+                    raise Exception("the file is not VALID")
+
 
 
             else:
@@ -61,16 +120,13 @@ class FileValidator:
             for key,value in data.items():
                 key_data.append(key)
 
-            self.validate_keys(keys_data=key_data,ordered_check=True)
-            self.validate_values(values_data=data,ordered_check=True)
+            validated_keys = self.validate_keys(keys_data=key_data,ordered_check=True)
+            validated_values = self.validate_values(values_data=data,ordered_check=True)
 
-
-
-            
-
-
-
-
+            if validated_keys and validated_values :
+                return True
+            else:
+                return False
 
 
     def csv_constructor(self,csv_file):
@@ -81,8 +137,14 @@ class FileValidator:
 
         graph_data = {header[i]: values[i] for i in range(len(header))}
 
+        #  = graph_data["x"].split(",")
+        # print(res)
+
+
+
         # graph_data['created_at'] = datetime.strptime(graph_data['created_at'], '%Y-%m-%d. %H:%M')
         return graph_data
+
 
     def validate_keys(self,keys_data:list,ordered_check=False):
         graph_default_data = ["graph_title","graph_description","graph_type","created_at","x","y","position"]
@@ -140,30 +202,34 @@ class FileValidator:
 
         #each item checked if its a string or not
 
-        for key,value in values_data:
-            print(key)
-            if type(value) == str:
+        #* iterating over the dict 
+        for keys in values_data:
+
+            #* checking that the keys are str
+            if type(values_data[keys]) == str:
+
                 #*checking if key exists in the default graph dict
-                if key in self.graph_maximum_length.keys():
+                if keys in self.graph_maximum_length.keys():
+
                     #*here it validates that the len of the values are smaller or equal the default settings
-                    if len(values_data) <= self.graph_maximum_length[key]:
+                    if len(values_data[keys]) <= self.graph_maximum_length[keys]:
                         print("THE VALUES LEN IS VALIDATED")
+                        return True
                     else:
-                        print(f"THE VALUES --{values_data[key]}-- ARE GREATER THEN THE DEFAULTS")
+                        print(f"THE VALUES --{values_data[keys]}-- ARE GREATER THEN THE DEFAULTS")
+                        return False
                 else:
-                    print(f"THE KEY --{key}-- IS NOT IN THE DEFAULTS")
+                    print(f"THE KEY --{keys}-- IS NOT IN THE DEFAULTS")
+                    return False
                 
 
             else:
-                print(f"THE FIELD {str(value)} IS NOT STRING")
+                print(f"THE FIELD {str(values_data[keys])} IS NOT STRING")
                 return False
         
         #this section is only executed if the for loop above is not breaking duo a invalid type of item
         print("I PASSED THE VALUE FOR LOOP")
 
-
-    def run_proccess(self):
-        self.start_validation()
 
 
 test_class_validation = FileValidator(file_data=["sasa","sasa"],file_max_size=1)

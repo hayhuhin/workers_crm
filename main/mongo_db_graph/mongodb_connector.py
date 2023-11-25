@@ -134,6 +134,10 @@ class MongoDBConstructor:
         # return titles,content
 
 
+    # def import_csv_record(self,csv_data:dict):
+    #     for keys in csv_data:
+
+
 
     def edit_record(self,collection_name:str,user,record_id:str,new_data:dict):
         self.collection_name = collection_name
@@ -163,6 +167,7 @@ class MongoDBConstructor:
         query = {"user_name": user}
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
+        print(new_record)
 
 
         #this gives me the option to see the keys of the graph_records.records

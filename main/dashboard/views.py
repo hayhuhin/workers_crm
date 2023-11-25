@@ -34,7 +34,7 @@ def dashboard(request):
     #this class have CRUD methods that save the graph data into the mongodb
     windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
     mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mongodb_handler = MongoDBConstructor(uri=mac_uri,db_name="test")
+    mongodb_handler = MongoDBConstructor(uri=windows_uri,db_name="test")
     
     #the graph html representation class
     graph_repr = GraphRepresantation()
@@ -51,7 +51,7 @@ def dashboard(request):
     
 
     #####################!testing in the get method section #############################
-
+    # mongodb_handler.remove_records(collection_name="gr",user=str(request.user),record_number="3")
 
     #! uncomment this and refresh the dashboard page to delete all ben records
     # mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
@@ -267,7 +267,7 @@ def dashboard(request):
         #! later add here form validation 
         if request.POST.get("export_csv") == "export_csv":
             graph_id = request.POST.get("graph_id")
-            graph_csv_model_data = mongodb_handler.export_csv_data(collection_name="gr",user=str(request.user),graph_id='True')
+            graph_csv_model_data = mongodb_handler.export_csv_data(collection_name="gr",user=str(request.user),graph_id=graph_id)
             csv_data = generate_csv([graph_csv_model_data[0],graph_csv_model_data[1]])
 
             # print(graph_csv_model_data)
@@ -276,11 +276,26 @@ def dashboard(request):
             return response
 
         if request.POST.get("import_csv_file") == "import_csv_file":
+            #*here its passing into the file form the data
             form_inst = ImportCSVForm(request.POST,request.FILES)
+
+            #*in the form is validated
             if form_inst.is_valid():
                 csv_file = request.FILES['csv_file']
-                validation_proccess = FileValidator(csv_file,2)
-                validation_proccess.run_proccess()
+
+                #*this is the file validator that checking the file contents and validate it
+                validation_proccess_instance = FileValidator(csv_file,2)
+                validated_data = validation_proccess_instance.start_validation()
+                if validated_data:
+                    mongodb_added_record = mongodb_handler.add_record(collection_name="gr",user=str(request.user),new_record=validated_data,max_record_amount=int(record_amount["record_amount"]))
+                    return HttpResponseRedirect("/dashboard")
+                
+
+                else:
+                    return HttpResponse("the record is not added because the file content is invalid")
+                    
+
+                
             else:
                 return HttpResponse("file form is invalid")
 
