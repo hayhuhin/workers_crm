@@ -183,7 +183,9 @@ def dashboard(request):
                     "graph_type":graph_type,
                     "created_at" : time_now,
                     "x":graph_data[1],
-                    "y":graph_data[0]
+                    "y":graph_data[0],
+                    "start_date":str(start),
+                    "end_date":str(end),
                     }
 
                 ######################################

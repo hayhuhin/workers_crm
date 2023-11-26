@@ -313,7 +313,7 @@ graph_title': ['Graph'],
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Start Date</label>
                       <p>previous date was : {{graph.graph_data.v.x|last}}</p>
-                        {% render_field edit_graph_form.start_date type='date' id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                        {% render_field edit_graph_form.start_date type='date' value=graph.graph_data.v.start_date id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
                     </div>
                     <!-- end of start_date div -->
 
@@ -321,7 +321,7 @@ graph_title': ['Graph'],
                       <div class='mb-3'>
                         <label for='graph_title' class='col-form-label'>End Date</label>
                         <p>previous date was : {{graph.graph_data.v.x|first}}</p>
-                        {% render_field edit_graph_form.end_date type='date' id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                        {% render_field edit_graph_form.end_date type='date' id='graph_date_{{graph.graph_data.k}}' value=graph.graph_data.v.end_date class='form-control'%}
                     </div>
                     <!-- end of the end_date div-->
 

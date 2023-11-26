@@ -223,9 +223,6 @@ class MongoDBConstructor:
 
             #its the first time that the user dont have records it will create record number
             # and a graph_position that shows us where it represented in the web-page
-            # position_data = {"$set":{"graph_records.position":position}}
-            # #this is the query to the mongodb database to add the position key and value
-            # self.db.get_collection(self.collection_name).update_one(query_filter,position_data)
             new_record['position'] = position
 
 
