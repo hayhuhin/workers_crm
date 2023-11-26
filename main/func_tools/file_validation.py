@@ -47,53 +47,51 @@ class FileValidator:
                     #* inside the x,y its a string that containts the list
                     #*below method transforms it from string to list
 
-                    data_x = []
-                    data_y = []
-                    constructed_data["x"] = constructed_data["x"].split(",")
-
 
                     constraints = ["[","]"," "]
                     end_string = [","]
-
-                    counter = 0
                     data = []
                     string = ""
                     index = 0
                     last_index_y = len(constructed_data["y"])
+                    #for loop over the long string 
                     for index in range(len(constructed_data["y"])):
-                        print(counter)
                         
+                        #if there space or brackets it will be removed by not adding the data to the new list
                         if constructed_data["y"][index] in constraints:
                             continue
+
+                        #this else is if the chars are not in the contstrains list
                         else:
-                            if constructed_data["y"][index] in end_string or index >= (last_index_y-1):
+                            
+                            #if statement that checking where the string ends and converts the string to int and adding it to 
+                            #the data list
+                            if constructed_data["y"][index] in end_string:
                                 data.append(int(string))
                                 string = ""
+                            
+                            #if its not the end of the string then im adding each character to the string variable
                             else:
                                 string += constructed_data["y"][index]
-                                print(string)
-                                counter += 1
 
+                                #if statement that checking if the for loop in the end and there is no "," in the end
+                                #so it will add the last string to the data 
+                                if last_index_y-2 == index:
+                                    data.append(int(string))
+
+                    #* the new list of integers saved as data and we are changing the value of constructed["y"] to the new data
                     constructed_data["y"] = data
-                    print(len(constructed_data["y"]))
-                    print(last_index_y-1)
-                    print(index)
-                    print(data)
-                    # print(index)
-                    # print(len(constructed_data["y"])-1)
 
+
+                    #removing the "[" from the start and the end of the string and then 
                     last_index_x = len(constructed_data["x"])-1
-                    # last_index_y = len(constructed_data["y"])-1
-  
+                    print(constructed_data["x"][0])
+                    constructed_data["x"] = constructed_data["x"].replace("[","")    
+                    constructed_data["x"] = constructed_data["x"].replace("]","")    
 
-                    constructed_data["x"][0] = constructed_data["x"][0].replace("[","")    
-                    constructed_data["x"][last_index_x] = constructed_data["x"][last_index_x].replace("]","")    
-                    # print(constructed_data["y"])
-
-                    # constructed_data["y"][0] = constructed_data["y"][0].replace("[","")  
-                    # constructed_data["y"][last_index_y] = constructed_data["x"][last_index_y].replace("]","")
-                    
-                    # return constructed_data
+                    #this method iterates over the strings and spliting it with ","
+                    constructed_data["x"] = constructed_data["x"].split(",")
+                    return constructed_data
                 
 
 
