@@ -62,10 +62,10 @@ create remove graph functionallity in the dashboard page - DONE
 
 make the dashboard page look much better 
 FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD + change the method to use timestamps - DONE
-    <<working on >>
-FIX:user can change position when there is no other positions and it breaks the page - 
+FIX:user can change position when there is no other positions and it breaks the page - DONE
 
 task 6:
+    << on hold >>
 ADD:change the profile page to look much more updated and nice for the end user - 
 ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
     1.export CSV - DONE
@@ -73,7 +73,8 @@ ADD:export CSV and Import CSV - in the import must be a option to watch without 
 migrate into the django the mongodb database - CANCELED : not needed because the pymongo suits my right needs
 ADD:change graph position - DONE
 
-<< on hold >>
+ADD:in the edit form it will automaticly fill the date - DONE
+    <<working on >>
 ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs
 https://plotly.com/python/bar-charts/
 
