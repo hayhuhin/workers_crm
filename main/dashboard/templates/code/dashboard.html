@@ -70,6 +70,44 @@
 
       </div><!-- end of 'modal-dialog' -->
     </div><!-- 'modal fade' -->
+{% comment %} <QueryDict: {'csrfmiddlewaretoken': ['ijpS2e1g1c8BqqBk5DpIp5OOgWeXFBUBpf9ZvJD5z3824w8uHqjebqaBx1AoXNtj'], '
+graph_title': ['Graph'],
+ 'graph_description': ['No Description'], 
+'start_date': ['2023-11-01'],
+ 'end_date': ['2024-11-01'], 'db': ['income'],
+ 'graph': ['bar_graph'],
+  'add_graph_data': ['add_graph_data']}> {% endcomment %}
+<form method="POST">
+ <div hidden>
+ {% csrf_token %}
+              {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}
+              {% render_field income_form.graph_description type='text' id='graph_description' class='form-control'  %}
+              {% render_field income_form.start_date type='date' id='graph_start_date' class='form-control' value='2023-11-01'%}
+              {% render_field income_form.end_date type='date' id='graph_end_date' class='form-control' value='2024-11-01' %}
+              {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' value='income'%}
+              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option' value='bar_graph'%}
+      </div>   
+<button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary'>1 year</button>
+</form> 
+
+<form method="POST">
+
+ {% csrf_token %}
+<button type='submit' name='delete_all_records' value='delete_all_records' class='btn btn-danger'>delete_all_records</button>
+</form> 
+
+ <form method="POST">
+ <div hidden>
+ {% csrf_token %}
+              {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}
+              {% render_field income_form.graph_description type='text' id='graph_description' class='form-control'  %}
+              {% render_field income_form.start_date type='date' id='graph_start_date' class='form-control' value='2023-11-01'%}
+              {% render_field income_form.end_date type='date' id='graph_end_date' class='form-control' value='2023-11-30' %}
+              {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' value='income'%}
+              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option' value='bar_graph'%}
+      </div>   
+<button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary'>1 month</button>
+</form> 
 
 
     <div class="m-3">
@@ -323,6 +361,7 @@
                 <!-- test test test test test -->
 
                 {% render_field edit_graph_form.graph_id type='text' value=graph.graph_data.k %}
+                {% render_field edit_graph_form.graph_position type='text' value=graph.graph_data.v.position %}
 
                 <!-- test test test test test -->
 

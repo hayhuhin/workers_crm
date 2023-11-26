@@ -58,26 +58,43 @@ class MongoDBConstructor:
             src_graph_position = (graph_data["graph_records"]["records"][str(current_graph_id)]["position"])
         src_graph_id = current_graph_id
 
-        #this changes the current graph id to the requested graph position
-        src_record_change = {
-        "$set": {
-            f"graph_records.records.{src_graph_id}.position":requested_position
-        }}
-        # self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+        user_collection_records = self.db.get_collection(self.collection_name).find(query_filter,{"graph_records.records":1})
 
 
-        #this changes the requested graph position to the current (switching the current and the requested places)
-        dst_graph_position = requested_position
-        dst_graph_id = self.find_graphID_by_position(collection_name=collection_name,user=user,position_value=requested_position)
-        dst_record_change = {
-            "$set":{
-                f"graph_records.records.{dst_graph_id}.position":int(src_graph_position)
+        user_records_position = []
+        for cursor in user_collection_records:
+
+            for records in  cursor["graph_records"]["records"]:
+                user_records_position.append(cursor["graph_records"]["records"][records]["position"])
+
+
+
+        available_positions = user_records_position
+        if requested_position not in available_positions:
+            #! need to add some response to the user 
+            raise Exception("invalid position requested ")
+
+        else:
+            #this changes the current graph id to the requested graph position
+            src_record_change = {
+            "$set": {
+                f"graph_records.records.{src_graph_id}.position":requested_position
+            }}
+            # self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+
+
+            #this changes the requested graph position to the current (switching the current and the requested places)
+            dst_graph_position = requested_position
+            dst_graph_id = self.find_graphID_by_position(collection_name=collection_name,user=user,position_value=requested_position)
+            dst_record_change = {
+                "$set":{
+                    f"graph_records.records.{dst_graph_id}.position":int(src_graph_position)
+                }
             }
-        }
 
-        #this two lines are updating the database with the new positions
-        self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
-        self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+            #this two lines are updating the database with the new positions
+            self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
+            self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
 
 
 
@@ -167,14 +184,13 @@ class MongoDBConstructor:
         query = {"user_name": user}
         projection = {"graph_records.records": 1, "_id": 0}
         sort = [("graph_records.records", 1)]
-        print(new_record)
 
 
         #this gives me the option to see the keys of the graph_records.records
-        print("*********************************")
+        # print("*********************************")
         # print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
         # print(len((list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])))
-        print("*********************************")
+        # print("*********************************")
         records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
 
         #this checking the users permission and its record capacity approved
@@ -223,7 +239,7 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
             final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-            print(new_record_query)
+
             print(f"the record is added successfully. record number : {new_record_name}")
  
 
@@ -257,7 +273,7 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
             final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-            print(new_record_query)
+
             print(f"the record is added successfully. record number : {new_record_name}")
 
 
@@ -312,6 +328,7 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
                 final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+                
 
         if delete_all:
 
@@ -324,7 +341,8 @@ class MongoDBConstructor:
                     "graph_records":""
                 },}
 
-                final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+                final = self.db.get_collection(self.collection_name).delete_one({"user_name":user})
+                # final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
         
         
 
@@ -424,6 +442,8 @@ class MongoDBConstructor:
             return None
 
         else:
+
+            #! need to add check statment that if the user trying to switch the current position to position that doesnt exists
             pipe_line = [
     {
         "$match": {"user_name": user_name}

@@ -19,19 +19,29 @@ def employer_data_info(request):
     return request_data
 
 
+#!steps to fix the date in the functions
+#*change the month data to time object that have str method
+
+
+
 def sum_month(start,db,db_func):
     """sums all records inside the same month and returning two lists :
        one list with the dates another with the summary of all the records inside the same month
+       attributes:
+       start:accepts string value represented as "2023-11-01" for example
     """
-    
-    start_date = datetime.datetime.strptime(start,"%Y-%m-%d").date()
-    # print(start_date)
-    end = start_date.replace(day = calendar.monthrange(start_date.year, start_date.month)[1])
 
-    all_months_test = db.objects.filter(month__range=(start_date,end)).all().values_list().aggregate(db_func('amount'))
+    first_day = datetime.datetime.strptime(start,"%Y-%m-%d").date()
 
-    date_list = str(start_date) + " - " + str(end)
-    summary_list = all_months_test['amount__sum']
+    end = first_day.replace(day = calendar.monthrange(first_day.year, first_day.month)[1])
+
+    full_amount_summary = db.objects.filter(month__range=(first_day,end)).all().values_list().aggregate(db_func('amount'))
+    print(full_amount_summary)
+
+    date_list_str = str(first_day) + " - " + str(end)
+
+    date_list = first_day.strftime("%B %Y")
+    summary_list = full_amount_summary['amount__sum']
 
     return date_list,summary_list
 
@@ -40,26 +50,33 @@ def sum_date_by_range(start_date,end_date,db,db_func):
   """method that returns two lists:
   1.with the summ of all the records in the same month
   2.with the all months and years
+  attributes:
+  start_date:accepts datetime.date class 
   """
+
 
   months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
 
-  unique_year_month_set = set()
+
+#! here somewhere the order is breaking 
+  unique_year_month_list = []
   for month in months_query_set:
-      unique_year_month_set.add((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
+      # print((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
+
+      if ((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01") in unique_year_month_list:
+          continue
+      else:
+        unique_year_month_list.append((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
   
-  # print(unique_year_month_set)
+  # print(unique_year_month_list)
 
   period = []
   full_summary = []
-  for unique_date in unique_year_month_set:
+  for unique_date in unique_year_month_list:
   
     calculated_period_sum = sum_month(unique_date,db,db_func)
     period.append(calculated_period_sum[0])
     full_summary.append(calculated_period_sum[1])
-
-
-  # return sum_by_period
   return full_summary,period
 
 
@@ -174,6 +191,7 @@ class GraphRepresantation(object):
         line_fig = px.line(y=values,x=names,template=self.template)
         line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)",modebar={'bgcolor':'rgba(0, 0, 0, 0)'},)
         line_fig.update_traces(textfont_size=12,text='percent+label')
+        line_fig.update_xaxes(tickangle=-45)
 
 
         if to_html:

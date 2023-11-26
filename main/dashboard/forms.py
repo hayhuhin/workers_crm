@@ -3,7 +3,7 @@ from .models import Income
 from django.core.exceptions import ValidationError
 import random
 import string
-
+from main import settings
 
 class AddGraphForm(forms.Form):
 
@@ -11,7 +11,6 @@ class AddGraphForm(forms.Form):
     graph_description = forms.CharField(max_length=400,initial="No Description")
     start_date = forms.DateField()
     end_date = forms.DateField()
-    # db = forms.CharField(max_length=100)
     db = forms.CharField(
         max_length=100,
         widget=forms.TextInput(attrs={'hidden': 'hidden'})
@@ -29,6 +28,7 @@ class EditGraphForm(forms.Form):
     start_date = forms.DateField()
     end_date = forms.DateField()
     graph_id = forms.CharField(max_length=10,widget=forms.TextInput(attrs={"hidden":"hidden","class":"vala_id"}))
+    graph_position = forms.IntegerField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
 
 
     db_options = [

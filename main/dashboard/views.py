@@ -45,9 +45,6 @@ def dashboard(request):
 
     #gets the users all records from the mongodb 
     record_amount = employer_db_inst.graph_permission.all().values("record_amount")[0]
-
-    # test = mongodb_handler.find_graphID_by_position(collection_name="gr",user=str(request.user),position_value=1)
-    # print(test)
     
 
     #####################!testing in the get method section #############################
@@ -128,13 +125,13 @@ def dashboard(request):
 
     #checking if the request method is POST
     if request.method == "POST":
-        print(request.POST)
+
 
         if request.POST.get("remove_graph") == "remove_graph":
             form_inst = DeleteGraphForm(request.POST)
             if form_inst.is_valid():
                 graph_id = form_inst.cleaned_data.get("graph_id")
-                mongodb_handler.remove_records(collection_name="gr",user=str(request.user),record_number=str(graph_id))
+                mongodb_handler.remove_records(collection_name="gr",user=str(request.user),record_number=str(graph_id),delete_all=False)
 
                 return HttpResponseRedirect("/dashboard")
             
@@ -151,14 +148,15 @@ def dashboard(request):
 
         #? this sectiong is only if the post request comming from the add graph form
         if request.POST.get("add_graph_data") == "add_graph_data":
+            print(request.POST)
 
             #filling the AddGraphForm with the request.POST data from the user
             form_inst = AddGraphForm(request.POST)
-            print(f"the requested post data is:{request.POST}")
+            # print(f"the requested post data is:{request.POST}")
 
             #checking the validity of the form (no injection etc...)
             if form_inst.is_valid():
-
+                print("is valid")
 
                 #simple form data for later usage
                 user = request.user
@@ -221,6 +219,7 @@ def dashboard(request):
                     edit_db = edit_form_inst.cleaned_data.get("db")
                     edit_start = edit_form_inst.cleaned_data.get("start_date")
                     edit_end = edit_form_inst.cleaned_data.get("end_date")
+                    edit_graph_position = edit_form_inst.cleaned_data.get("graph_position")
 
                     #calculates the x and the y of the graph and returns it as two lists
                     edit_graph_data = graph_calculator.sum_by_range(start_date=edit_start,end_date=edit_end)
@@ -238,7 +237,8 @@ def dashboard(request):
                          "graph_type":edit_graph_type,
                          "created_at":edit_time_now,
                          "x":edit_graph_data[1],
-                         "y":edit_graph_data[0]
+                         "y":edit_graph_data[0],
+                         "position":edit_graph_position
                     }
                     final = mongodb_handler.edit_record(collection_name="gr",user=str(edit_user),record_id=edit_graph_id,new_data=edited_data)
                     # mongodb_handler.find_data(collection_name="gr",data={"user_name":"ben"})
@@ -299,9 +299,15 @@ def dashboard(request):
             else:
                 return HttpResponse("file form is invalid")
 
+        if request.POST.get("delete_all_records") == "delete_all_records":
+            mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
+            return HttpResponseRedirect("/dashboard")
+
                     
     if request.method == "DELETE":
         print("the requested method is DELETE")
+    
+
 
 
 
