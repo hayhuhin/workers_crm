@@ -96,9 +96,91 @@ class MongoDBConstructor:
             self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
             self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
 
+    def compare_record(self,collection_name:str,user:str,src_id:str,user_data:dict,max_record_amount):
+        """this method checking that the compare record is having the same amount of months and returns 3 lists
+            one with first graph y(values)
+            second with second graph y(values)
+            third is a list with the x(months)
+        """
+        
+        #* first step i have to validate that there are the same amount of data in both graphs
+        # this is the source graph data
+        src_graph_data = self.db.get_collection(self.collection_name).find({"user_name":user},{f"graph_records.records.{src_id}":1})
+
+        dst_position = user_data["dst_position"]
+        #getting the dst_id by its position records
+        dst_id = self.find_graphID_by_position(collection_name="gr",user=user,position_value=dst_position)
+
+        # this is the destination graph data
+        dst_graph_data = self.db.get_collection(self.collection_name).find({"user_name":user},{f"graph_records.records.{dst_id}":1})
+
+        #* the comparement between the src graph and the dst graph
+        src_data = []
+        for src in src_graph_data:
+            src_data.append(src["graph_records"]["records"][src_id])
+        dst_data = []
+        for dst in dst_graph_data:
+            dst_data.append(dst["graph_records"]["records"][dst_id])
 
 
-    def find_graphID_by_position(self,collection_name:str,user:str,position_value):
+        #*checking the length of the both keys and values for comparison
+        x_fields_validated = False
+        for index in range(len(src_data[0]["x"])):
+            #checking the values if the x are the same 
+            if src_data[0]["x"][index] == dst_data[0]["x"][index]:
+                #checking the length of both data
+                if len(src_data[0]["x"]) == len(dst_data[0]["x"]):
+                    x_fields_validated = True
+                else:
+                    print( "the src len is not the same")
+                    return "the src len is not the same"
+            else:
+                print("the src data and the dst data not matching")
+                return "the src data and the dst data not matching"
+        y_fields_validated = False
+        for index in range(len(src_data[0]["y"])):
+            #checking the length of both data
+            if len(src_data[0]["y"]) == len(dst_data[0]["y"]):
+                y_fields_validated = True
+            else:
+                print( "the src len is not the same")
+                return "the src len is not the same"
+
+        #
+        if y_fields_validated and x_fields_validated:
+            compared_dict = {"src_user_data":{src_id:src_data},"dst_user_data":{dst_id:dst_data}}
+            # print(src_data)
+
+            #if the fields true i will delete the records to create a new one that compared
+            self.remove_records(collection_name=self.collection_name,user=user,record_number=dst_id)
+            self.remove_records(collection_name=self.collection_name,user=user,record_number=src_id)
+
+
+            #to create a new one we have to add new data
+            new_record = {
+                "graph_title":user_data["graph_title"],
+                "graph_description":user_data["graph_description"],
+                "graph_type":user_data["graph_type"],
+                "created_at" : "11-11-11",
+                "x":src_data[0]["x"],
+                "y_2":dst_data[0]["y"],
+                "y":src_data[0]["y"],
+                "start_date":user_data["start"],
+                "end_date":user_data["end"],
+                }
+            
+            #small check if the add compare graph was made from position "1" to something else so the position will be "1"
+            if src_data[0]["position"] == 1:
+                self.add_record(collection_name=self.collection_name,user=user,new_record=new_record,max_record_amount=max_record_amount,set_position=True)   
+            
+            else: 
+                self.add_record(collection_name=self.collection_name,user=user,new_record=new_record,max_record_amount=max_record_amount)
+
+            # return x1_values
+
+
+
+    def find_graphID_by_position(self,collection_name:str,user:str,position_value:int):
         """this method will search the graph id by its position value inside each graph
             it does a loop that iterates over the graph records(max graph records for now is 7)
             the complexity is a o(n+1)
@@ -122,6 +204,7 @@ class MongoDBConstructor:
             for record_id in items["graph_records"]["records"]:
                 if items["graph_records"]["records"][record_id]["position"] == position_value:
                     found_id = record_id
+
                     return found_id
 
 
@@ -175,7 +258,7 @@ class MongoDBConstructor:
         print(f"record: {record_id} is updated successfully")
 
 
-    def add_record(self,max_record_amount,collection_name:str,new_record:dict,user:str,many_records=False):
+    def add_record(self,max_record_amount,collection_name:str,new_record:dict,user:str,many_records=False,set_position=False):
         """ add method that creates collection if doesnt exists and writes 
             data into the collection
         """
@@ -253,6 +336,38 @@ class MongoDBConstructor:
             #the position will always be len(records) + 1 besause the add graph will be added to the end
             #of the page by default
             position = len(records)+1
+            # user_filter = {"user_name":user}
+            # position_data = {"$set":{"graph_records.position":position}}
+            # self.db.get_collection(self.collection_name).update_one(user_filter,position_data)
+            new_record["position"] = position
+            #bellow section is responsible for formating the new record 
+
+            query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+            #the format of the new data
+            new_record_query = {
+                "$set":{
+                    f"graph_records.records.{new_record_name}":new_record
+                }
+            }
+
+            #the final result that will save the added record in the mongo db database
+            final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+
+            print(f"the record is added successfully. record number : {new_record_name}")
+
+        if set_position:
+
+
+            #the record that saved last in the db
+            prev_record = list(records)[-1]
+
+            #the new record that will be created
+            new_record_name = str(int(prev_record)+1)
+
+            #the position will always be len(records) + 1 besause the add graph will be added to the end
+            #of the page by default
+            position = 1
             # user_filter = {"user_name":user}
             # position_data = {"$set":{"graph_records.position":position}}
             # self.db.get_collection(self.collection_name).update_one(user_filter,position_data)

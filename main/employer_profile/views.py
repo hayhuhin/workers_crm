@@ -30,7 +30,8 @@ def profile_page(request):
         values = [20, 50, 37, 18]
 
         names = ['week 1', 'week 2', 'week 3', 'week 4']
-        monthly_pie_graph = instance_of_graph_presentation.bar_graph(group=names,value=values)
+        data_dict = {"x":names,"y":values}
+        monthly_pie_graph = instance_of_graph_presentation.bar_graph(dict_values=data_dict)
 
 
 

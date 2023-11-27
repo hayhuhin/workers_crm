@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm,CompareGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph import GraphCalculator,GraphRepresantation
@@ -76,18 +76,20 @@ def dashboard(request):
     mongodb_getting_data = mongodb_handler.get_record(collection_name="gr",user_name=str(request.user),record_count=total_records)
 
 
-
     #checking if there is any data at all from the mongodb query
     if mongodb_getting_data:
+        #this dict structures the group and values data into a dict
+
+        graph_values = {}
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
         for graph in mongodb_getting_data:
+            # graph_values["group"] = graph["v"]["x"]
+            # graph_values["value"] =  graph["v"]["y"]
+            # graph_values["value_2"] = graph["v"]["y_2"]
+        
 
-    
-
-            
-            
-            graph_html = graph_repr.graph_options(graph_type=graph["v"]["graph_type"],group=graph["v"]["x"],values=graph["v"]["y"])  
+            graph_html = graph_repr.graph_options(dict_values=graph["v"],graph_type=graph["v"]["graph_type"])  
 
             #this is the graph chart list that pushed to the html template with its graph data
             graph_chart.append({"graph_data":graph,"graph_html":graph_html})
@@ -106,6 +108,8 @@ def dashboard(request):
     change_positon_form = ChangeGraphPosition()
 
     import_csv_form = ImportCSVForm()
+
+    compare_graph_form = CompareGraphForm()
 
     values=[20, 20, 20, 20, 20,13,51]
     names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
@@ -304,8 +308,45 @@ def dashboard(request):
         if request.POST.get("delete_all_records") == "delete_all_records":
             mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
             return HttpResponseRedirect("/dashboard")
+        
+        if request.POST.get("compare_graph_data") == "compare_graph_data":
+            form_inst = CompareGraphForm(request.POST)
+            if form_inst.is_valid():
+                print("the graph_compare is valid")
+                user = str(request.user)
+                graph_title = form_inst.cleaned_data.get("graph_title")
+                graph_description = form_inst.cleaned_data.get("graph_description")
+                graph_type = form_inst.cleaned_data.get("graph")
+                db = form_inst.cleaned_data.get("db")
+                start = form_inst.cleaned_data.get("start_date")
+                end = form_inst.cleaned_data.get("end_date")
+                src_id = form_inst.cleaned_data.get("graph_id")
+                dst_position = form_inst.cleaned_data.get("dst_position")
+                src_position = form_inst.cleaned_data.get("graph_position")
 
-                    
+
+                user_compare_data = {
+                    "graph_title":graph_title,
+                    "graph_description":graph_description,
+                    "graph_type":graph_type,
+                    "src_position":src_position,
+                    "dst_position":dst_position,
+                    "start":str(start),
+                    "end":str(end)
+                        }
+                # final = mongodb_handler.edit_record(collection_name="gr",user=str(edit_user),record_id=src_id,new_data=edited_data)
+              
+                structured_data = mongodb_handler.compare_record(collection_name="gr",user=user,src_id=src_id,user_data=user_compare_data,max_record_amount=int(record_amount["record_amount"]))
+                return HttpResponseRedirect("/dashboard")
+                #if the method returned data it will continue and add the data
+                #     mongodb_handler.switch_records(collection_name="gr",max_record_amount=int(record_amount["record_amount"]),user=user,new_record=new_record)
+
+                #!steps to acomplish the compare graph
+                #!need to add more fields to the form
+                #!
+
+
+    
     if request.method == "DELETE":
         print("the requested method is DELETE")
     
@@ -319,7 +360,15 @@ def dashboard(request):
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,'income_form':income_form,'import_csv_form':import_csv_form,'edit_graph_form':edit_graph_form,'delete_graph_form':delete_graph_form,'change_position_form':change_positon_form,'graph_chart':graph_chart}
+    context = {'databases':databases,
+               'income_form':income_form,
+               'import_csv_form':import_csv_form,
+               'edit_graph_form':edit_graph_form,
+               'delete_graph_form':delete_graph_form,
+               'change_position_form':change_positon_form,
+               'graph_chart':graph_chart,
+               'compare_graph_form':compare_graph_form}
+    
     return render(request,'code/dashboard.html',context)
 
 

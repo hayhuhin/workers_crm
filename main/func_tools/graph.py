@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import calendar
 import datetime
+import plotly.graph_objects as go
 
 
 #? helper function that will be used later inside the class
@@ -95,21 +96,23 @@ class GraphRepresantation(object):
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
 
-    def graph_options(self,graph_type,group:list,values:list,path=None,to_html=True):
+    def graph_options(self,graph_type,dict_values:dict,path=None,to_html=True):
         """method that gives you the option to choose which grap to represent by the graph_type
            arg that must be the same as the name of the func (example:"graph_type")
         """
         if graph_type == self.bar_graph.__name__:
-            return self.bar_graph(group=group,value=values,path=path,to_html=to_html)
+            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == self.pie_graph.__name__:
-            return self.pie_graph(group=group,value=values,path=path,to_html=to_html)
+            return self.pie_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == self.donut_graph.__name__:
-            return self.donut_graph(group=group,value=values,path=path,to_html=to_html)
+            return self.donut_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == self.line_graph.__name__:
-            return self.line_graph(values=values,names=group,path=path,to_html=to_html)
+            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html)
+        if graph_type == "bar_graph_compare":
+            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
 
     
-    def bar_graph(self,group:list,value:list,path=None,to_html=True):
+    def bar_graph(self,dict_values:dict,path=None,to_html=True,compare=False):
         """this method return the bar graph 
             args:
               group: most of the time its the x line on the graphs
@@ -118,6 +121,8 @@ class GraphRepresantation(object):
               to_html : default is true and returns the graph as html repr so it can be loaded in the html template
         """
 
+        group = dict_values["x"]
+        value = dict_values["y"]
         data_frame = pd.DataFrame(dict(group=group,value=value))
 
         graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
@@ -132,13 +137,6 @@ class GraphRepresantation(object):
                                 # width=300
 )
 
-
-
-        # path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
-        # line_fig = px.line(y=values,x=names,template=self.template)
-        # line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)")
-        # line_fig.update_traces(textfont_size=12,text='percent+label')
-
         graph_fig.update_traces(textfont_size=12)
 
         graph_fig.update_xaxes(
@@ -146,8 +144,42 @@ class GraphRepresantation(object):
           dtick="M1", # sets minimal interval to month
           tickformat="%d.%m.%Y", # the date format you want 
 )
+        if compare:
+
+          values_1 = dict_values["y"]
+          values_2 = dict_values["y_2"]
+          group = dict_values["x"]
+
+          graph_fig = px.bar(
+              x=group,
+              y=[values_1, values_2],
+              labels={'value': 'Income', 'x':'Date','variable': 'amount'},
+              title=dict_values["graph_description"],
+              color_discrete_sequence=['blue', 'orange'],  # Set custom colors
+              template=self.template,
+          )
+
+          # fig.update_layout(barmode='group')
+          # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
+          graph_fig.update_layout(barmode='group',
+                                  paper_bgcolor='rgba(0,0,0,0)',
+                                  plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                  modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                  bargap=0.2,
+                                  bargroupgap=0.2,)
+                                  # width=300
 
 
+          graph_fig.update_traces(textfont_size=12)
+
+          graph_fig.update_xaxes(
+            tickangle=-45,#the angle of the presentation
+            dtick="M1", # sets minimal interval to month
+            tickformat="%d.%m.%Y",) # the date format you want 
+          
+          graph = graph_fig.to_html(config={'displayModeBar': True})
+          return graph
+        
         if to_html:
             graph = graph_fig.to_html(config={'displayModeBar': True})
         else:

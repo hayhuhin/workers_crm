@@ -87,3 +87,23 @@ class ImportCSVForm(forms.Form):
             self.files['csv_file'].name = new_file_name
 
         return csv_file
+    
+class CompareGraphForm(forms.Form):
+
+    db_options = [
+        ("income","Income"),
+        ("outcome","Outcome")]
+    
+    graph_options = [
+        ("bar_graph_compare","Bar graph"),
+        ("line_graph_compare","Line Graph")]
+  
+    graph_title = forms.CharField(max_length=50,widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    graph_description = forms.CharField(max_length=300,widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    start_date = forms.DateField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    end_date = forms.DateField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    graph_id = forms.CharField(max_length=10,widget=forms.TextInput(attrs={"hidden":"hidden","class":"vala_id"}))
+    graph_position = forms.IntegerField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
+    db = forms.ChoiceField(choices=db_options)
+    graph = forms.ChoiceField(choices=graph_options)
+    dst_position = forms.IntegerField(max_value=8)
