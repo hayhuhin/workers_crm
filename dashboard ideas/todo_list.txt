@@ -75,8 +75,13 @@ ADD:change graph position - DONE
 
 ADD:in the edit form it will automaticly fill the date - DONE
     <<working on >>
-ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs
+ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs - 
 https://plotly.com/python/bar-charts/
+
+############################################################
+FIX:refactoring and documentation for all classes and methods !!!!
+############################################################
+
 
 ADD:smaller presentation example: 2 or 4 graphs together
 

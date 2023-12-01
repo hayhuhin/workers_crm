@@ -83,7 +83,7 @@ def dashboard(request):
         graph_values = {}
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
-        for graph in mongodb_getting_data:
+        for graph in mongodb_getting_data[0]:
             # graph_values["group"] = graph["v"]["x"]
             # graph_values["value"] =  graph["v"]["y"]
             # graph_values["value_2"] = graph["v"]["y_2"]
@@ -93,6 +93,21 @@ def dashboard(request):
 
             #this is the graph chart list that pushed to the html template with its graph data
             graph_chart.append({"graph_data":graph,"graph_html":graph_html})
+
+        total_graph = mongodb_getting_data[1]["total_records"]
+
+
+
+    graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"income"})
+    information_insight = {
+        "total_records":total_graph,
+        "max_records" :total_records,
+        "current_year_income":100,
+        "last_year_income":100,
+        "current_year_spendings":100
+    }
+
+
 
 
 
@@ -111,6 +126,9 @@ def dashboard(request):
 
     compare_graph_form = CompareGraphForm()
 
+
+    #* this is only for testing 
+
     values=[20, 20, 20, 20, 20,13,51]
     names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
     weekly_donut_graph = graph_repr.donut_graph(values=values,names= names)
@@ -124,6 +142,11 @@ def dashboard(request):
 
     #! only for testing for now (later it will be queried and represented)
     databases = ["Income","Outcome"]
+
+
+
+
+
 
 
 
@@ -152,7 +175,7 @@ def dashboard(request):
 
         #? this sectiong is only if the post request comming from the add graph form
         if request.POST.get("add_graph_data") == "add_graph_data":
-            print(request.POST)
+
 
             #filling the AddGraphForm with the request.POST data from the user
             form_inst = AddGraphForm(request.POST)
@@ -311,6 +334,7 @@ def dashboard(request):
         
         if request.POST.get("compare_graph_data") == "compare_graph_data":
             form_inst = CompareGraphForm(request.POST)
+            print(request.POST)
             if form_inst.is_valid():
                 print("the graph_compare is valid")
                 user = str(request.user)
@@ -340,7 +364,8 @@ def dashboard(request):
                 return HttpResponseRedirect("/dashboard")
                 #if the method returned data it will continue and add the data
                 #     mongodb_handler.switch_records(collection_name="gr",max_record_amount=int(record_amount["record_amount"]),user=user,new_record=new_record)
-
+            else:
+                return HttpResponse("the form is not valid")
                 #!steps to acomplish the compare graph
                 #!need to add more fields to the form
                 #!
@@ -367,7 +392,8 @@ def dashboard(request):
                'delete_graph_form':delete_graph_form,
                'change_position_form':change_positon_form,
                'graph_chart':graph_chart,
-               'compare_graph_form':compare_graph_form}
+               'compare_graph_form':compare_graph_form,
+               'total_records':total_graph}
     
     return render(request,'code/dashboard.html',context)
 

@@ -70,9 +70,12 @@ def sum_date_by_range(start_date,end_date,db,db_func):
         unique_year_month_list.append((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
   
   # print(unique_year_month_list)
-
+  
+  #string repr of the months and years
   period = []
+  #each month total sum of the income\outcome
   full_summary = []
+
   for unique_date in unique_year_month_list:
   
     calculated_period_sum = sum_month(unique_date,db,db_func)
@@ -110,6 +113,8 @@ class GraphRepresantation(object):
             return self.line_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == "bar_graph_compare":
             return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
+        if graph_type == "line_graph_compare":
+            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
 
     
     def bar_graph(self,dict_values:dict,path=None,to_html=True,compare=False):
@@ -208,7 +213,7 @@ class GraphRepresantation(object):
             graph = pie_fig.write_image(path)
         return graph
 
-    def line_graph(self,values:list,names:list,path='',to_html=True):
+    def line_graph(self,dict_values:dict,path='',to_html=True,compare=False):
         
 
         #! examples 
@@ -216,14 +221,52 @@ class GraphRepresantation(object):
         # fig = px.line(df, x="year", y="lifeExp", title='Life expectancy in Canada')
         # fig.show()
 
-
-
+        group = dict_values["x"]
+        value = dict_values["y"]
 
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
-        line_fig = px.line(y=values,x=names,template=self.template)
+        line_fig = px.line(y=value,x=group,template=self.template)
         line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)",modebar={'bgcolor':'rgba(0, 0, 0, 0)'},)
         line_fig.update_traces(textfont_size=12,text='percent+label')
         line_fig.update_xaxes(tickangle=-45)
+
+        if compare:
+            
+          dict_values
+          values_1 = dict_values["y"]
+          values_2 = dict_values["y_2"]
+          group = dict_values["x"]
+
+          line_fig = px.line(
+              x=group,
+              y=[values_1, values_2],
+              labels={'value': 'Income', 'x':'Date','variable': 'amount'},
+              title=dict_values["graph_description"],
+              color_discrete_sequence=['blue', 'orange'],  # Set custom colors
+              template=self.template,
+          )
+
+          # fig.update_layout(barmode='group')
+          # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
+          line_fig.update_layout(barmode='group',
+                                  paper_bgcolor='rgba(0,0,0,0)',
+                                  plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                  modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                  bargap=0.2,
+                                  bargroupgap=0.2,)
+                                  # width=300
+
+
+          line_fig.update_traces(textfont_size=12)
+
+          line_fig.update_xaxes(
+            tickangle=-45,#the angle of the presentation
+            dtick="M1", # sets minimal interval to month
+            tickformat="%d.%m.%Y",) # the date format you want 
+          
+          graph = line_fig.to_html(config={'displayModeBar': True})
+          return graph
+
 
 
         if to_html:
@@ -357,6 +400,15 @@ class GraphCalculator:
         """ in the future will save the data in log folder with log file of graph repr and the user that used it"""
         
         return graph_html
+
+    def repr_yearly_data(self,args,**kwargs):
+      test = kwargs["kwargs"]["db"]
+      year_range = args
+      start = "2023-01-01"
+      end = "2023-10-01" 
+      print(self.db[0].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))["amount__sum"])
+
+      # total_amount = (self.db[0]).objects.filter(month__range=(start, end)).aggregate(self.db_func('amount'))['amount__sum']
 
 
     def sum_by_range(self,start_date,end_date):

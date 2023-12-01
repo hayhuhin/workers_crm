@@ -17,11 +17,17 @@
                     data-bs-toggle='modal' data-bs-target='#import_csv_modal' data-bs-whatever='@getbootstrap' href="#"
                     >Import Graph CSV</a>
                     </form>
-
 {% endblock title %}
 
 {% block content %}
 <div class='container p-4 pt-5'>
+
+<p>total graph records : {{total_records}}</p>
+<p>maximum graph records : </p>
+<p>this year income : </p>
+<p>previous year income : </p>
+<p>this year spendings : </p>
+
   <div class='border border-secondary rounded border-1' style="background:#212529;">
 
 
@@ -263,12 +269,12 @@ graph_title': ['Graph'],
       <form method="POST">
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
         {% csrf_token %}
-        <button type='submit'  name='remove_graph' class='btn btn-danger' value='remove_graph'>Remove Graph</button>
         {% render_field delete_graph_form.graph_id value=graph.graph_data.k %}
-        <button type='button' class='btn btn-success text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
-        <button type='submit' class='btn btn-success text-uppercase' name='export_csv'value='export_csv'> Export CSV </button>
-         <button type='button' class='btn btn-success text-uppercase' data-bs-toggle='modal' data-bs-target='#change_position_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Change Position</button>
-         <button type='button' class='btn btn-success text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_compare_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Compare Graph</button>
+        <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
+        <button type='submit' class='btn btn-secondary text-uppercase' name='export_csv'value='export_csv'> Export CSV </button>
+         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#change_position_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Change Position</button>
+         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_compare_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Compare Graph</button>
+        <button type='submit'  name='remove_graph' class='btn btn-danger' value='remove_graph'>Remove Graph</button>
 
       </form>
 
@@ -439,11 +445,6 @@ graph_title': ['Graph'],
                   <div class="mb-3 row">
                   <label for="data_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
                     <div class="col-sm-auto">
-                      {% comment %} <select class="form-select selected_edit_graph" aria-label="Default select example">
-                        <option selected class="select" value="select" name="bar_graph">Select One</option>
-                        <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
-                        <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
-                      </select> {% endcomment %}
                         {% render_field compare_graph_form.graph type='text' class='form-control-plaintext' id='graph_edit_option'%}
                       </div>
                     </div> 
@@ -451,13 +452,13 @@ graph_title': ['Graph'],
                     <!-- test of the options section-->
 
                     <!-- edit database div -->
-                      <div class="mb-3 row">
+                      {% comment %} <div class="mb-3 row">
                       <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
                           <div class="col-sm-auto">
 
                             {% render_field compare_graph_form.db type='text' class='form-control-plaintext' id='data_edit_option' %}
                           </div>
-                      </div><!-- end of the database div--> 
+                      </div><!-- end of the database div-->  {% endcomment %}
 
 
                 {% render_field compare_graph_form.graph_id type='text' value=graph.graph_data.k %}

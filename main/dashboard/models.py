@@ -7,7 +7,6 @@ from django.db import models
 
 
 class Income(models.Model):
-    # amount = models.IntegerField(default=0,null=True)
     month = models.DateField()
     amount = models.IntegerField()
 

@@ -33,6 +33,18 @@ class MongoDBConstructor:
 
         #testing phase - will return small number 
         return 7
+    
+    def available_positions(self,user:str):
+        
+        query_filter = {"user_name":user}
+        user_collection_records = self.db.get_collection(self.collection_name).find(query_filter,{"graph_records.records":1})
+        user_records_position = []
+        for cursor in user_collection_records:
+
+            for records in  cursor["graph_records"]["records"]:
+                user_records_position.append(cursor["graph_records"]["records"][records]["position"])
+        return user_records_position
+
 
     def switch_records(self,collection_name:str,user:str,current_graph_id,requested_position):
         """ this method gets the users current record position and id and switching the places of the records positions.
@@ -61,15 +73,10 @@ class MongoDBConstructor:
         user_collection_records = self.db.get_collection(self.collection_name).find(query_filter,{"graph_records.records":1})
 
 
-        user_records_position = []
-        for cursor in user_collection_records:
-
-            for records in  cursor["graph_records"]["records"]:
-                user_records_position.append(cursor["graph_records"]["records"][records]["position"])
+        
 
 
-
-        available_positions = user_records_position
+        available_positions = self.available_positions(user=user)
         if requested_position not in available_positions:
             #! need to add some response to the user 
             raise Exception("invalid position requested ")
@@ -102,6 +109,7 @@ class MongoDBConstructor:
             second with second graph y(values)
             third is a list with the x(months)
         """
+        print("compare_record called")
         
         #* first step i have to validate that there are the same amount of data in both graphs
         # this is the source graph data
@@ -148,8 +156,9 @@ class MongoDBConstructor:
 
         #
         if y_fields_validated and x_fields_validated:
+
             compared_dict = {"src_user_data":{src_id:src_data},"dst_user_data":{dst_id:dst_data}}
-            # print(src_data)
+
 
             #if the fields true i will delete the records to create a new one that compared
             self.remove_records(collection_name=self.collection_name,user=user,record_number=dst_id)
@@ -270,11 +279,9 @@ class MongoDBConstructor:
 
 
         #this gives me the option to see the keys of the graph_records.records
-        # print("*********************************")
-        # print(list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])
-        # print(len((list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"])))
-        # print("*********************************")
         records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
+
+
 
         #this checking the users permission and its record capacity approved
         #and return integer of the records approved
@@ -387,6 +394,7 @@ class MongoDBConstructor:
             final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
 
             print(f"the record is added successfully. record number : {new_record_name}")
+
 
 
 
@@ -602,9 +610,10 @@ class MongoDBConstructor:
 
             # return aggregated_data
             for items in aggregated_data:
+                #the total records here only for user representation
+                total_records = {"total_records":records_amount}
 
-
-                return items["lastrecords"]
+                return items["lastrecords"],total_records
 
 
 

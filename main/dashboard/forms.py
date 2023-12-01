@@ -104,6 +104,6 @@ class CompareGraphForm(forms.Form):
     end_date = forms.DateField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
     graph_id = forms.CharField(max_length=10,widget=forms.TextInput(attrs={"hidden":"hidden","class":"vala_id"}))
     graph_position = forms.IntegerField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
-    db = forms.ChoiceField(choices=db_options)
+    # db = forms.ChoiceField(choices=db_options,widget=forms.TextInput(attrs={'hidden':'hidden'}))
     graph = forms.ChoiceField(choices=graph_options)
     dst_position = forms.IntegerField(max_value=8)
