@@ -22,11 +22,17 @@
 {% block content %}
 <div class='container p-4 pt-5'>
 
-<p>total graph records : {{total_records}}</p>
-<p>maximum graph records : </p>
-<p>this year income : </p>
-<p>previous year income : </p>
-<p>this year spendings : </p>
+<p>total graph records : {{information_insight.total_records}}</p>
+<p>maximum graph records :{{information_insight.max_records}} </p>
+{% for year,income in information_insight.current_year_income.items %}
+<p>on that {{year}} the income was {{income}}</p>
+{% endfor %}
+
+{% for year,outcome in information_insight.current_year_spendings.items %}
+<p>on that {{year}} the outcome was {{outcome}}</p>
+{% endfor %}
+
+
 
   <div class='border border-secondary rounded border-1' style="background:#212529;">
 
@@ -83,7 +89,8 @@ graph_title': ['Graph'],
  'end_date': ['2024-11-01'], 'db': ['income'],
  'graph': ['bar_graph'],
   'add_graph_data': ['add_graph_data']}> {% endcomment %}
-{% comment %} <form method="POST">
+{% comment %} 
+<form method="POST">
  <div hidden>
  {% csrf_token %}
               {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}

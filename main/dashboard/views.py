@@ -34,7 +34,7 @@ def dashboard(request):
     #this class have CRUD methods that save the graph data into the mongodb
     windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
     mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mongodb_handler = MongoDBConstructor(uri=mac_uri,db_name="test")
+    mongodb_handler = MongoDBConstructor(uri=windows_uri,db_name="test")
     
     #the graph html representation class
     graph_repr = GraphRepresantation()
@@ -76,8 +76,11 @@ def dashboard(request):
     mongodb_getting_data = mongodb_handler.get_record(collection_name="gr",user_name=str(request.user),record_count=total_records)
 
 
+    information_insight = []
     #checking if there is any data at all from the mongodb query
+
     if mongodb_getting_data:
+
         #this dict structures the group and values data into a dict
 
         graph_values = {}
@@ -94,18 +97,20 @@ def dashboard(request):
             #this is the graph chart list that pushed to the html template with its graph data
             graph_chart.append({"graph_data":graph,"graph_html":graph_html})
 
-        total_graph = mongodb_getting_data[1]["total_records"]
+            total_graph = mongodb_getting_data[1]["total_records"]
 
 
 
-    graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"income"})
-    information_insight = {
-        "total_records":total_graph,
-        "max_records" :total_records,
-        "current_year_income":100,
-        "last_year_income":100,
-        "current_year_spendings":100
-    }
+        yearly_income_summary = graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"income"})
+        yearly_outcome_summary = graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"outcome"})
+
+        information_insight.append({
+            "total_records":total_graph,
+            "max_records" :record_amount["record_amount"],
+            "current_year_income":yearly_income_summary,
+            "current_year_spendings":yearly_outcome_summary,
+            
+        })
 
 
 
@@ -292,7 +297,6 @@ def dashboard(request):
             else:
                 return HttpResponse("the form is invalid")
 
-
         #! later add here form validation 
         if request.POST.get("export_csv") == "export_csv":
             graph_id = request.POST.get("graph_id")
@@ -385,16 +389,30 @@ def dashboard(request):
 
 
     #? here its the response in the get scope
-    context = {'databases':databases,
-               'income_form':income_form,
-               'import_csv_form':import_csv_form,
-               'edit_graph_form':edit_graph_form,
-               'delete_graph_form':delete_graph_form,
-               'change_position_form':change_positon_form,
-               'graph_chart':graph_chart,
-               'compare_graph_form':compare_graph_form,
-               'total_records':total_graph}
-    
+    if request.method == "GET":
+        if information_insight:
+            context = {'databases':databases,
+                    'income_form':income_form,
+                    'import_csv_form':import_csv_form,
+                    'edit_graph_form':edit_graph_form,
+                    'delete_graph_form':delete_graph_form,
+                    'change_position_form':change_positon_form,
+                    'graph_chart':graph_chart,
+                    'compare_graph_form':compare_graph_form,
+                    'information_insight':information_insight[0]}
+   
+        if not information_insight:
+            context = {'databases':databases,
+                    'income_form':income_form,
+                    'import_csv_form':import_csv_form,
+                    'edit_graph_form':edit_graph_form,
+                    'delete_graph_form':delete_graph_form,
+                    'change_position_form':change_positon_form,
+                    'graph_chart':graph_chart,
+                    'compare_graph_form':compare_graph_form,
+                    'information_insight':information_insight}
+        
+        
     return render(request,'code/dashboard.html',context)
 
 

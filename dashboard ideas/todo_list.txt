@@ -74,12 +74,18 @@ migrate into the django the mongodb database - CANCELED : not needed because the
 ADD:change graph position - DONE
 
 ADD:in the edit form it will automaticly fill the date - DONE
-    <<working on >>
-ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs - 
+ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs - DONE
 https://plotly.com/python/bar-charts/
 
+ADD:need to handle the outcome adding data to db !! -
+
+ADD:smaller data insight on the dashboard page - 
+
+
+<<working on >>
 ############################################################
 FIX:refactoring and documentation for all classes and methods !!!!
+ADD:TESTS FOR EACH FUNCTION
 ############################################################
 
 

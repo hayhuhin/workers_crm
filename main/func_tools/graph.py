@@ -6,8 +6,8 @@ import datetime
 import plotly.graph_objects as go
 
 
-#? helper function that will be used later inside the class
 
+#* this function used in the employer profile app view
 def employer_data_info(request):
     """method returning dict with the user information"""
     first_name = request.user.employer.first_name
@@ -20,45 +20,60 @@ def employer_data_info(request):
     return request_data
 
 
-#!steps to fix the date in the functions
-#*change the month data to time object that have str method
+
+# class DatabaseExtractor:
+#    def __init__(self,databases=list[object],functions=list):
+#       self.databases = databases
+#       self.functions = functions
+
+#     def sum_month(self,start,d)
+   
 
 
+def sum_single_month(date:str,db:object,db_func:object):
+    """
+    sums all records inside the same month and returning two lists with data if the records exists 
+    if the records not exists it will raise exception message
 
-def sum_month(start,db,db_func):
-    """sums all records inside the same month and returning two lists :
-       one list with the dates another with the summary of all the records inside the same month
-       attributes:
-       start:accepts string value represented as "2023-11-01" for example
+    Attributes:
+      first_day (str) : the starting point of the month(example: "2024-11-01").
+      db (object): database instance.
+      db_func (object function): database function(example "Sum" object that can be used inside the aggregate method when extracting sql data)
+    
     """
 
-    first_day = datetime.datetime.strptime(start,"%Y-%m-%d").date()
+    first_day_datetime_object = datetime.datetime.strptime(date,"%Y-%m-%d").date()
+    last_day_datetime_object = first_day_datetime_object.replace(day = calendar.monthrange(first_day_datetime_object.year, first_day_datetime_object.month)[1])
 
-    end = first_day.replace(day = calendar.monthrange(first_day.year, first_day.month)[1])
+    first_day = first_day_datetime_object.strftime("%Y-%m-%d")
+    last_day = last_day_datetime_object.strftime("%Y-%m-%d")
 
-    full_amount_summary = db.objects.filter(month__range=(first_day,end)).all().values_list().aggregate(db_func('amount'))
-    print(full_amount_summary)
+    full_amount_summary = db.objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(db_func('amount'))["amount__sum"]
+    month_year_repr= first_day_datetime_object.strftime("%B %Y")
 
-    date_list_str = str(first_day) + " - " + str(end)
+    if full_amount_summary: 
+      return month_year_repr,full_amount_summary
+    
+    else:
+       raise Exception("the record doesnt exists in the database")
+    
 
-    date_list = first_day.strftime("%B %Y")
-    summary_list = full_amount_summary['amount__sum']
 
-    return date_list,summary_list
+def sum_by_range(start_date:str,end_date:str,db:object,db_func:object):
+  """
+  queries the database and returning two lists of months and the amount in this month
+  example:["november"][1000]
 
+  Attributes:
+    start_date (str): the start date for the year range query
+    end_date (str): the last date for the year range query
+    db (object): the object of the database 
+    db_func (object): the object of the django database aggregate functions
 
-def sum_date_by_range(start_date,end_date,db,db_func):
-  """method that returns two lists:
-  1.with the summ of all the records in the same month
-  2.with the all months and years
-  attributes:
-  start_date:accepts datetime.date class 
   """
 
-
   months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
-
-
+  print(start_date,end_date)
 #! here somewhere the order is breaking 
   unique_year_month_list = []
   for month in months_query_set:
@@ -78,7 +93,7 @@ def sum_date_by_range(start_date,end_date,db,db_func):
 
   for unique_date in unique_year_month_list:
   
-    calculated_period_sum = sum_month(unique_date,db,db_func)
+    calculated_period_sum = sum_single_month(unique_date,db,db_func)
     period.append(calculated_period_sum[0])
     full_summary.append(calculated_period_sum[1])
   return full_summary,period
@@ -402,19 +417,40 @@ class GraphCalculator:
         return graph_html
 
     def repr_yearly_data(self,args,**kwargs):
-      test = kwargs["kwargs"]["db"]
+      database = kwargs["kwargs"]["db"]
+      print(database)
       year_range = args
-      start = "2023-01-01"
-      end = "2023-10-01" 
-      print(self.db[0].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))["amount__sum"])
 
-      # total_amount = (self.db[0]).objects.filter(month__range=(start, end)).aggregate(self.db_func('amount'))['amount__sum']
+
+      if database == "income":
+        yearly_sum_dict = {}
+        for year in year_range:
+          start = f"{year}-01-01"
+          end = f"{year}-12-31"
+
+          full_sum = self.db[0].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
+          yearly_sum_dict[year] = full_sum
+
+        return yearly_sum_dict
+
+      if database == "outcome":
+        yearly_sum_dict = {}
+        for year in year_range:
+          start = f"{year}-01-01"
+          end = f"{year}-12-31"
+
+          full_sum = self.db[1].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
+          yearly_sum_dict[year] = full_sum
+
+
+        return yearly_sum_dict
+
 
 
     def sum_by_range(self,start_date,end_date):
         #TODO add much more functionality to this method that can return the data in more ways
 
-        graph_data_lists = sum_date_by_range(start_date,end_date,self.db[0],self.db_func[0])
+        graph_data_lists = sum_by_range(start_date,end_date,self.db[0],self.db_func[0])
         return graph_data_lists
 
 

@@ -360,17 +360,19 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
             final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-
             print(f"the record is added successfully. record number : {new_record_name}")
+
 
         if set_position:
 
 
             #the record that saved last in the db
-            prev_record = list(records)[-1]
-
+            if len(records) <= 1:
+                prev_record = list(records)[-1]
+                new_record_name = str(int(prev_record)+1)
+            else:
+                new_record_name = "0"
             #the new record that will be created
-            new_record_name = str(int(prev_record)+1)
 
             #the position will always be len(records) + 1 besause the add graph will be added to the end
             #of the page by default

@@ -1,8 +1,5 @@
-import random 
-import string
+
 #handle DB querying from the arguments passed to the function
-
-
 def graph_percentage_presentation(user_model,job_position_tasks=False,personal_tasks=False,leads=False):
     """ simple percentage function that returns the completed percentage of the tasks"""
     if job_position_tasks:
