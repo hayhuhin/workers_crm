@@ -162,7 +162,6 @@ class GraphRepresantation(object):
             graph = graph_fig.write_image(path)
         return graph
 
-
     def pie_graph(self,values:list,names:list,path:str=None,to_html=True):
         """
         extracting values and passing them into plotly pie figure.
@@ -263,7 +262,6 @@ class GraphRepresantation(object):
             graph = line_fig.write_image(path)
         return graph
 
-
     def donut_graph(self,values:list,names:list,path:str=None,to_html=True):
         """this method return the donut graph 
             Args:
@@ -294,7 +292,6 @@ class GraphRepresantation(object):
             graph = donut_fig.write_image(path)
         return graph
     
-
     def user_card(self,user_data:dict):
         """
         returns html card with the user data that recieved from the user_data
@@ -367,8 +364,7 @@ class GraphRepresantation(object):
         </div>""".format(profile_pic,username,user_position)
         
         return card_html
-    
-
+  
     def graph_card(self,user_data:dict,user_calc:str):
         """
         returns html card with the user data that recieved from the user_data and user_calc

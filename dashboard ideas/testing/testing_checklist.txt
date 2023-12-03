@@ -1,0 +1,24 @@
+tests created:
+    func_tools
+        graph_calculations.py
+            GraphCalculator class - done
+            employer_data_info - going to change
+            graph_percentage_presentation - going to change
+        graph_presentations.py
+            GraphRepresantation class - 
+    
+
+
+documentation:
+    func_tools
+        graph_calculations.py
+            GraphCalculator class - done
+            employer_data_info - done 
+            graph_percentage_presentation - done 
+        graph_presentations.py
+            GraphRepresantation class - done
+    dashboard
+        views
+        models
+        forms
+        urls
