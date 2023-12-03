@@ -1,122 +1,69 @@
 import plotly.express as px
 import pandas as pd
 from pathlib import Path
-import calendar
-import datetime
 import plotly.graph_objects as go
 
 
 
-#* this function used in the employer profile app view
-def employer_data_info(request):
-    """method returning dict with the user information"""
-    first_name = request.user.employer.first_name
-    last_name = request.user.employer.last_name
-    department = request.user.employer.job_position.position
-    rank = request.user.employer.job_position.rank 
-    profile_pic = request.user.employer.profile_pic.url
-
-    request_data = {'username':first_name+" "+last_name,'job_position':department,'job_rank':rank,'profile_pic':profile_pic}
-    return request_data
-
-
-
-# class DatabaseExtractor:
-#    def __init__(self,databases=list[object],functions=list):
-#       self.databases = databases
-#       self.functions = functions
-
-#     def sum_month(self,start,d)
-   
-
-
-def sum_single_month(date:str,db:object,db_func:object):
-    """
-    sums all records inside the same month and returning two lists with data if the records exists 
-    if the records not exists it will raise exception message
-
-    Attributes:
-      first_day (str) : the starting point of the month(example: "2024-11-01").
-      db (object): database instance.
-      db_func (object function): database function(example "Sum" object that can be used inside the aggregate method when extracting sql data)
-    
-    """
-
-    first_day_datetime_object = datetime.datetime.strptime(date,"%Y-%m-%d").date()
-    last_day_datetime_object = first_day_datetime_object.replace(day = calendar.monthrange(first_day_datetime_object.year, first_day_datetime_object.month)[1])
-
-    first_day = first_day_datetime_object.strftime("%Y-%m-%d")
-    last_day = last_day_datetime_object.strftime("%Y-%m-%d")
-
-    full_amount_summary = db.objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(db_func('amount'))["amount__sum"]
-    month_year_repr= first_day_datetime_object.strftime("%B %Y")
-
-    if full_amount_summary: 
-      return month_year_repr,full_amount_summary
-    
-    else:
-       raise Exception("the record doesnt exists in the database")
-    
-
-
-def sum_by_range(start_date:str,end_date:str,db:object,db_func:object):
-  """
-  queries the database and returning two lists of months and the amount in this month
-  example:["november"][1000]
-
-  Attributes:
-    start_date (str): the start date for the year range query
-    end_date (str): the last date for the year range query
-    db (object): the object of the database 
-    db_func (object): the object of the django database aggregate functions
-
-  """
-
-  months_query_set = db.objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
-  print(start_date,end_date)
-#! here somewhere the order is breaking 
-  unique_year_month_list = []
-  for month in months_query_set:
-      # print((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
-
-      if ((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01") in unique_year_month_list:
-          continue
-      else:
-        unique_year_month_list.append((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
-  
-  # print(unique_year_month_list)
-  
-  #string repr of the months and years
-  period = []
-  #each month total sum of the income\outcome
-  full_summary = []
-
-  for unique_date in unique_year_month_list:
-  
-    calculated_period_sum = sum_single_month(unique_date,db,db_func)
-    period.append(calculated_period_sum[0])
-    full_summary.append(calculated_period_sum[1])
-  return full_summary,period
-
-
-
-#?graph classes that will do some of the functionality in the website
-
-
 
 class GraphRepresantation(object):
-    """graph class that using the plotly.express and pandas .
-       class is used for returning plotly graphs in much easier and cleaner way
-       each method is returning graph as image or html
     """
-    def __init__(self,presentation='card'):
+    this class is a wrapper for the plotly library.
+    class is used for returning plotly graphs in much easier and cleaner way
+    each method is returning graph as image or html
+
+    Attributes:
+      presentation(str) : default value is "card"(not used for now)
+
+    Methods:
+      graph_option(graph_type:str,dict_values:dict,path=None,to_html=True)
+        controller method that calling other methods by the given graph_type
+        example:if the given graph type is "bar_graph" then it will call the bar_graph fill the args and return the result
+      bar_graph(dict_values:dict,path=None,to_html=True,compare=False)
+        unpacking the dict values and pushing it to the plotly library functions
+        that creates the graph representation(can return image or html)
+      pie_graph(values:list,names:list,path=None,to_html=True)
+        passing the values and names into the plotly class to create
+        pie graph and represent it as image or html
+      line_graph(dict_values:dict,path=None,to_html=True,compare=False)
+        unpacking the dict values and pushing it to the plotly library functions
+        that creates the graph representation(can return image or html)
+      donut_graph(values:list,names:list,path=None,to_html=True)
+        passing the values and names into the plotly class to create
+        donut graph and represent it as image or html
+      user_card(user_data:dict)
+        cretes html simple block representation with user data
+      graph_card(user_data:dict,user_calc)
+        cretes html simple block representation with user data
+    """
+
+    def __init__(self,presentation=str('card')):
+        """
+        Constructor method for GraphRepresantation.
+
+        Args:
+          self.presentation(str):default value is 'card'
+          self.template (str) : changing the plotly graph background
+          self.current_path(object) : this path is the path where to store the graphs if displayed as picture
+        """
         self.presentation = presentation
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
 
-    def graph_options(self,graph_type,dict_values:dict,path=None,to_html=True):
-        """method that gives you the option to choose which grap to represent by the graph_type
-           arg that must be the same as the name of the func (example:"graph_type")
+    def graph_options(self,graph_type:str,dict_values:dict,path=None,to_html=True):
+        """
+        method that gives you the option to choose which graph to represent by the graph_type
+        arg that must be the same as the name of the func (example:"graph_type")
+        this method calling other methods by the graph type arg and returns the method result
+
+        Args:
+          graph_type(str):accepts on of graph represantations the user chooses "bar_graph","line_grap"
+          dict_values(dict):accepts dict that contains the keys:x(str/int),y(int),y_2(int)
+          path=None : the path to save the image of the graph if to_html=False
+          to_html=True: if True returns all graphs figures as html/if false returns figures as image
+
+        Returns:
+          HTML string represantation 
         """
         if graph_type == self.bar_graph.__name__:
             return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html)
@@ -132,13 +79,22 @@ class GraphRepresantation(object):
             return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
 
     
-    def bar_graph(self,dict_values:dict,path=None,to_html=True,compare=False):
-        """this method return the bar graph 
-            args:
-              group: most of the time its the x line on the graphs
-              value: its the y line on the graphs
-              path: only used to_html=False and saving the pic in specified path
-              to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+    def bar_graph(self,dict_values:dict,path:str=None,to_html=True,compare=False):
+        """
+        extracting dict values and passing them into plotly bar figure.
+        can return image or html string represantation
+
+        args:
+          dict_values(dict):
+            contains x(str/int) : most of the time its the x line on the graphs.
+            contains y(int) : its the y line on the graphs.
+            if compare=True it can contain y_2 as a compare y value.
+          path: only used to_html=False and saving the pic in specified path
+          to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+        
+        
+        Returns:
+          HTML string representation
         """
 
         group = dict_values["x"]
@@ -207,14 +163,22 @@ class GraphRepresantation(object):
         return graph
 
 
-    def pie_graph(self,values:list,names:list,path='',to_html=True):
-        """this method return the pie graph 
-            args:
-              group: most of the time its the x line on the graphs
-              value: its the y line on the graphs
-              path: only used to_html=False and saving the pic in specified path
-              to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+    def pie_graph(self,values:list,names:list,path:str=None,to_html=True):
         """
+        extracting values and passing them into plotly pie figure.
+        can return image or html string represantation
+
+        args:
+          names(list) :contains x(str/int) : most of the time its the x line on the graphs.
+          value(list) :scontains y(int) : its the y line on the graphs.
+            if compare=True it can contain y_2 as a compare y value.
+          path: only used to_html=False and saving the pic in specified path
+          to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+
+        Returns:
+          HTML string representation
+        """
+
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
 
         pie_fig = px.pie(values=values,names=names,template=self.template)
@@ -228,13 +192,22 @@ class GraphRepresantation(object):
             graph = pie_fig.write_image(path)
         return graph
 
-    def line_graph(self,dict_values:dict,path='',to_html=True,compare=False):
-        
+    def line_graph(self,dict_values:dict,path:str=None,to_html=True,compare=False):
+        """
+        extracting dict values and passing them into plotly line figure.
+        can return image or html string represantation
 
-        #! examples 
-        # df = px.data.gapminder().query("country=='Canada'")
-        # fig = px.line(df, x="year", y="lifeExp", title='Life expectancy in Canada')
-        # fig.show()
+        args:
+          dict_values(dict):
+            contains x(str/int) : most of the time its the x line on the graphs.
+            contains y(int) : its the y line on the graphs.
+            if compare=True it can contain y_2 as a compare y value.
+          path: only used to_html=False and saving the pic in specified path
+          to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+        
+        Returns:
+          HTML string representation
+        """
 
         group = dict_values["x"]
         value = dict_values["y"]
@@ -291,13 +264,16 @@ class GraphRepresantation(object):
         return graph
 
 
-    def donut_graph(self,values:list,names:list,path="",to_html=True):
+    def donut_graph(self,values:list,names:list,path:str=None,to_html=True):
         """this method return the donut graph 
-            args:
+            Args:
               group: most of the time its the x line on the graphs
               value: its the y line on the graphs
               path: only used to_html=False and saving the pic in specified path
               to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+ 
+            Returns:
+              HTML string representation
         """
         path = str(self.currant_path) +"/employer_profile/static/employer/images/donut.png"
 
@@ -319,16 +295,22 @@ class GraphRepresantation(object):
         return graph
     
 
-    def user_card(self,user_data):
-        """returns html card with the user data that recieved from the user
-          the user data must contain 'username','user_position','picture' as a 
-          dict 
+    def user_card(self,user_data:dict):
+        """
+        returns html card with the user data that recieved from the user_data
+        the user data must contain 'username','user_position','picture' as a 
+        dict
+
+        Args:
+          user_data(dict):must contain 'username','user_position'and 'picture' keys with values
+
+        Returns:
+          HTML string representation
         """
 
         username = user_data['username']
         user_position = user_data['job_position']
         profile_pic = user_data['profile_pic']
-        # picture = user_data['picture']
         card_html = """<div class="">
         <div class="">
 
@@ -387,9 +369,18 @@ class GraphRepresantation(object):
         return card_html
     
 
-    def graph_card(self,user_data,user_calc):
-        """returns html card with the graph data that recieved from users queries"""
+    def graph_card(self,user_data:dict,user_calc:str):
+        """
+        returns html card with the user data that recieved from the user_data and user_calc
+        the user data must contain 'username','user_position','picture' as a 
+        dict
 
+        Args:
+          user_data(dict):must contain 'username','user_position'and 'picture' keys with values
+
+        Returns:
+          HTML string representation
+        """
         card_html = """<div class="col"style='width:350px;height:450px'>
                           <div class="ms-3"> 
                           <p class="text-secondary fs-5">- {}</p>
@@ -400,74 +391,4 @@ class GraphRepresantation(object):
         return card_html
     
 
-    
-class GraphCalculator:
-    """ graph calculater can 
-    """
-    def __init__(self,user,db:list,db_func:list,last_save):
-        self.user = user
-        self.last_save = last_save
-        self.db = db 
-        self.db_func = db_func
-
-
-    def graph_log(self,graph_html):
-        """ in the future will save the data in log folder with log file of graph repr and the user that used it"""
-        
-        return graph_html
-
-    def repr_yearly_data(self,args,**kwargs):
-      database = kwargs["kwargs"]["db"]
-      print(database)
-      year_range = args
-
-
-      if database == "income":
-        yearly_sum_dict = {}
-        for year in year_range:
-          start = f"{year}-01-01"
-          end = f"{year}-12-31"
-
-          full_sum = self.db[0].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
-          yearly_sum_dict[year] = full_sum
-
-        return yearly_sum_dict
-
-      if database == "outcome":
-        yearly_sum_dict = {}
-        for year in year_range:
-          start = f"{year}-01-01"
-          end = f"{year}-12-31"
-
-          full_sum = self.db[1].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
-          yearly_sum_dict[year] = full_sum
-
-
-        return yearly_sum_dict
-
-
-
-    def sum_by_range(self,start_date,end_date):
-        #TODO add much more functionality to this method that can return the data in more ways
-
-        graph_data_lists = sum_by_range(start_date,end_date,self.db[0],self.db_func[0])
-        return graph_data_lists
-
-
-    def start_date(self,start):
-      if start:
-        return start
-      else:
-          return self.default_view_repr
-
-
-    def end_date(self,end):
-        if end :
-          return end
-        else:
-            return self.default_view_repr
-
-    def default_view_repr(self):
-        """returns default graph repr when there is no data present"""
-        pass
     

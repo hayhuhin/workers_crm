@@ -1,8 +1,8 @@
 from django.shortcuts import render,HttpResponse
 from pathlib import Path
 from django.contrib.auth.decorators import login_required
-from func_tools.graph import GraphRepresantation,employer_data_info
-
+from func_tools.graph_calculations import employer_data_info
+from func_tools.graph_presentations import GraphRepresantation
 
 #current path
 curr_path = Path.cwd()
@@ -62,7 +62,7 @@ def profile_page(request):
     if request_data['job_rank'] <= 400 and request_data['job_rank'] > 300:
 
         #graph html builder(combine the graph representation with html)
-        instance_of_graph_presentation = graph_presentation()
+        instance_of_graph_presentation = GraphRepresantation()
 
 
         #in the future there will be funtion that represents the graph 

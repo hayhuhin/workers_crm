@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm,CompareGraphForm
 from .models import Income,Outcome
 from django.db.models import Sum
-from func_tools.graph import GraphCalculator,GraphRepresantation
+from func_tools.graph_calculations import GraphCalculator
+from func_tools.graph_presentations import GraphRepresantation
 from func_tools.file_validation import FileValidator
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
@@ -101,8 +102,8 @@ def dashboard(request):
 
 
 
-        yearly_income_summary = graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"income"})
-        yearly_outcome_summary = graph_calculator.repr_yearly_data(args=["2024","2025"],kwargs={"db":"outcome"})
+        yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
+        yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
 
         information_insight.append({
             "total_records":total_graph,
@@ -200,8 +201,9 @@ def dashboard(request):
                 end = form_inst.cleaned_data.get("end_date")
 
 
-                #this is the calculation of the data and returning it as 2 lists with x and y
-                graph_data = graph_calculator.sum_by_range(start_date=start,end_date=end)
+                #this is the calculation of the data and returning it as 2 lists with x and y 
+                graph_data = graph_calculator.sum_by_range(start_date=start,end_date=end,db=db)
+
 
 
                 #getting the time for the new_record that will be added to the mongodb record
