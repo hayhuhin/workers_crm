@@ -79,10 +79,10 @@ https://plotly.com/python/bar-charts/
 
 ADD:need to handle the outcome adding data to db !! -
 
+<<working on >>
 ADD:smaller data insight on the dashboard page - 
 
 
-<<working on >>
 ############################################################
 FIX:refactoring and documentation for all classes and methods !!!!
 ADD:TESTS FOR EACH FUNCTION

@@ -198,4 +198,4 @@ class TestGraphCalculator(TestCase):
 
 class TestGraphRepresentation(TestCase):
 
-    def 
+    pass
