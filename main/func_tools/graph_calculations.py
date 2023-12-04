@@ -179,7 +179,7 @@ class GraphCalculator:
                 full_summary.append(calculated_period_sum[1])
 
             #return two lists with the months and sums
-            return period,full_summary
+            return full_summary,period
 
 
     def get_data_by_year(self,args:list,**kwargs:str):

@@ -1,7 +1,7 @@
 {% extends 'code/base.html'%} {% load widget_tweaks %}
+
+
 <!-- the dashboard title-->
-
-
 {% block title %}
     <a class="nav-link close_small_navbar 
                     icon-link
@@ -16,161 +16,28 @@
                     link-underline"
                     data-bs-toggle='modal' data-bs-target='#import_csv_modal' data-bs-whatever='@getbootstrap' href="#"
                     >Import Graph CSV</a>
-                    </form>
+
+                    <li class="nav-link
+                    link-offset-2
+                    close_small_navbar
+                    dropdown 
+                    link-body-emphasis 
+                    link-underline">
+                      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Graph Representation</a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item active" href="#">One Rows</a></li>
+                        <li><a class="dropdown-item" href="#">Two Rows</a></li>
+                        <li><a class="dropdown-item" href="#">Four Rows</a></li>
+
+                      </ul>
+                    </li>
+                  </form>
 {% endblock title %}
+
 
 {% block content %}
 <div class='container p-4 pt-5'>
-
-
-<div class="mb-3" style="margin-left:8rem">
-  <div class="border border-secondary rounded border-1" style="background:#212529">
-    <div class="">
-      <nav class="navbar navbar-expand-lg ">
-        <div class="container-start " >
-          <div class="navbar-nav">
-            <div class="row" >
-
-            <div class="row">
-              <div class="col-auto">
-                <li class="nav-item">
-                  <a class="nav-link 
-                            link-body-emphasis 
-                            link-offset-2
-                            link-underline 
-                            link-opacity-25-hover mb-5" 
-                            href="/logout"
-                            aria-disabled="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg></a>
-                            </a>
-                            </div>
-                            <div class="col p-2" >
-                              <div class="col">
-                              Maximum Graphs
-                              </div>
-                            <div class="col text-start" >
-                              {{information_insight.max_records}}                            
-                            </div>
-                          </div>
-                        </div>
-                    </div><!-- this is the first row col-->
-
-            <div class="row">
-              <div class="col-auto">
-                <li class="nav-item">
-                  <a class="nav-link 
-                            link-body-emphasis 
-                            link-offset-2
-                            link-underline 
-                            link-opacity-25-hover mb-5" 
-                            href="/logout"
-                            aria-disabled="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>                    </a>
-                            </a>
-                            </div>
-                            <div class="col p-2" >
-                              <div class="col" >
-                              Graphs Made
-                              </div>
-                            <div class="col text-start" >
-                              {{information_insight.total_records}}                            
-                            </div>
-                          </div>
-                        </div>
-
-            {% for year,value in information_insight.current_year_income.items %}
-            <div class="row" >
-              <div class="col-auto">
-                <li class="nav-item">
-                  <a class="nav-link 
-                            link-body-emphasis 
-                            link-offset-2
-                            link-underline 
-                            link-opacity-25-hover mb-5" 
-                            href="/logout"
-                            aria-disabled="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>                    </a>
-                            </a>
-                            </div>
-                            <div class="col p-2" >
-                              <div class="col-auto" >
-                              <p class="text-center">
-                              Income {{year}}
-                              </p>
-                              </div>
-                            <div class="col text-start" >
-                            {{value}}
-                            </div>
-                          </div>
-                        </div>
-                        {% endfor %}
-
-            {% for year,value in information_insight.current_year_spendings.items %}
-
-            <div class="row" >
-              <div class="col-auto">
-                <li class="nav-item">
-                  <a class="nav-link 
-                            link-body-emphasis 
-                            link-offset-2
-                            link-underline 
-                            link-opacity-25-hover mb-5" 
-                            href="/logout"
-                            aria-disabled="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
-                            </a>
-                            </div>
-                            <div class="col p-2" style="pink">
-                              <div class="col">
-                              Spendings in {{year}}
-                              </div>
-                            <div class="col text-start" >
-                            {{value}}
-                            </div>
-                          </div>
-                        </div>
-                        {% endfor %}
-
-
-            <!-- here its the content of the navbar-->
-          </div>
-        </div>
-      </nav>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-{% comment %} 
-
-<p>total graph records : {{information_insight.total_records}}</p>
-<p>maximum graph records :{{information_insight.max_records}} </p>
-{% for year,income in information_insight.current_year_income.items %}
-<p>on that {{year}} the income was {{income}}</p>
-{% endfor %}
-
-{% for year,outcome in information_insight.current_year_spendings.items %}
-<p>on that {{year}} the outcome was {{outcome}}</p>
-{% endfor %}
- {% endcomment %}
-
-
   <div class='border border-secondary rounded border-1' style="background:#212529;">
-
-
-
-
-
-
-
 
 
 <!-- this is the import modal section -->
@@ -211,46 +78,6 @@
 
       </div><!-- end of 'modal-dialog' -->
     </div><!-- 'modal fade' -->
-{% comment %} <QueryDict: {'csrfmiddlewaretoken': ['ijpS2e1g1c8BqqBk5DpIp5OOgWeXFBUBpf9ZvJD5z3824w8uHqjebqaBx1AoXNtj'], '
-graph_title': ['Graph'],
- 'graph_description': ['No Description'], 
-'start_date': ['2023-11-01'],
- 'end_date': ['2024-11-01'], 'db': ['income'],
- 'graph': ['bar_graph'],
-  'add_graph_data': ['add_graph_data']}> {% endcomment %}
-{% comment %} 
-<form method="POST">
- <div hidden>
- {% csrf_token %}
-              {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}
-              {% render_field income_form.graph_description type='text' id='graph_description' class='form-control'  %}
-              {% render_field income_form.start_date type='date' id='graph_start_date' class='form-control' value='2023-11-01'%}
-              {% render_field income_form.end_date type='date' id='graph_end_date' class='form-control' value='2024-11-01' %}
-              {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' value='income'%}
-              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option' value='bar_graph'%}
-      </div>   
-<button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary'>1 year</button>
-</form> 
-
-<form method="POST">
-
- {% csrf_token %}
-<button type='submit' name='delete_all_records' value='delete_all_records' class='btn btn-danger'>delete_all_records</button>
-</form> 
-
- <form method="POST">
- <div hidden>
- {% csrf_token %}
-              {% render_field income_form.graph_title type='title' id='graph_title' class='form-control'  %}
-              {% render_field income_form.graph_description type='text' id='graph_description' class='form-control'  %}
-              {% render_field income_form.start_date type='date' id='graph_start_date' class='form-control' value='2023-11-01'%}
-              {% render_field income_form.end_date type='date' id='graph_end_date' class='form-control' value='2023-11-30' %}
-              {% render_field income_form.db type='text' class='form-control-plaintext' id='data_option' value='income'%}
-              {% render_field income_form.graph type='text' class='form-control-plaintext' id='graph_option' value='bar_graph'%}
-      </div>   
-<button type='submit' name='add_graph_data' value='add_graph_data' class='btn btn-primary'>1 month</button>
-</form> 
- {% endcomment %}
 
     <div class="m-3">
       <h1>Dashboard</h1>
@@ -270,24 +97,98 @@ graph_title': ['Graph'],
         </div>
       </div>
     </div>
+
+
+
+<!-- this is the insights bar-->
+
+
+
 </div>
 
 
+<!-- THE INSIGHT BAR -->
 
+
+<div class="container">
+  <h4 class="py-3">Insights</h4>
+  <div class="col">
+    <div class="row p-3  border border-1 rounded-4" style="background: #212529" >
+      <div class="col">
+        <div class="row">
+          <div class="col-auto align-self-center">
+  
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg></a>
+  
+          </div>
+          <div class="col">
+            <div class="row">Total Graphs</div>
+            <div class="row">{{information_insight.max_records}}</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col">
+  
+        <div class="row">
+          <div class="col-auto align-self-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#ffffff" d="M32 32c17.7 0 32 14.3 32 32V400c0 8.8 7.2 16 16 16H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-44.2 0-80-35.8-80-80V64C0 46.3 14.3 32 32 32zM160 224c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32s-32-14.3-32-32V256c0-17.7 14.3-32 32-32zm128-64V320c0 17.7-14.3 32-32 32s-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32zm64 32c17.7 0 32 14.3 32 32v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V224c0-17.7 14.3-32 32-32zM480 96V320c0 17.7-14.3 32-32 32s-32-14.3-32-32V96c0-17.7 14.3-32 32-32s32 14.3 32 32z"/></svg>        </div>
+          <div class="col">
+            <div class="row">Graphs Made</div>
+            <div class="row">{{information_insight.total_records}}</div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- here the income loop starts-->
+      {% for year,income in information_insight.current_year_income.items %}
+      <div class="col">
+        <div class="row">
+          <div class="col-auto align-self-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>                    </a>
+          </div>
+          <div class="col">
+            <div class="row">Income in {{year}}</div>
+            <div class="row">{{income}}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  
+  <!-- here the Outcoe loop starts-->
+  {% for year,outcome in information_insight.current_year_spendings.items %}
+      <div class="col">
+        <div class="row">
+          <div class="col-auto align-self-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+          </div>
+          <div class="col">
+            <div class="row">Outcome in {{year}}</div>
+            <div class="row">{{outcome}}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  
+  
+    </div><!-- pre last row div-->
+  
+  </div><!-- last col div of the presentation-->
+
+  <!-- END OF THE INSIGHT BAR REPR-->
 
 
 <!-- THIS IS THE GRAPHS REPRESENTATION OF THE USER -->
 <!-- IN THE FUTURE THIS WILL BE CHEKED OR MODIFIED BY THE USER -->
 
 
-
-
-
-
-
   <!-- this is the space between the top and the graph-->
+  <h4 class="pt-5">Graph Representation</h4>
 
-<div class="graph" style="margin-bottom:100px">
+<div class="graph">
+
+
+<!-- this is the add graph section -->
 
 <div class='col-sm-auto'>
     <div class='modal fade' id='graph_modal' tabindex='-1' aria-labelledby='graph_modal_label' aria-hidden='true'>
@@ -380,11 +281,19 @@ graph_title': ['Graph'],
       </div><!-- end of 'modal-dialog' -->
     </div><!-- 'modal fade' -->
 
+<!-- this is the end of add graph section -->
+
+
+
+<!-- GRAPH REPRESENTATION -->
+</div><!-- this div must be here its a part of the container in the top -->
+<div class="cotainer">
+<div class="whole_graph row row-cols-1 row-cols-md-2 g-4">
 
 {% for graph in graph_chart%}
-  </div>
-
-        <div class="graph m-2 p-3 my-5 border border-secondary rounded border-1" style="background:#212529">
+<div class="col maina border border-secondary rounded border-1 g-2" style="background:#212529">
+<div class="" style="background:#212529">
+<!-- <div class="graph m-1 p-3 my-5 border border-secondary rounded border-1" style="background:#212529"> -->
 
 
         <h3>{{graph.graph_data.v.graph_title}}</h3>
@@ -418,7 +327,7 @@ graph_title': ['Graph'],
         <!-- THIS IS THE MODAL SECTION THAT HAVE THE CONTROL OVER THE EDIT BUTTON -->
 
 
-          <div class='col-sm-auto'>
+          <div class=''>
               <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
                 <div class='modal-dialog'>
                   <div class='modal-content'>
@@ -526,10 +435,9 @@ graph_title': ['Graph'],
         </div>
       </div>
 
-
           <!-- this is the compare graph position modal-->
 
-          <div class='col-sm-auto'>
+          <div class=''>
               <div class='modal' id='graph_compare_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_compare_modal_label' aria-hidden='true'>
                 <div class='modal-dialog'>
                   <div class='modal-content'>
@@ -682,8 +590,13 @@ graph_title': ['Graph'],
 <!--#################################################################################################-->
                                       <!-- TEST TEST TEST-->
 <!--#################################################################################################-->
-    {% endfor %}
+</div><!-- this is the full graph position-->
+</div>
+</div>
 
+</div>
+    {% endfor %}
+  </div><!-- end of the whole_graph div-->
 
 
 
@@ -695,92 +608,4 @@ graph_title': ['Graph'],
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} 
-
-
-
-<div class="container m-5">
-
-  <div class="col">
-
-    <div class="row mb-5"> 
-
-      <figure class="mb-5">
-      <blockquote class="blockquote">
-        <h2>company income</h2>
-      </blockquote>
-      <figcaption class="blockquote-footer">
-        Calculated by sales leads.
-      </figcaption>
-    </figure>
-    
-  <!-- dashboard graphs-->
-         {{ graph_chart|safe }}
-
-
-  </div><!-- end of row div-->
-
-
-
-
-<div class="row mb-5">
-
-  <figure class="mb-5">
-
-  <blockquote class="blockquote ">
-    <h3>Stock Value</h3>
-  </blockquote>
-  <figcaption class="blockquote-footer">
-        computed the company's price-to-earnings (P/E) ratio.
-  </figcaption>
-  </figure>
-
-
-        {{ pie_chart|safe }}
-
-</div><!-- end of row div-->
-
-
-
-
-</div><!-- END OF COL DIV-->
-
-
-
-
-
-</div><!-- {% endcomment %}
-{% endblock content %}
-
+{% endblock %}

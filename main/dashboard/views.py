@@ -258,7 +258,7 @@ def dashboard(request):
                     edit_graph_position = edit_form_inst.cleaned_data.get("graph_position")
 
                     #calculates the x and the y of the graph and returns it as two lists
-                    edit_graph_data = graph_calculator.sum_by_range(start_date=edit_start,end_date=edit_end)
+                    edit_graph_data = graph_calculator.sum_by_range(start_date=edit_start,end_date=edit_end,db=edit_db)
                     
                     
                     #showing the current time- its for user graph creation show
