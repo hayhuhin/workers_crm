@@ -79,8 +79,6 @@ https://plotly.com/python/bar-charts/
 
 ADD:need to handle the outcome adding data to db !! -
 
-<<working on >>
-ADD:smaller data insight on the dashboard page - 
 
 
 ############################################################
