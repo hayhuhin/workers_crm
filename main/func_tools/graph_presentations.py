@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 
 
 
+
 class GraphRepresantation(object):
     """
     this class is a wrapper for the plotly library.
@@ -108,8 +109,8 @@ class GraphRepresantation(object):
         graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
                                 plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                 modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                bargap=0.2,
-                                bargroupgap=0.2,
+                                
+                                # bargroupgap=0.2,
                                 # width=300
 )
 
@@ -141,10 +142,10 @@ class GraphRepresantation(object):
                                   paper_bgcolor='rgba(0,0,0,0)',
                                   plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                   modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                  bargap=0.2,
-                                  bargroupgap=0.2,)
+                                  # bargap=0.2,
+                                  # bargroupgap=0.2,)
                                   # width=300
-
+          )
 
           graph_fig.update_traces(textfont_size=12)
 
