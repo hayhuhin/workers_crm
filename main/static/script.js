@@ -551,16 +551,16 @@ $('.selected_data').change(function (e) {
 
 });
 
-$(document).ready(function() {
-    var graph_class = $('.whole_graph').attr("class")
-;
-    var one_row_repr = "whole_graph row row-cols-1 row-cols-md-1 g-4 1_row";
-    var two_row_repr = "whole_graph row row-cols-1 row-cols-md-2 g-4 2_row";
+// $(document).ready(function() {
+//     var graph_class = $('.whole_graph').attr("class")
+// ;
+//     var one_row_repr = "whole_graph row row-cols-1 row-cols-md-1 g-4 1_row";
+//     var two_row_repr = "whole_graph row row-cols-1 row-cols-md-2 g-4 2_row";
 
-    if (graph_class.includes("1_row")){
-        $('.whole_graph').attr('class',one_row_repr)
-    }
-    if (graph_class.includes("2_row")){
-        $('.whole_graph').attr('class',two_row_repr)
-    }
-});
+//     if (graph_class.includes("1_row")){
+//         $('.whole_graph').attr('class',one_row_repr)
+//     }
+//     if (graph_class.includes("2_row")){
+//         $('.whole_graph').attr('class',two_row_repr)
+//     }
+// });

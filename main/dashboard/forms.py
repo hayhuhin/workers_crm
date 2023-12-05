@@ -115,3 +115,19 @@ class EditGraphRow(forms.Form):
     ]
     row_repr = forms.ChoiceField(choices=row_options)
     
+
+class AddInsights(forms.Form):
+    year_choices = [
+        (0,"0"),(2023,"2023"),(2024,"2024"),(2025,"2025")
+    ]
+    
+    total_records = forms.IntegerField(max_value=7,
+                                    widget=forms.TextInput(attrs={'hidden': 'hidden'})
+                                               )
+    max_records = forms.IntegerField(max_value=7,
+                                    widget=forms.TextInput(attrs={'hidden': 'hidden'})
+)
+    income_year_1 = forms.ChoiceField(choices=year_choices)
+    income_year_2 = forms.ChoiceField(choices=year_choices,initial=0)
+    outcome_year_1 = forms.ChoiceField(choices=year_choices)
+    outcome_year_2 = forms.ChoiceField(choices=year_choices,initial=0)

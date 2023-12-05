@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm,CompareGraphForm,EditGraphRow
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm,CompareGraphForm,EditGraphRow,AddInsights
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph_calculations import GraphCalculator
@@ -101,18 +101,22 @@ def dashboard(request):
             total_graph = mongodb_getting_data[1]["total_records"]
 
 
+        ########################################################################################
+        #this section will be done inside the get/post request later 
+        #
+        #
+        ########################################################################################
+        # yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
+        # yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
 
-        yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
-        yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
-
-        information_insight.append({
-            "total_records":total_graph,
-            "max_records" :record_amount["record_amount"],
-            "current_year_income":yearly_income_summary,
-            "current_year_spendings":yearly_outcome_summary,
+        # information_insight.append({
+        #     "total_records":total_graph,
+        #     "max_records" :record_amount["record_amount"],
+        #     "current_year_income":yearly_income_summary,
+        #     "current_year_spendings":yearly_outcome_summary,
             
-        })
-
+        # })
+        ########################################################################################
 
 
 
@@ -133,6 +137,8 @@ def dashboard(request):
     compare_graph_form = CompareGraphForm()
 
     edit_graph_repr_form = EditGraphRow()
+
+    add_insights_form = AddInsights()
 
 
     #* this is only for testing 
@@ -383,13 +389,46 @@ def dashboard(request):
             if form_inst.is_valid():
                 row_repr = form_inst.cleaned_data.get("row_repr")
                 if row_repr == "graph_representation":
-                    return HttpResponse("the input is not valid")
+                    return HttpResponseRedirect("/dashboard")
                 else:
                     mongodb_handler.edit_graph_repr(collection_name="gr",user=str(request.user),new_repr=row_repr)
                     return HttpResponseRedirect("/dashboard")
                 
             if not form_inst.is_valid():
                 return HttpResponse("the form is invalid")
+        
+        if request.POST.get("add_insights_btn") == "add_insights_btn":
+
+            form_inst = AddInsights(request.POST)
+
+            if form_inst.is_valid():
+
+                #all data gathered from the user input fields after validation 
+                total_records = form_inst.cleaned_data.get("total_records")
+                max_records = form_inst.cleaned_data.get("max_records")
+                income_year_1 = form_inst.cleaned_data.get("income_year_1")
+                income_year_2 = form_inst.cleaned_data.get("income_year_2")
+                outcome_year_1 = form_inst.cleaned_data.get("outcome_year_1")
+                outcome_year_2 = form_inst.cleaned_data.get("outcome_year_2")
+                
+                
+                yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
+                yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
+                information_insight.append({
+                    "total_records":total_graph,
+                    "max_records" :record_amount["record_amount"],
+                    "current_year_income":yearly_income_summary,
+                    "current_year_spendings":yearly_outcome_summary,
+                    
+                })
+                
+                
+                
+                
+                insights_data = {}
+
+                mongodb_handler.save_insights(collection_name="gr",user=str(request.user),insights_data=insights_data)
+
 
 
 
@@ -416,7 +455,8 @@ def dashboard(request):
                     'change_position_form':change_positon_form,
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
-                    'edit_graph_row':edit_graph_repr_form}
+                    'edit_graph_row':edit_graph_repr_form,
+                    'add_insights_form':add_insights_form}
         if information_insight:
             context = {'databases':databases,
                     'income_form':income_form,
@@ -427,8 +467,9 @@ def dashboard(request):
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
                     'information_insight':information_insight[0],
-                    'graph_repr':mongodb_getting_data[2],
-                    'edit_graph_row':edit_graph_repr_form}
+                    'graph_repr':mongodb_getting_data[2][0],
+                    'edit_graph_row':edit_graph_repr_form,
+                    'add_insights_form':add_insights_form}
    
         if not information_insight:
             context = {'databases':databases,
@@ -440,7 +481,8 @@ def dashboard(request):
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
                     'information_insight':information_insight,
-                    'edit_graph_row':edit_graph_repr_form}
+                    'edit_graph_row':edit_graph_repr_form,
+                    'add_insights_form':add_insights_form}
         
         
         return render(request,'code/dashboard.html',context)

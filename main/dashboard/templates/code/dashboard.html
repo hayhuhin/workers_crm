@@ -32,7 +32,40 @@
 
 {% block content %}
 <div class='container p-4 pt-5'>
+<!-- ################################## test for add insights form ############################################ -->
+<div class="form-control">
+<form method="POST">
+{% csrf_token %}
+<!-- this two are hidden -->
+{% render_field add_insights_form.total_records value=information_insight.max_records %}
+{% render_field add_insights_form.max_records value=information_insight.total_records %}
+<!-- this two are hidden -->
+
+
+<p>income year first choice</p>
+{% render_field add_insights_form.income_year_1 type='option'%}
+<p>income year second choice</p>
+{% render_field add_insights_form.income_year_2 type='option'%}
+<p>outcome year first choice</p>
+{% render_field add_insights_form.outcome_year_1 type='option'%}
+<p>outcome year second choice</p>
+{% render_field add_insights_form.outcome_year_1 type='option'%}
+<button class="btn btn-success" name="add_insights_btn" value="add_insights_btn" type="submit">submit me</button>
+</form>
+</div>
+
+
+
   <div class='border border-secondary rounded border-1' style="background:#212529;">
+
+
+
+
+
+
+
+
+
 
 
 <!-- this is the import modal section -->
@@ -283,7 +316,7 @@
 <!-- GRAPH REPRESENTATION -->
 </div><!-- this div must be here its a part of the container in the top -->
 <div class="cotainer">
-<div class="whole_graph row row-cols-1 row-cols-md-2 g-4 {{graph_repr}}">
+<div class="whole_graph row row-cols-1 row-cols-md-{{graph_repr}} g-4 ">
 
 {% for graph in graph_chart%}
 <div class="col maina border border-secondary rounded border-1 " style="background:#212529">

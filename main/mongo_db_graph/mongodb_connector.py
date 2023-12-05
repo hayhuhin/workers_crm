@@ -545,6 +545,25 @@ class MongoDBConstructor:
         self.db_gr_query.update_one(filter_query,new_query)
 
 
+    def save_insights(self,collection_name:str,user:str,insights_data:dict):
+        """
+        this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
+        mongodb and not with sql each get request
+
+        Args:
+            collection_name(str) : the collection name of the mongodb database.
+            user(str) : the user that we will querie in the mongodb
+            insights_data(dict) : this data will be saved in the db each time the method called 
+        """
+        filter_query = {"user_name":user}
+        new_query = {
+                "$set":{
+                    insights_data
+                }
+            }
+        self.db_gr_query.update_one(filter_query,new_query)
+
+
     def get_record(self,collection_name:str,user_name:str,record_count=2):
         """method should return specific users x,y records of the graph
             ARGS:
