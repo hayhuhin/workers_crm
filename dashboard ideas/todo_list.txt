@@ -87,6 +87,7 @@ ADD:TESTS FOR EACH FUNCTION
 ############################################################
 
 
+<<working on >>
 ADD:smaller presentation example: 2 or 4 graphs together
 
 
@@ -98,3 +99,4 @@ task 5:
 add logic to the home page that will represent the usage of the crm with a description - 
 
 
+ADD:cache/save the data (to prevent the sql querieng every time the user sending get request/refreshing the page)
