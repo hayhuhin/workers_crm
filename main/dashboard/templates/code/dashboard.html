@@ -3,6 +3,7 @@
 
 <!-- the dashboard title-->
 {% block title %}
+
     <a class="nav-link close_small_navbar 
                     icon-link
                     link-body-emphasis 
@@ -17,21 +18,15 @@
                     data-bs-toggle='modal' data-bs-target='#import_csv_modal' data-bs-whatever='@getbootstrap' href="#"
                     >Import Graph CSV</a>
 
-                    <li class="nav-link
-                    link-offset-2
-                    close_small_navbar
-                    dropdown 
-                    link-body-emphasis 
-                    link-underline">
-                      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Graph Representation</a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item active" href="#">One Rows</a></li>
-                        <li><a class="dropdown-item" href="#">Two Rows</a></li>
-                        <li><a class="dropdown-item" href="#">Four Rows</a></li>
+                      <form class="d-flex" method="POST">
+                      {% csrf_token %}
+                    <div class="col-sm-auto">
+                        {% render_field edit_graph_row.row_repr type='text' class='form-control-plaintext' id='graph_edit_option'%}
+                    </div>  
+                        <button class="btn btn-secondary bt-sm" name="set_row" value="set_row" type="submit">Save Graph View</button>
+                      </form>
 
-                      </ul>
-                    </li>
-                  </form>
+                                      
 {% endblock title %}
 
 
@@ -288,7 +283,7 @@
 <!-- GRAPH REPRESENTATION -->
 </div><!-- this div must be here its a part of the container in the top -->
 <div class="cotainer">
-<div class="whole_graph row row-cols-1 row-cols-md-4 g-4">
+<div class="whole_graph row row-cols-1 row-cols-md-2 g-4 {{graph_repr}}">
 
 {% for graph in graph_chart%}
 <div class="col maina border border-secondary rounded border-1 " style="background:#212529">

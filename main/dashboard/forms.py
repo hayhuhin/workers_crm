@@ -107,3 +107,11 @@ class CompareGraphForm(forms.Form):
     # db = forms.ChoiceField(choices=db_options,widget=forms.TextInput(attrs={'hidden':'hidden'}))
     graph = forms.ChoiceField(choices=graph_options)
     dst_position = forms.IntegerField(max_value=8)
+
+
+class EditGraphRow(forms.Form):
+    row_options = [
+        ("graph_representation","Graph Representation"),("1_row","One Row"),("2_row","Two Row")
+    ]
+    row_repr = forms.ChoiceField(choices=row_options)
+    

@@ -294,7 +294,7 @@ class MongoDBConstructor:
             print(max_record_exceded_message)
             return max_record_exceded_message
         
-
+        #first time creating record
         if len(records) ==  0:
 
             #the new record that will be created
@@ -302,8 +302,6 @@ class MongoDBConstructor:
             
 
             #bellow section is responsible for formating the new record 
-
-
             query_filter = {"user_name":user} #query filter to get the data of the specific user
 
 
@@ -317,15 +315,17 @@ class MongoDBConstructor:
 
 
 
-            #the format of the new data
-            new_record_query = {
+            #the format of the new data example:"graph_records.records.1:{"x":[1,2,3],"y":["t","y","l"]...}
+            first_time_graph = {
                 "$set":{
                     f"graph_records.records.{new_record_name}":new_record,
                 }
             }
 
+            final = self.db.get_collection(self.collection_name).update_one(query_filter,first_time_graph)
+
             #the final result that will save the added record in the mongo db database
-            final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
+
 
             print(f"the record is added successfully. record number : {new_record_name}")
  
@@ -501,8 +501,8 @@ class MongoDBConstructor:
             new_user_data = {
                 "user_name":user,
                 "graph_records" : {"records":{}
-                    
-                }
+                },
+                "graph_repr":"1_row"
             }
             new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
             new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
@@ -525,7 +525,24 @@ class MongoDBConstructor:
         print("\n{}".format(find_result[0]))
         print("\nfind result ********************")
 
-    
+
+    def edit_graph_repr(self,collection_name:str,user:str,new_repr:str):
+        """
+        method that changing the users graph representation to one of these:1 row , 2 rows
+
+        Args:
+            collection_name(str):mongodb collection name
+            user(str):the user name that will be queried in the db
+            new_repr(str):new representation of the users graph page (1 row or 2 rows)        
+        """
+
+        filter_query = {"user_name":user}
+        new_query = {
+                "$set":{
+                    "graph_repr":new_repr,
+                }
+            }
+        self.db_gr_query.update_one(filter_query,new_query)
 
 
     def get_record(self,collection_name:str,user_name:str,record_count=2):
@@ -573,6 +590,7 @@ class MongoDBConstructor:
     {
         "$project": {
             "user_name": 1,
+            "graph_repr":1,
             "lastrecords": {
                 "$slice": [
                     {
@@ -602,6 +620,7 @@ class MongoDBConstructor:
         "$group": {
             "_id": "$_id",
             "user_name": {"$first": "$user_name"},
+            "graph_repr":{"$first":"$graph_repr"},
             "lastrecords": {"$push": "$lastrecords"}
         }
     }
@@ -615,7 +634,7 @@ class MongoDBConstructor:
                 #the total records here only for user representation
                 total_records = {"total_records":records_amount}
 
-                return items["lastrecords"],total_records
+                return items["lastrecords"],total_records,items["graph_repr"]
 
 
 

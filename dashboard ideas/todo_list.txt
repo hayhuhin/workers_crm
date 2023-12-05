@@ -80,7 +80,7 @@ https://plotly.com/python/bar-charts/
 ADD:need to handle the outcome adding data to db !! -
 
 <<working on >>
-ADD:smaller data insight on the dashboard page - 
+ADD:smaller data insight on the dashboard page - done
 
 
 ############################################################
@@ -89,7 +89,7 @@ ADD:TESTS FOR EACH FUNCTION
 ############################################################
 
 
-ADD:smaller presentation example: 2 or 4 graphs together
+ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
 
 
 #MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
