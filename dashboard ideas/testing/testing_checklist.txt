@@ -22,3 +22,9 @@ documentation:
         models
         forms
         urls
+
+
+1.no duplications
+2.check years values
+
+

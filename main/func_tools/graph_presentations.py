@@ -76,9 +76,9 @@ class GraphRepresantation(object):
         if graph_type == self.line_graph.__name__:
             return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
         if graph_type == "bar_graph_compare":
-            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
+            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
         if graph_type == "line_graph_compare":
-            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
+            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
 
     
     def bar_graph(self,dict_values:dict,graph_repr:str,path:str=None,to_html=True,compare=False):
@@ -100,78 +100,80 @@ class GraphRepresantation(object):
         """
 
         #checking the required bar sizes
+        
+        
         if graph_repr in self.graph_repr_sizes:
             x_size = self.graph_repr_sizes[graph_repr]["x"]
             y_size = self.graph_repr_sizes[graph_repr]["y"]
 
 
-        group = dict_values["x"]
-        value = dict_values["y"]
-        data_frame = pd.DataFrame(dict(group=group,value=value))
+            group = dict_values["x"]
+            value = dict_values["y"]
+            data_frame = pd.DataFrame(dict(group=group,value=value))
 
-        graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
+            graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
 
 
-        #,margin=dict(l=50,r=20,t=20,b=100)
-        graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                                plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                                modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                width=x_size,
-                                height=y_size,
-                                
-                                # bargroupgap=0.2,
-                                # width=300
-)
+            #,margin=dict(l=50,r=20,t=20,b=100)
+            graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                                    plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                    modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                    width=x_size,
+                                    height=y_size,
+                                    
+                                    # bargroupgap=0.2,
+                                    # width=300
+    )
 
-        graph_fig.update_traces(textfont_size=12)
+            graph_fig.update_traces(textfont_size=12)
 
-        graph_fig.update_xaxes(
-          tickangle=-45,#the angle of the presentation
-          dtick="M1", # sets minimal interval to month
-          tickformat="%d.%m.%Y", # the date format you want 
-)
-        if compare:
+            graph_fig.update_xaxes(
+              tickangle=-45,#the angle of the presentation
+              dtick="M1", # sets minimal interval to month
+              tickformat="%d.%m.%Y", # the date format you want 
+    )
+            if compare:
 
-          values_1 = dict_values["y"]
-          values_2 = dict_values["y_2"]
-          group = dict_values["x"]
+              values_1 = dict_values["y"]
+              values_2 = dict_values["y_2"]
+              group = dict_values["x"]
 
-          graph_fig = px.bar(
-              x=group,
-              y=[values_1, values_2],
-              labels={'value': 'Income', 'x':'Date','variable': 'amount'},
-              title=dict_values["graph_description"],
-              color_discrete_sequence=['blue', 'orange'],  # Set custom colors
-              template=self.template,
-          )
+              graph_fig = px.bar(
+                  x=group,
+                  y=[values_1, values_2],
+                  labels={'value': 'Income', 'x':'Date','variable': 'amount'},
+                  title=dict_values["graph_description"],
+                  color_discrete_sequence=['blue', 'orange'],  # Set custom colors
+                  template=self.template,
+              )
 
-          # fig.update_layout(barmode='group')
-          # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
-          graph_fig.update_layout(barmode='group',
-                                  paper_bgcolor='rgba(0,0,0,0)',
-                                  plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                                  modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                  width=x_size,
-                                  height=y_size
-                                  # bargap=0.2,
-                                  # bargroupgap=0.2,)
-          )
+              # fig.update_layout(barmode='group')
+              # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
+              graph_fig.update_layout(barmode='group',
+                                      paper_bgcolor='rgba(0,0,0,0)',
+                                      plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                      modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                      width=x_size,
+                                      height=y_size
+                                      # bargap=0.2,
+                                      # bargroupgap=0.2,)
+              )
 
-          graph_fig.update_traces(textfont_size=12)
+              graph_fig.update_traces(textfont_size=12)
 
-          graph_fig.update_xaxes(
-            tickangle=-45,#the angle of the presentation
-            dtick="M1", # sets minimal interval to month
-            tickformat="%d.%m.%Y",) # the date format you want 
-          
-          graph = graph_fig.to_html(config={'displayModeBar': True})
-          return graph
-        
-        if to_html:
-            graph = graph_fig.to_html(config={'displayModeBar': True})
-        else:
-            graph = graph_fig.write_image(path)
-        return graph
+              graph_fig.update_xaxes(
+                tickangle=-45,#the angle of the presentation
+                dtick="M1", # sets minimal interval to month
+                tickformat="%d.%m.%Y",) # the date format you want 
+              
+              graph = graph_fig.to_html(config={'displayModeBar': True})
+              return graph
+            
+            if to_html:
+                graph = graph_fig.to_html(config={'displayModeBar': True})
+            else:
+                graph = graph_fig.write_image(path)
+            return graph
 
     def pie_graph(self,values:list,names:list,path:str=None,to_html=True):
         """
@@ -220,72 +222,73 @@ class GraphRepresantation(object):
         """
 
         #first checking if the graph_repr in the graph repr sizes
+
         if graph_repr in self.graph_repr_sizes:
           x_size = self.graph_repr_sizes[graph_repr]["x"]
           y_size = self.graph_repr_sizes[graph_repr]["y"]
 
 
 
-        group = dict_values["x"]
-        value = dict_values["y"]
-
-        path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
-        line_fig = px.line(y=value,x=group,template=self.template)
-        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                               plot_bgcolor = "rgba(0,0,0,0)",
-                               modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                               width=x_size,
-                               height=y_size
-                               )
-        line_fig.update_traces(textfont_size=12,text='percent+label')
-        line_fig.update_xaxes(tickangle=-45)
-
-        if compare:
-            
-          dict_values
-          values_1 = dict_values["y"]
-          values_2 = dict_values["y_2"]
           group = dict_values["x"]
+          value = dict_values["y"]
 
-          line_fig = px.line(
-              x=group,
-              y=[values_1, values_2],
-              labels={'value': 'Income', 'x':'Date',},
-              title=dict_values["graph_description"],
-              color_discrete_sequence=['blue', 'orange'],  # Set custom colors
-              template=self.template,
-          )
+          path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
+          line_fig = px.line(y=value,x=group,template=self.template)
+          line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor = "rgba(0,0,0,0)",
+                                modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                width=x_size,
+                                height=y_size
+                                )
+          line_fig.update_traces(textfont_size=12,text='percent+label')
+          line_fig.update_xaxes(tickangle=-45)
 
-          # fig.update_layout(barmode='group')
-          # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
-          line_fig.update_layout(barmode='group',
-                                  paper_bgcolor='rgba(0,0,0,0)',
-                                  plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                                  modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                  bargap=0.2,
-                                  bargroupgap=0.2,
-                                  width=x_size,
-                                  height=y_size
-                                  )
+          if compare:
+              
+            dict_values
+            values_1 = dict_values["y"]
+            values_2 = dict_values["y_2"]
+            group = dict_values["x"]
+
+            line_fig = px.line(
+                x=group,
+                y=[values_1, values_2],
+                labels={'value': 'Income', 'x':'Date',},
+                title=dict_values["graph_description"],
+                color_discrete_sequence=['blue', 'orange'],  # Set custom colors
+                template=self.template,
+            )
+
+            # fig.update_layout(barmode='group')
+            # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
+            line_fig.update_layout(barmode='group',
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                                    modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                    bargap=0.2,
+                                    bargroupgap=0.2,
+                                    width=x_size,
+                                    height=y_size
+                                    )
 
 
-          line_fig.update_traces(textfont_size=12)
+            line_fig.update_traces(textfont_size=12)
 
-          line_fig.update_xaxes(
-            tickangle=-45,#the angle of the presentation
-            dtick="M1", # sets minimal interval to month
-            tickformat="%d.%m.%Y",) # the date format you want 
-          
-          graph = line_fig.to_html(config={'displayModeBar': True})
-          return graph
-
-
-
-        if to_html:
+            line_fig.update_xaxes(
+              tickangle=-45,#the angle of the presentation
+              dtick="M1", # sets minimal interval to month
+              tickformat="%d.%m.%Y",) # the date format you want 
+            
             graph = line_fig.to_html(config={'displayModeBar': True})
-        else:
-            graph = line_fig.write_image(path)
-        return graph
+            return graph
+
+
+
+          if to_html:
+              graph = line_fig.to_html(config={'displayModeBar': True})
+          else:
+              graph = line_fig.write_image(path)
+          return graph
 
     def donut_graph(self,values:list,names:list,path:str=None,to_html=True):
         """this method return the donut graph 

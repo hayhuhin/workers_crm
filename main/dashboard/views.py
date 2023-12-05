@@ -88,17 +88,17 @@ def dashboard(request):
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
 
-        for graph in mongodb_getting_data[0]:
+        for graph in mongodb_getting_data:
             # graph_values["group"] = graph["v"]["x"]
             # graph_values["value"] =  graph["v"]["y"]
             # graph_values["value_2"] = graph["v"]["y_2"]
-        
-            graph_html = graph_repr.graph_options(dict_values=graph["v"],graph_type=graph["v"]["graph_type"],graph_repr=mongodb_getting_data[2])  
+
+            graph_html = graph_repr.graph_options(dict_values=mongodb_getting_data["lastrecords"][0]["v"],graph_type=mongodb_getting_data["lastrecords"][0]["v"]["graph_type"],graph_repr=mongodb_getting_data["graph_repr"])  
 
             #this is the graph chart list that pushed to the html template with its graph data
             graph_chart.append({"graph_data":graph,"graph_html":graph_html})
 
-            total_graph = mongodb_getting_data[1]["total_records"]
+            
 
 
         ########################################################################################
@@ -400,36 +400,45 @@ def dashboard(request):
         if request.POST.get("add_insights_btn") == "add_insights_btn":
 
             form_inst = AddInsights(request.POST)
+            print(request.POST)
 
             if form_inst.is_valid():
 
                 #all data gathered from the user input fields after validation 
-                total_records = form_inst.cleaned_data.get("total_records")
-                max_records = form_inst.cleaned_data.get("max_records")
+                # total_records = form_inst.cleaned_data.get("total_records")
+                # max_records = form_inst.cleaned_data.get("max_records")
                 income_year_1 = form_inst.cleaned_data.get("income_year_1")
                 income_year_2 = form_inst.cleaned_data.get("income_year_2")
                 outcome_year_1 = form_inst.cleaned_data.get("outcome_year_1")
                 outcome_year_2 = form_inst.cleaned_data.get("outcome_year_2")
                 
-                
-                yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
-                yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
-                information_insight.append({
-                    "total_records":total_graph,
-                    "max_records" :record_amount["record_amount"],
+                # if income_year_1 != "0":        
+                #     income_year_1 = income_year_1
+                # elif income_year_2 != "0":
+                #     income_year_2 = income_year_2
+                # elif outcome_year_1 != "0":
+                #     outcome_year_1 = outcome_year_1
+                # elif outcome_year_2 == "0":
+                #     outcome_year_2 = outcome_year_2
+                        
+                total_graph = mongodb_getting_data[1]["total_records"]
+                yearly_income_summary = graph_calculator.get_data_by_year(args=[income_year_1,income_year_2],kwargs={"db":"income"})
+                yearly_outcome_summary = graph_calculator.get_data_by_year(args=[outcome_year_1,outcome_year_2],kwargs={"db":"outcome"})
+
+
+                insights_data = {
+                    "total_records":total_records,
+                    "max_records" :total_graph,
                     "current_year_income":yearly_income_summary,
-                    "current_year_spendings":yearly_outcome_summary,
-                    
-                })
-                
-                
-                
-                
-                insights_data = {}
+                    "current_year_spendings":yearly_outcome_summary,                    
+                }
 
                 mongodb_handler.save_insights(collection_name="gr",user=str(request.user),insights_data=insights_data)
 
+                return HttpResponseRedirect("/dashboard")
 
+            if not form_inst.is_valid():
+                return HttpResponse("invalid form")
 
 
     
@@ -447,6 +456,8 @@ def dashboard(request):
 
     #? here its the response in the get scope
     if request.method == "GET":
+
+        
         context= {'databases':databases,
                     'income_form':income_form,
                     'import_csv_form':import_csv_form,
@@ -456,33 +467,35 @@ def dashboard(request):
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
                     'edit_graph_row':edit_graph_repr_form,
+                    'graph_repr':mongodb_getting_data["graph_repr"],
                     'add_insights_form':add_insights_form}
-        if information_insight:
-            context = {'databases':databases,
-                    'income_form':income_form,
-                    'import_csv_form':import_csv_form,
-                    'edit_graph_form':edit_graph_form,
-                    'delete_graph_form':delete_graph_form,
-                    'change_position_form':change_positon_form,
-                    'graph_chart':graph_chart,
-                    'compare_graph_form':compare_graph_form,
-                    'information_insight':information_insight[0],
-                    'graph_repr':mongodb_getting_data[2][0],
-                    'edit_graph_row':edit_graph_repr_form,
-                    'add_insights_form':add_insights_form}
+        # if information_insight:
+        #     context = {'databases':databases,
+        #             'income_form':income_form,
+        #             'import_csv_form':import_csv_form,
+        #             'edit_graph_form':edit_graph_form,
+        #             'delete_graph_form':delete_graph_form,
+        #             'change_position_form':change_positon_form,
+        #             'graph_chart':graph_chart,
+        #             'compare_graph_form':compare_graph_form,
+        #             'information_insight':information_insight[0],
+        #             'graph_repr':mongodb_getting_data[2][0],
+        #             'edit_graph_row':edit_graph_repr_form,
+        #             'add_insights_form':add_insights_form}
    
-        if not information_insight:
-            context = {'databases':databases,
-                    'income_form':income_form,
-                    'import_csv_form':import_csv_form,
-                    'edit_graph_form':edit_graph_form,
-                    'delete_graph_form':delete_graph_form,
-                    'change_position_form':change_positon_form,
-                    'graph_chart':graph_chart,
-                    'compare_graph_form':compare_graph_form,
-                    'information_insight':information_insight,
-                    'edit_graph_row':edit_graph_repr_form,
-                    'add_insights_form':add_insights_form}
+        # if not information_insight:
+        #     context = {'databases':databases,
+        #             'income_form':income_form,
+        #             'import_csv_form':import_csv_form,
+        #             'edit_graph_form':edit_graph_form,
+        #             'delete_graph_form':delete_graph_form,
+        #             'change_position_form':change_positon_form,
+        #             'graph_chart':graph_chart,
+        #             'compare_graph_form':compare_graph_form,
+        #             'information_insight':information_insight,
+        #             'edit_graph_row':edit_graph_repr_form,
+        #             'graph_repr':mongodb_getting_data[2][0],
+        #             'add_insights_form':add_insights_form}
         
         
         return render(request,'code/dashboard.html',context)

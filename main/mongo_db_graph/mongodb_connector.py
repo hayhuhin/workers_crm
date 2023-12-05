@@ -509,6 +509,18 @@ class MongoDBConstructor:
             return new_user_data_insertion
 
 
+    def get_insights(self,collection_name:str,user:str):
+        """
+        method that represents the insights data and returns it as a dict
+
+        Args:
+            collection_name(str) : collection name of the mongo database
+            user(str) : the specific user that we need to get insights
+        """
+        query_filter = {"user_name":user}
+        user_data = self.db_gr_query.find_one(query_filter)
+        print(user_data)
+
 
     def find_data(self,collection_name:str,data):
         """thid method is for testing or checking the data 
@@ -557,9 +569,7 @@ class MongoDBConstructor:
         """
         filter_query = {"user_name":user}
         new_query = {
-                "$set":{
-                    insights_data
-                }
+                "$set":insights_data
             }
         self.db_gr_query.update_one(filter_query,new_query)
 
@@ -575,7 +585,6 @@ class MongoDBConstructor:
                 returns list of dicts with the records number as a key and the x and y as a value
                 with a date data.
         """
-
         collection = self.db[collection_name]
 
         # Define the query, projection, and sort
@@ -610,6 +619,10 @@ class MongoDBConstructor:
         "$project": {
             "user_name": 1,
             "graph_repr":1,
+            "current_year_income":1,
+            "current_year_spendings":1,
+            "max_records":1,
+            "total_records":1,
             "lastrecords": {
                 "$slice": [
                     {
@@ -640,6 +653,10 @@ class MongoDBConstructor:
             "_id": "$_id",
             "user_name": {"$first": "$user_name"},
             "graph_repr":{"$first":"$graph_repr"},
+            "max_records":{"$first":"$max_records"},
+            "total_records":{"$first":"$,total_records"},
+            "current_year_income":{"$first":"$current_year_income"},
+            "current_year_spendings":{"$first":"$current_year_spendings"},
             "lastrecords": {"$push": "$lastrecords"}
         }
     }
@@ -653,7 +670,12 @@ class MongoDBConstructor:
                 #the total records here only for user representation
                 total_records = {"total_records":records_amount}
 
-                return items["lastrecords"],total_records,items["graph_repr"]
+                # print(items["max_records"])
+                # print(items["max_records"])
+                # print(items["current_year_income"])
+                # print(items["current_year_spendings"])
+                print(items["lastrecords"][0]["v"])
+                return items
 
 
 

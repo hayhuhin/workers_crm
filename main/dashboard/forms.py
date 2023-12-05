@@ -121,13 +121,13 @@ class AddInsights(forms.Form):
         (0,"0"),(2023,"2023"),(2024,"2024"),(2025,"2025")
     ]
     
-    total_records = forms.IntegerField(max_value=7,
-                                    widget=forms.TextInput(attrs={'hidden': 'hidden'})
-                                               )
-    max_records = forms.IntegerField(max_value=7,
-                                    widget=forms.TextInput(attrs={'hidden': 'hidden'})
-)
+#     total_records = forms.IntegerField(max_value=7,
+#                                     widget=forms.TextInput(attrs={'hidden': 'hidden'})
+#                                                )
+#     max_records = forms.IntegerField(max_value=7,
+#                                     widget=forms.TextInput(attrs={'hidden': 'hidden'})
+# )
     income_year_1 = forms.ChoiceField(choices=year_choices)
-    income_year_2 = forms.ChoiceField(choices=year_choices,initial=0)
+    income_year_2 = forms.ChoiceField(choices=year_choices)
     outcome_year_1 = forms.ChoiceField(choices=year_choices)
-    outcome_year_2 = forms.ChoiceField(choices=year_choices,initial=0)
+    outcome_year_2 = forms.ChoiceField(choices=year_choices)
