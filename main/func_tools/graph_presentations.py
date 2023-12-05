@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 
 
 
+
 class GraphRepresantation(object):
     """
     this class is a wrapper for the plotly library.
@@ -49,8 +50,9 @@ class GraphRepresantation(object):
         self.presentation = presentation
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
+        self.graph_repr_sizes = {"1_row":{"x":900,"y":500},"2_row":{"x":480,"y":500}}
 
-    def graph_options(self,graph_type:str,dict_values:dict,path=None,to_html=True):
+    def graph_options(self,graph_type:str,dict_values:dict,graph_repr:str,path=None,to_html=True):
         """
         method that gives you the option to choose which graph to represent by the graph_type
         arg that must be the same as the name of the func (example:"graph_type")
@@ -66,20 +68,20 @@ class GraphRepresantation(object):
           HTML string represantation 
         """
         if graph_type == self.bar_graph.__name__:
-            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html)
+            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
         if graph_type == self.pie_graph.__name__:
             return self.pie_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == self.donut_graph.__name__:
             return self.donut_graph(dict_values=dict_values,path=path,to_html=to_html)
         if graph_type == self.line_graph.__name__:
-            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html)
+            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
         if graph_type == "bar_graph_compare":
             return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
         if graph_type == "line_graph_compare":
             return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True)
 
     
-    def bar_graph(self,dict_values:dict,path:str=None,to_html=True,compare=False):
+    def bar_graph(self,dict_values:dict,graph_repr:str,path:str=None,to_html=True,compare=False):
         """
         extracting dict values and passing them into plotly bar figure.
         can return image or html string represantation
@@ -97,6 +99,12 @@ class GraphRepresantation(object):
           HTML string representation
         """
 
+        #checking the required bar sizes
+        if graph_repr in self.graph_repr_sizes:
+            x_size = self.graph_repr_sizes[graph_repr]["x"]
+            y_size = self.graph_repr_sizes[graph_repr]["y"]
+
+
         group = dict_values["x"]
         value = dict_values["y"]
         data_frame = pd.DataFrame(dict(group=group,value=value))
@@ -108,8 +116,10 @@ class GraphRepresantation(object):
         graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
                                 plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                 modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                bargap=0.2,
-                                bargroupgap=0.2,
+                                width=x_size,
+                                height=y_size,
+                                
+                                # bargroupgap=0.2,
                                 # width=300
 )
 
@@ -141,10 +151,11 @@ class GraphRepresantation(object):
                                   paper_bgcolor='rgba(0,0,0,0)',
                                   plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                   modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                  bargap=0.2,
-                                  bargroupgap=0.2,)
-                                  # width=300
-
+                                  width=x_size,
+                                  height=y_size
+                                  # bargap=0.2,
+                                  # bargroupgap=0.2,)
+          )
 
           graph_fig.update_traces(textfont_size=12)
 
@@ -191,7 +202,7 @@ class GraphRepresantation(object):
             graph = pie_fig.write_image(path)
         return graph
 
-    def line_graph(self,dict_values:dict,path:str=None,to_html=True,compare=False):
+    def line_graph(self,dict_values:dict,graph_repr:str,path:str=None,to_html=True,compare=False):
         """
         extracting dict values and passing them into plotly line figure.
         can return image or html string represantation
@@ -208,12 +219,24 @@ class GraphRepresantation(object):
           HTML string representation
         """
 
+        #first checking if the graph_repr in the graph repr sizes
+        if graph_repr in self.graph_repr_sizes:
+          x_size = self.graph_repr_sizes[graph_repr]["x"]
+          y_size = self.graph_repr_sizes[graph_repr]["y"]
+
+
+
         group = dict_values["x"]
         value = dict_values["y"]
 
         path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
         line_fig = px.line(y=value,x=group,template=self.template)
-        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor = "rgba(0,0,0,0)",modebar={'bgcolor':'rgba(0, 0, 0, 0)'},)
+        line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                               plot_bgcolor = "rgba(0,0,0,0)",
+                               modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                               width=x_size,
+                               height=y_size
+                               )
         line_fig.update_traces(textfont_size=12,text='percent+label')
         line_fig.update_xaxes(tickangle=-45)
 
@@ -227,7 +250,7 @@ class GraphRepresantation(object):
           line_fig = px.line(
               x=group,
               y=[values_1, values_2],
-              labels={'value': 'Income', 'x':'Date','variable': 'amount'},
+              labels={'value': 'Income', 'x':'Date',},
               title=dict_values["graph_description"],
               color_discrete_sequence=['blue', 'orange'],  # Set custom colors
               template=self.template,
@@ -240,8 +263,10 @@ class GraphRepresantation(object):
                                   plot_bgcolor= 'rgba(0, 0, 0, 0)',
                                   modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
                                   bargap=0.2,
-                                  bargroupgap=0.2,)
-                                  # width=300
+                                  bargroupgap=0.2,
+                                  width=x_size,
+                                  height=y_size
+                                  )
 
 
           line_fig.update_traces(textfont_size=12)

@@ -77,8 +77,12 @@ ADD:in the edit form it will automaticly fill the date - DONE
 ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs - DONE
 https://plotly.com/python/bar-charts/
 
-ADD:need to handle the outcome adding data to db !! -
+ADD:need to handle the outcome adding data to db !! - DONE
 
+
+<<working on >>
+ADD:smaller data insight on the dashboard page - done
+>>>>>>> 643e20f4f9da1ebf009822bc54e60fd6f75360ce
 
 
 ############################################################
@@ -87,9 +91,10 @@ ADD:TESTS FOR EACH FUNCTION
 ############################################################
 
 
-<<working on >>
-ADD:smaller presentation example: 2 or 4 graphs together
-
+ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
+ADD:visually change the graph presentation to look clean - 
+FIX:dashboard.views hirarcy of the code -
+>>>>>>> 643e20f4f9da1ebf009822bc54e60fd6f75360ce
 
 #MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
 https://docs.djangoproject.com/en/4.2/topics/security/#user-uploaded-content-security

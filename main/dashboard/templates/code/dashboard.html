@@ -3,6 +3,7 @@
 
 <!-- the dashboard title-->
 {% block title %}
+
     <a class="nav-link close_small_navbar 
                     icon-link
                     link-body-emphasis 
@@ -17,27 +18,54 @@
                     data-bs-toggle='modal' data-bs-target='#import_csv_modal' data-bs-whatever='@getbootstrap' href="#"
                     >Import Graph CSV</a>
 
-                    <li class="nav-link
-                    link-offset-2
-                    close_small_navbar
-                    dropdown 
-                    link-body-emphasis 
-                    link-underline">
-                      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Graph Representation</a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item active" href="#">One Rows</a></li>
-                        <li><a class="dropdown-item" href="#">Two Rows</a></li>
-                        <li><a class="dropdown-item" href="#">Four Rows</a></li>
+                      <form class="d-flex" method="POST">
+                      {% csrf_token %}
+                    <div class="col-sm-auto">
+                        {% render_field edit_graph_row.row_repr type='text' class='form-control-plaintext' id='graph_edit_option'%}
+                    </div>  
+                        <button class="btn btn-secondary bt-sm" name="set_row" value="set_row" type="submit">Save Graph View</button>
+                      </form>
 
-                      </ul>
-                    </li>
-                  </form>
+                                      
 {% endblock title %}
 
 
 {% block content %}
 <div class='container p-4 pt-5'>
+<!-- ################################## test for add insights form ############################################ -->
+<div class="form-control">
+<form method="POST">
+{% csrf_token %}
+<!-- this two are hidden -->
+{% render_field add_insights_form.total_records value=information_insight.max_records %}
+{% render_field add_insights_form.max_records value=information_insight.total_records %}
+<!-- this two are hidden -->
+
+
+<p>income year first choice</p>
+{% render_field add_insights_form.income_year_1 type='option'%}
+<p>income year second choice</p>
+{% render_field add_insights_form.income_year_2 type='option'%}
+<p>outcome year first choice</p>
+{% render_field add_insights_form.outcome_year_1 type='option'%}
+<p>outcome year second choice</p>
+{% render_field add_insights_form.outcome_year_1 type='option'%}
+<button class="btn btn-success" name="add_insights_btn" value="add_insights_btn" type="submit">submit me</button>
+</form>
+</div>
+
+
+
   <div class='border border-secondary rounded border-1' style="background:#212529;">
+
+
+
+
+
+
+
+
+
 
 
 <!-- this is the import modal section -->
@@ -288,10 +316,10 @@
 <!-- GRAPH REPRESENTATION -->
 </div><!-- this div must be here its a part of the container in the top -->
 <div class="cotainer">
-<div class="whole_graph row row-cols-1 row-cols-md-2 g-4">
+<div class="whole_graph row row-cols-1 row-cols-md-{{graph_repr}} g-4 ">
 
 {% for graph in graph_chart%}
-<div class="col maina border border-secondary rounded border-1 g-2" style="background:#212529">
+<div class="col maina border border-secondary rounded border-1 " style="background:#212529">
 <div class="" style="background:#212529">
 <!-- <div class="graph m-1 p-3 my-5 border border-secondary rounded border-1" style="background:#212529"> -->
 
