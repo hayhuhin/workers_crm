@@ -1,5 +1,5 @@
 from django.db import models
-# from dashboard.models import Employer
+
 
 #models here
 
@@ -26,11 +26,6 @@ class Outcome(models.Model):
         return f"{self.month} -- {self.amount}"
 
 
-# class GraphRecord(models.Model):
-#     employer = models.ForeignKey(Employer,on_delete=models.CASCADE)
-#     record = models.DateTimeField(auto_created=True)
-
-
 
 
 class CompanyWorth:
@@ -54,14 +49,12 @@ class CompanyWorth:
         
 
 class GraphPermission(models.Model):
-    graph_amount = models.IntegerField(default=4)
-    record_amount = models.IntegerField(default=7)
+    permited = models.BooleanField(default=False)
+    graph_type = models.CharField(max_length=30,default="general_graph")
+    max_record_amount = models.IntegerField(default=7)
 
-    description = "Graph Permission"
+    description = f"graph_type - {graph_type} graph type - {graph_type} max_amount - {max_record_amount}"
 
     def __str__(self):
         return self.description
         
-
-
-    

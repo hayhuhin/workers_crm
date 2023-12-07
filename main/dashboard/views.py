@@ -33,9 +33,9 @@ def dashboard(request):
     graph_calculator = GraphCalculator( user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = "")
 
     #this class have CRUD methods that save the graph data into the mongodb
-    windows_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mac_uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    mongodb_handler = MongoDBConstructor(uri=windows_uri,db_name="test")
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    mongodb_handler = MongoDBConstructor(uri=uri,db_name="test")
+
     
     #the graph html representation class
     graph_repr = GraphRepresantation()
@@ -88,10 +88,7 @@ def dashboard(request):
         #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
         #save it as html
 
-        for graph in mongodb_getting_data:
-            # graph_values["group"] = graph["v"]["x"]
-            # graph_values["value"] =  graph["v"]["y"]
-            # graph_values["value_2"] = graph["v"]["y_2"]
+        for graph in mongodb_getting_data["lastrecords"]:
 
             graph_html = graph_repr.graph_options(dict_values=mongodb_getting_data["lastrecords"][0]["v"],graph_type=mongodb_getting_data["lastrecords"][0]["v"]["graph_type"],graph_repr=mongodb_getting_data["graph_repr"])  
 
@@ -404,23 +401,10 @@ def dashboard(request):
 
             if form_inst.is_valid():
 
-                #all data gathered from the user input fields after validation 
-                # total_records = form_inst.cleaned_data.get("total_records")
-                # max_records = form_inst.cleaned_data.get("max_records")
                 income_year_1 = form_inst.cleaned_data.get("income_year_1")
                 income_year_2 = form_inst.cleaned_data.get("income_year_2")
                 outcome_year_1 = form_inst.cleaned_data.get("outcome_year_1")
                 outcome_year_2 = form_inst.cleaned_data.get("outcome_year_2")
-                
-                # if income_year_1 != "0":        
-                #     income_year_1 = income_year_1
-                # elif income_year_2 != "0":
-                #     income_year_2 = income_year_2
-                # elif outcome_year_1 != "0":
-                #     outcome_year_1 = outcome_year_1
-                # elif outcome_year_2 == "0":
-                #     outcome_year_2 = outcome_year_2
-                        
                 total_graph = mongodb_getting_data[1]["total_records"]
                 yearly_income_summary = graph_calculator.get_data_by_year(args=[income_year_1,income_year_2],kwargs={"db":"income"})
                 yearly_outcome_summary = graph_calculator.get_data_by_year(args=[outcome_year_1,outcome_year_2],kwargs={"db":"outcome"})
@@ -434,14 +418,15 @@ def dashboard(request):
                 }
 
                 mongodb_handler.save_insights(collection_name="gr",user=str(request.user),insights_data=insights_data)
-
                 return HttpResponseRedirect("/dashboard")
+
+
 
             if not form_inst.is_valid():
                 return HttpResponse("invalid form")
 
 
-    
+
     if request.method == "DELETE":
         print("the requested method is DELETE")
     
@@ -467,7 +452,7 @@ def dashboard(request):
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
                     'edit_graph_row':edit_graph_repr_form,
-                    'graph_repr':mongodb_getting_data["graph_repr"],
+                    # 'graph_repr':mongodb_getting_data["graph_repr"],
                     'add_insights_form':add_insights_form}
         # if information_insight:
         #     context = {'databases':databases,

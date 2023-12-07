@@ -9,44 +9,142 @@ uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS
 
 
 class MongoDBConstructor:
-    """class that connecting to the local mongodb and perform CRUD operations 
-        with a help of methods that checking the users record permission
     """
-    def __init__(self,uri:str,db_name:str):
+    class that connecting to the local mongo database and performing CRUD operations 
+    with a help of methods that checking the users record permission
+    """
+    def __init__(self,uri:str,db:str,collection:str,user_data:dict):
+        #TODO must add good data structure to the init args and structure it in the views
 
         #this is the connection to the db server
         self.client = MongoClient(uri)
+        #string repr of the args
+        self.str_db = db
+        self.str_collection = collection
 
-        self.db_name = db_name
+        #the classes of the pymongo client
+        self.db = self.client[self.str_db]
+        self.collection = self.db[self.str_collection]
 
-        #this is the specific db 
-        self.db = self.client[self.db_name]
+        #first data passed argument
+        self.user_data = user_data
+        # self.user_filter = {"user_name":self.user_data["user"]}
 
-        self.db_gr_query = self.db["gr"]
+
+        self.raw_dict = self.structured_data()
+
+    def structured_data(self):
+        """
+        method returns structured data that will be used later in CRUD methods.
+        this method iterates through the user specific records and then structuring it as a dict.
+
+        Args:
+            user_data(dict) : the first data that the class instantiated with and passed into the class.
+            db(str) : the first data that the class instantiated with and passed into the class.
+            collection(str) : the first data that the class instantiated with and passed into the class.
+
+        Returns:
+            gets the data then checking if the records exists if not adding it to the db 
+            and returns a structured dict
+        """
+
+        data = {"user_name":(self.user_data["user_name"]),
+                "db":str(self.str_db),
+                "collection":str(self.str_collection),
+                "graph_permited":self.user_data["graph_permited"],
+                "graph_type":self.user_data["graph_type"]
+                }
+
         
+        #checking if record exists (creating one if not existing)
 
-    def user_permission_records(self,user):
-        #this method will check this users permission level and decide how much records the user can have
+        records = self.collection.find_one({"user_name":data["user_name"]})
+        # print(records["graph_records"])
+        #if the user doesnt exists in the db it will create first time graph record and if the graph_permited for the user
+        if not records:
+            data["graph_records"] = {"records":{}}
+            data["graph_repr"] = "1_row"
+            new_user_data_insertion = self.collection.insert_one(data)
+
+            data.pop("_id")
+            return data
+
+        if records:
+            data["graph_records"] = records["graph_records"]
+            data["graph_repr"] = records["graph_repr"]
+            if records["graph_records"]["records"]:
+                data["records"] = records["graph_records"]["records"]
+                return data
+            else:
+                return data
 
 
-        #TODO add logic later to handle the permission records
+    def remove_record(self,required_record:str,delete_all=False):
+        """
+        method removes specific record by the record number provided from the arguments.
 
-        #testing phase - will return small number 
-        return 7
-    
-    def available_positions(self,user:str):
-        
-        query_filter = {"user_name":user}
-        user_collection_records = self.db.get_collection(self.collection_name).find(query_filter,{"graph_records.records":1})
+        Args:
+            required_record(str) : this record number provided in the args and represented as the key in the mongodb structure.
+                example for mongodb record structure:
+                each record will generate a number 
+                {"records":{"1":{this record data is here},"2":{this record data is here},"3":{this record data is here}}
+            delete_all(bool=False) : if True it will drop the whole table of the user 
+
+        Returns:
+            deletes the required record and returns None
+        """
+
+        if delete_all:
+            #deletes the whole table
+            final = self.collection.delete_one({"user_name":self.user_data["user_name"]})
+            self.raw_dict = {}
+
+        #if delete_all is True
+        if not delete_all:
+            if self.user_data["records"]:
+
+                #this checking if the records exists and if not then it will return an error
+                if required_record not in self.user_data["records"]:
+                    #prints the available record keys
+                    print(f"this is the records : {self.user_data['records'].keys()}")
+                    raise ValueError("this record dont exists")
+
+                else:
+                #the format of the new data
+                    delete_query = {
+                        "$unset":{
+                            f"graph_records.records.{required_record}":1,
+                            },
+                        }
+                    #the final result that will save the added record in the mongo db database
+                    self.collection.update_one({"user_name":self.user_data["user_name"]},delete_query)
+                    self.data["records"].pop(required_record)
+            
+            #if there are not records exists it will raise a ValueError
+            else:
+                raise ValueError("records doesnt exists")
+
+
+
+
+
+    def available_positions(self):
+
+        all_users_records = self.collection.find(self.user_filter,{"graph_records.records":1})
         user_records_position = []
-        for cursor in user_collection_records:
+        for cursor in user_records_position:
 
             for records in  cursor["graph_records"]["records"]:
                 user_records_position.append(cursor["graph_records"]["records"][records]["position"])
+        print(user_records_position)
         return user_records_position
 
 
-    def switch_records(self,collection_name:str,user:str,current_graph_id,requested_position):
+
+
+
+
+    def switch_records(self,current_graph_id,requested_position):
         """ this method gets the users current record position and id and switching the places of the records positions.
             example:user_ben :{
                                 record_1:data,
@@ -61,22 +159,22 @@ class MongoDBConstructor:
             record_1:data
             and add another key and value of the graph position in the web
         """
-        self.collection_name = collection_name
-        query_filter = {"user_name":user} #query filter to get the data of the specific user
+
+ #query filter to get the data of the specific user
 
         #this is the current graph position and the current graph id
-        src_graph_position_cursor = self.db.get_collection(self.collection_name).find(query_filter,{f"graph_records.records.{current_graph_id}.position":1})
+        src_graph_position_cursor = self.db.get_collection(self.collection_name).find(self.user_filter,{f"graph_records.records.{current_graph_id}.position":1})
         for graph_data in src_graph_position_cursor:
             src_graph_position = (graph_data["graph_records"]["records"][str(current_graph_id)]["position"])
         src_graph_id = current_graph_id
 
-        user_collection_records = self.db.get_collection(self.collection_name).find(query_filter,{"graph_records.records":1})
+        user_collection_records = self.db.get_collection(self.collection_name).find(self.user_filter,{"graph_records.records":1})
 
 
         
 
 
-        available_positions = self.available_positions(user=user)
+        available_positions = self.available_positions(user=user,collection=self.collection_name)
         if requested_position not in available_positions:
             #! need to add some response to the user 
             raise Exception("invalid position requested ")
@@ -103,11 +201,13 @@ class MongoDBConstructor:
             self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
             self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
 
+
     def compare_record(self,collection_name:str,user:str,src_id:str,user_data:dict,max_record_amount):
-        """this method checking that the compare record is having the same amount of months and returns 3 lists
-            one with first graph y(values)
-            second with second graph y(values)
-            third is a list with the x(months)
+        """
+        this method checking that the compare record is having the same amount of months and returns 3 lists
+        one with first graph y(values)
+        second with second graph y_2(values)
+        third is a list with the x(months)
         """
         print("compare_record called")
         
@@ -419,53 +519,7 @@ class MongoDBConstructor:
             return records
 
 
-    def remove_records(self,collection_name:str,user:str,record_number:str,delete_all=False):
-        """this method can remove records with the record number"""
 
-        self.collection_name = collection_name
-
-        query_filter = {"user_name":user} #query filter to get the data of the specific user
-
-        #this to see the amount of records and check if the record exists
-        projection = {"graph_records.records": 1, "_id": 0}
-        sort = [("graph_records.records", 1)]
-        # [0]["graph_records"]["records"]
-        records = list(self.db.get_collection(self.collection_name).find(query_filter, projection).sort(sort))[0]["graph_records"]["records"]
-
-        if delete_all == False:
-        #this checking if the records exists or not        
-            if record_number not in records.keys():
-                print("this record is wrong ")
-                print(f"this is the records : {records.keys()}")
-
-            else:
-
-            #the format of the new data
-                new_record_query = {
-                    "$unset":{
-                        f"graph_records.records.{record_number}":1,
-                    },
-
-                }
-
-            #the final result that will save the added record in the mongo db database
-                final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-                
-
-        if delete_all:
-
-            for record_number in records:
-                print(f"record deleted :{record_number}")
-
-                new_record_query = {
-                "$unset":{
-                    # f"graph_records.records.{record_number}":1,
-                    "graph_records":""
-                },}
-
-                final = self.db.get_collection(self.collection_name).delete_one({"user_name":user})
-                # final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-        
         
 
 
@@ -711,16 +765,16 @@ my_new_data = [{
 
 
 
-test_class = MongoDBConstructor(uri,"test")
+# test_class = MongoDBConstructor(uri,"test")
 # add_record_test = test_class.extract_record("gr","david",2)
 
 
 
-test_dict = {
-    "created_at":"YYYY-MM-DD",
-    "x":[1,1,1,1],
-    "y":["q","w","e","r"]
-}
+# test_dict = {
+#     "created_at":"YYYY-MM-DD",
+#     "x":[1,1,1,1],
+#     "y":["q","w","e","r"]
+# }
 
 
 #checking if the add record working - done

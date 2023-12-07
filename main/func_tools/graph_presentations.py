@@ -38,7 +38,7 @@ class GraphRepresantation(object):
         cretes html simple block representation with user data
     """
 
-    def __init__(self,presentation=str('card')):
+    def __init__(self,presentation:str='card'):
         """
         Constructor method for GraphRepresantation.
 
@@ -51,6 +51,12 @@ class GraphRepresantation(object):
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
         self.graph_repr_sizes = {"1_row":{"x":900,"y":500},"2_row":{"x":480,"y":500}}
+
+        self.visuals_data = {"paper_bgcolor":"rgba(0,0,0,0)",
+                              "plot_bgcolor": "rgba(0, 0, 0, 0)",
+                              "modebar":{'bgcolor':'rgba(0, 0, 0, 0)'}
+        }
+
 
     def graph_options(self,graph_type:str,dict_values:dict,graph_repr:str,path=None,to_html=True):
         """
@@ -67,20 +73,27 @@ class GraphRepresantation(object):
         Returns:
           HTML string represantation 
         """
-        if graph_type == self.bar_graph.__name__:
-            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
-        if graph_type == self.pie_graph.__name__:
-            return self.pie_graph(dict_values=dict_values,path=path,to_html=to_html)
-        if graph_type == self.donut_graph.__name__:
-            return self.donut_graph(dict_values=dict_values,path=path,to_html=to_html)
-        if graph_type == self.line_graph.__name__:
-            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
-        if graph_type == "bar_graph_compare":
-            return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
-        if graph_type == "line_graph_compare":
-            return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
 
-    
+        #this method validating the inputs of the user(its called each time the graph_option called) returns True if validated
+        validated = self.validate_inputs(dict_values=dict_values,graph_repr=graph_repr,path=path)
+
+        if validated:      
+          if graph_type == self.bar_graph.__name__:
+              return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
+          if graph_type == self.pie_graph.__name__:
+              return self.pie_graph(dict_values=dict_values,path=path,to_html=to_html)
+          if graph_type == self.donut_graph.__name__:
+              return self.donut_graph(dict_values=dict_values,path=path,to_html=to_html)
+          if graph_type == self.line_graph.__name__:
+              return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
+          if graph_type == "bar_graph_compare":
+              return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
+          if graph_type == "line_graph_compare":
+              return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
+          else:
+              raise ValueError("the correct value must be existing graph type")
+
+
     def bar_graph(self,dict_values:dict,graph_repr:str,path:str=None,to_html=True,compare=False):
         """
         extracting dict values and passing them into plotly bar figure.
@@ -99,64 +112,49 @@ class GraphRepresantation(object):
           HTML string representation
         """
 
-        #checking the required bar sizes
-        
-        
+        #checking the required bar sizes 
         if graph_repr in self.graph_repr_sizes:
             x_size = self.graph_repr_sizes[graph_repr]["x"]
             y_size = self.graph_repr_sizes[graph_repr]["y"]
 
 
-            group = dict_values["x"]
-            value = dict_values["y"]
-            data_frame = pd.DataFrame(dict(group=group,value=value))
-
+            #creating dataframe for the graph figure
+            data_frame = pd.DataFrame(dict(group=dict_values["x"],value=dict_values["y"]))
+            #creating the right graph figure(bar graph)and passing the data frame created
             graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
-
-
-            #,margin=dict(l=50,r=20,t=20,b=100)
-            graph_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                                    plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                                    modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+            #updating some visuals for the graph and the size
+            graph_fig.update_layout(paper_bgcolor=self.visuals_data["paper_bgcolor"],
+                                    plot_bgcolor= self.visuals_data["plot_bgcolor"],
+                                    modebar=self.visuals_data["modebar"],
                                     width=x_size,
                                     height=y_size,
-                                    
-                                    # bargroupgap=0.2,
-                                    # width=300
-    )
-
+    )        #updating the textfont size
             graph_fig.update_traces(textfont_size=12)
-
+            #adding angle for the months keys
             graph_fig.update_xaxes(
               tickangle=-45,#the angle of the presentation
               dtick="M1", # sets minimal interval to month
               tickformat="%d.%m.%Y", # the date format you want 
     )
+            #here its checking if the data have to be compared
             if compare:
 
-              values_1 = dict_values["y"]
-              values_2 = dict_values["y_2"]
-              group = dict_values["x"]
-
+              #creating the right graph figure(bar graph)and passing the data frame created
               graph_fig = px.bar(
-                  x=group,
-                  y=[values_1, values_2],
+                  x=dict_values["x"],
+                  y=[dict_values["y"], dict_values["y_2"]],
                   labels={'value': 'Income', 'x':'Date','variable': 'amount'},
                   title=dict_values["graph_description"],
                   color_discrete_sequence=['blue', 'orange'],  # Set custom colors
                   template=self.template,
               )
 
-              # fig.update_layout(barmode='group')
-              # graph_fig = px.bar(data_frame,x='group',y='value',template=self.template)
               graph_fig.update_layout(barmode='group',
-                                      paper_bgcolor='rgba(0,0,0,0)',
-                                      plot_bgcolor= 'rgba(0, 0, 0, 0)',
-                                      modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
+                                      paper_bgcolor=self.visuals_data["paper_bgcolor"],
+                                      plot_bgcolor= self.visuals_data["plot_bgcolor"],
+                                      modebar=self.visuals_data["modebar"],
                                       width=x_size,
-                                      height=y_size
-                                      # bargap=0.2,
-                                      # bargroupgap=0.2,)
+                                      height=y_size,
               )
 
               graph_fig.update_traces(textfont_size=12)
@@ -174,35 +172,7 @@ class GraphRepresantation(object):
             else:
                 graph = graph_fig.write_image(path)
             return graph
-
-    def pie_graph(self,values:list,names:list,path:str=None,to_html=True):
-        """
-        extracting values and passing them into plotly pie figure.
-        can return image or html string represantation
-
-        args:
-          names(list) :contains x(str/int) : most of the time its the x line on the graphs.
-          value(list) :scontains y(int) : its the y line on the graphs.
-            if compare=True it can contain y_2 as a compare y value.
-          path: only used to_html=False and saving the pic in specified path
-          to_html : default is true and returns the graph as html repr so it can be loaded in the html template
-
-        Returns:
-          HTML string representation
-        """
-
-        path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
-
-        pie_fig = px.pie(values=values,names=names,template=self.template)
-        pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
-        pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
-
-
-        if to_html:
-            graph = pie_fig.to_html(config={'displayModeBar': True})
-        else:
-            graph = pie_fig.write_image(path)
-        return graph
+        
 
     def line_graph(self,dict_values:dict,graph_repr:str,path:str=None,to_html=True,compare=False):
         """
@@ -290,6 +260,100 @@ class GraphRepresantation(object):
               graph = line_fig.write_image(path)
           return graph
 
+
+    def validate_inputs(self,dict_values:dict,graph_repr:str,path:str=None,):
+        """
+        method that called once in the graph_option method to check if the input is the right type
+        this method validated and tested in the test.py file
+
+        Args:
+          dict_values(dict):accepts dict that contains the keys:x(str/int),y(int),y_2(int).
+          graph_repr(str) : accepts only str.
+          path(str) or None:accepts None or str path.
+
+        Returns:
+          validates the fields and raises Value error with message if not validate
+          if the values are valid it will return True
+        """
+
+        #first we are validating the dict_values(they must in the list)
+        proper_values = ["graph_title","graph_description","graph_type","created_at","x","y","y_2","start_date","end_date","position"]
+
+        for key in dict_values:
+            if key in proper_values:
+                continue
+            else:
+                raise ValueError("the key name is invalid")
+        #creating for loop with o(n) time complexity
+
+        #iterating over the len of dict x (it will always be the same length as y or y_2)
+        for index in range(len(dict_values["x"])):
+            #check the x type
+            if not isinstance(dict_values["x"][index],(str,float)):
+              raise ValueError("x/y/y_2 value types are invalid")
+
+            #check the y type
+            if not isinstance(dict_values["y"][index],int):
+                raise ValueError("x/y/y_2 value types are invalid")
+            
+            #check if the y_2 compare is existing
+            if "y_2" in dict_values:
+                if not isinstance(dict_values["y_2"][index],int):
+                  raise ValueError("x/y/y_2 value types are invalid")
+                
+        #check if the y_2 exists
+        if "y_2" in dict_values:
+            #if y_2 exists and if the len is the same
+            if len(dict_values["y_2"]) != len(dict_values["x"]):
+                raise ValueError("len x is not the same as y")
+        #check if the len(x) same as len(y)
+        if len(dict_values["x"]) != len(dict_values["y"]):
+            raise ValueError("len x is not the same as y")
+
+        #check path type 
+        if path:
+          if not isinstance(path,(str)):
+              raise ValueError("not str type")
+
+        #check if graph_repr is not str
+        if not isinstance(graph_repr,(str)):
+            raise ValueError("not str type")
+
+
+        #if it passed all the validations it will return True
+        return True
+ 
+
+    def pie_graph(self,values:list,names:list,path:str=None,to_html=True):
+        """
+        extracting values and passing them into plotly pie figure.
+        can return image or html string represantation
+
+        args:
+          names(list) :contains x(str/int) : most of the time its the x line on the graphs.
+          value(list) :scontains y(int) : its the y line on the graphs.
+            if compare=True it can contain y_2 as a compare y value.
+          path: only used to_html=False and saving the pic in specified path
+          to_html : default is true and returns the graph as html repr so it can be loaded in the html template
+
+        Returns:
+          HTML string representation
+        """
+
+        path = str(self.currant_path) +"/employer_profile/static/employer/images/pie.png"
+
+        pie_fig = px.pie(values=values,names=names,template=self.template)
+        pie_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+        pie_fig.update_traces(textfont_size=12,textinfo='percent+label')
+
+
+        if to_html:
+            graph = pie_fig.to_html(config={'displayModeBar': True})
+        else:
+            graph = pie_fig.write_image(path)
+        return graph
+
+
     def donut_graph(self,values:list,names:list,path:str=None,to_html=True):
         """this method return the donut graph 
             Args:
@@ -320,6 +384,7 @@ class GraphRepresantation(object):
             graph = donut_fig.write_image(path)
         return graph
     
+
     def user_card(self,user_data:dict):
         """
         returns html card with the user data that recieved from the user_data
@@ -393,6 +458,7 @@ class GraphRepresantation(object):
         
         return card_html
   
+
     def graph_card(self,user_data:dict,user_calc:str):
         """
         returns html card with the user data that recieved from the user_data and user_calc
