@@ -1,8 +1,43 @@
 
 from pymongo.mongo_client import MongoClient
+from dataclasses import dataclass,field
+import json
 
 
-uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+@dataclass
+class RecordContent:
+    graph_title : str
+    graph_description :str
+    graph_type : str
+    created_at: str
+    start_date : str
+    end_date : str 
+    position : int 
+    x : list[str,int] = field(default_factory=list)
+    y : list[int] = field(default_factory=list)
+    y_2 :[str,int] = field(default_factory=list)
+
+
+
+@dataclass
+class GraphRecords:
+    records_id : str = field(default="0")
+    records_content : RecordContent = field(default_factory=dict)
+
+
+
+@dataclass
+class UserConfig:
+    name : str
+    db : str
+    collection : str
+    graph_permited : bool
+    graph_db_type : str
+    graph_Records : GraphRecords = field(default_factory=dict)
+    graph_repr : str = field(default="1_row")
+
+    def to_json(self):
+        return json.dumps(self.__dict__,default=lambda x:x.__dict__,indent=4)
 
 
 
@@ -11,10 +46,37 @@ uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS
 class MongoDBConstructor:
     """
     class that connecting to the local mongo database and performing CRUD operations 
-    with a help of methods that checking the users record permission
+    with a help of methods and checking methods
     """
     def __init__(self,uri:str,db:str,collection:str,user_data:dict):
-        #TODO must add good data structure to the init args and structure it in the views
+        """
+        Attributes:
+            uri (str): uri to connect to the mongodb database.
+            db (str) : database name.
+            collection (str) : collection name.
+            user_data (dict) : the dict must to have these keys:
+                {"user_name"(str):"ben",
+                "graph_permited"(boolean):True,
+                "graph_type"(str):"general_graph"}
+
+        Methods:
+            user_exists(self) -> boolean :
+                queries the mongodb database and checking if any record exists with this username
+            create_basic_record(self) -> True or raises Value error:
+                adding simple first record to the mongo database and returns True.
+                if there is already user exists it will raise ValueError.
+            drop_user_data(self) - None :
+                drops the specific users data
+            graph_records(self) -> dict:
+                queries the database and searching for user specific records.
+                if no records it will return empty list
+            dump_test_records(self) - > None:
+                FOR TESTING ONLY-- adds two random records to the users records database.
+            remove_record(self,required_record,delete_all) -> None
+                this method removes specific record or deleting all records.
+            
+
+        """
 
         #this is the connection to the db server
         self.client = MongoClient(uri)
@@ -28,15 +90,12 @@ class MongoDBConstructor:
 
         #first data passed argument
         self.user_data = user_data
-        # self.user_filter = {"user_name":self.user_data["user"]}
 
+        self.user_config = UserConfig(name=self.user_data["user_name"],graph_permited=self.user_data["graph_permited"],graph_db_type=self.user_data["graph_type"],db=self.str_db,collection=self.str_collection)
 
-        self.raw_dict = self.structured_data()
-
-    def structured_data(self):
+    def user_exists(self):
         """
-        method returns structured data that will be used later in CRUD methods.
-        this method iterates through the user specific records and then structuring it as a dict.
+        queries the database and returns the data as
 
         Args:
             user_data(dict) : the first data that the class instantiated with and passed into the class.
@@ -47,37 +106,93 @@ class MongoDBConstructor:
             gets the data then checking if the records exists if not adding it to the db 
             and returns a structured dict
         """
-
-        data = {"user_name":(self.user_data["user_name"]),
-                "db":str(self.str_db),
-                "collection":str(self.str_collection),
-                "graph_permited":self.user_data["graph_permited"],
-                "graph_type":self.user_data["graph_type"]
-                }
-
         
-        #checking if record exists (creating one if not existing)
-
-        records = self.collection.find_one({"user_name":data["user_name"]})
-        # print(records["graph_records"])
-        #if the user doesnt exists in the db it will create first time graph record and if the graph_permited for the user
+        #searching if the user exists
+        records = self.collection.find_one({"name":self.user_data["user_name"]})
+        
         if not records:
-            data["graph_records"] = {"records":{}}
-            data["graph_repr"] = "1_row"
-            new_user_data_insertion = self.collection.insert_one(data)
+            return False
 
-            data.pop("_id")
-            return data
-
+        #the user exists and returns True
         if records:
-            data["graph_records"] = records["graph_records"]
-            data["graph_repr"] = records["graph_repr"]
-            if records["graph_records"]["records"]:
-                data["records"] = records["graph_records"]["records"]
-                return data
-            else:
-                return data
+            return True
 
+
+    def create_basic_record(self):
+        if self.user_exists():
+            raise ValueError("the user already have basic record")
+
+        else:
+            data = json.loads(self.user_config.to_json())
+            print(data)
+            # print(f"creating basic record for {self.user_data['user_name']}")
+            self.collection.insert_one(data)
+            return True
+
+
+    def drop_user_data(self):
+        self.collection.delete_one({"name":self.user_data["user_name"]})
+
+
+    def graph_records(self):
+        """
+        queries the database to find the records if not found will return empty list
+        """
+        found_records = self.collection.find_one({"name":self.user_data["user_name"]},{"graph_records.records":1})
+        if found_records:
+            found_records.pop("_id")
+            return found_records["graph_records"]["records"]
+        else:
+            return []
+        
+
+    def dump_test_records(self):
+        #adding full list of records for TESTING ONLY!!!
+        dump_data = {
+                '0': {
+                    'graph_title': 'Graph',
+                    'graph_description': 'No Description',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023' ],
+                    'y': [ 7491 ],
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    'position': 1
+                    },
+                '1': {
+                    'graph_title': 'Graph',
+                    'graph_description': 'No Description',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023' ],
+                    'y': [ 7491 ],
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    'position': 2
+                    }}
+
+        for key in dump_data:
+
+            
+            record_1_content = RecordContent(graph_title=dump_data["0"]["graph_title"],graph_description=)
+            record_2_content = RecordContent()
+
+
+            graph_record = GraphRecords(records_id=self.generate_id(),records_content=record_1_content)
+            graph_record = GraphRecords(records_id=self.generate_id(),records_content=record_2_content)
+            #the format of the new data
+
+
+            new_record = dump_data[key]
+            new_record_name = key
+            new_record_query = {
+                "$set":{
+                    f"graph_records.records.{new_record_name}":new_record
+                }
+            }
+            self.collection.update_one({"user_name":self.user_data["user_name"]},new_record_query)
+        
 
     def remove_record(self,required_record:str,delete_all=False):
         """
@@ -94,38 +209,43 @@ class MongoDBConstructor:
             deletes the required record and returns None
         """
 
-        if delete_all:
-            #deletes the whole table
-            final = self.collection.delete_one({"user_name":self.user_data["user_name"]})
-            self.raw_dict = {}
-
-        #if delete_all is True
-        if not delete_all:
-            if self.user_data["records"]:
-
-                #this checking if the records exists and if not then it will return an error
-                if required_record not in self.user_data["records"]:
-                    #prints the available record keys
-                    print(f"this is the records : {self.user_data['records'].keys()}")
-                    raise ValueError("this record dont exists")
-
-                else:
-                #the format of the new data
-                    delete_query = {
-                        "$unset":{
-                            f"graph_records.records.{required_record}":1,
-                            },
-                        }
-                    #the final result that will save the added record in the mongo db database
-                    self.collection.update_one({"user_name":self.user_data["user_name"]},delete_query)
-                    self.data["records"].pop(required_record)
+        #first checking if the user exists
+        if self.user_exists():
             
-            #if there are not records exists it will raise a ValueError
-            else:
-                raise ValueError("records doesnt exists")
+            if delete_all:
+                #deletes the whole user data from the database
+                    self.collection.delete_one({"user_name":self.user_data["user_name"]})
+                    print(f"the {self.user_data['user_name']} deleted from the database")
 
+            #if delete_all is False
+            if not delete_all:
+                
+                #calling graph_records will return records dict if exists or empty list of not exists
+                records = self.graph_records()
+                
+                if not records:
+                    raise ValueError("the user exists but dont have records")
+                
+                if records:
+                    #this checking if the required_record exists inside the  records and if not then it will return an error
+                    if required_record not in records["graph_record"]["records"].keys():
+                        print(f"this is the records : {records['graph_records']['records'].keys()}")
+                        raise ValueError("this record dont exists")
 
-
+                    else:
+                    #the format of the new data
+                        delete_query = {
+                            "$unset":{
+                                f"graph_records.records.{required_record}":1,
+                                },
+                            }
+                        #the final result that will save the added record in the mongo db database
+                        self.collection.update_one({"user_name":self.user_data["user_name"]},delete_query)
+                        print("the record deleted successfully")
+                
+                #if there are not records exists it will raise a ValueError
+                else:
+                    raise ValueError("records doesnt exists")
 
 
     def available_positions(self):
@@ -523,44 +643,44 @@ class MongoDBConstructor:
         
 
 
-    def user_exists(self,collection_name:str,user:str):
-        query_filter = {
-            "user_name":user
-        }
-        user_found = list(self.db.get_collection(collection_name).find(query_filter))
+    # def user_exists(self,collection_name:str,user:str):
+    #     query_filter = {
+    #         "user_name":user
+    #     }
+    #     user_found = list(self.db.get_collection(collection_name).find(query_filter))
         
-        #if user exists
-        #! important that ill add another validation that the users exists but without the record and it will add the record
-        if user_found:
-            #if user have the records
+    #     #if user exists
+    #     #! important that ill add another validation that the users exists but without the record and it will add the record
+    #     if user_found:
+    #         #if user have the records
 
-            # records_found = list(self.db.get_collection(collection_name).find(query_filter{"graph_records":""}))
-            # print(records_found)
-            # if records_found:
-            return True
-            # else:
-            #     new_user_data = {
-            #     "user_name":user,
-            #     "graph_records" : {
+    #         # records_found = list(self.db.get_collection(collection_name).find(query_filter{"graph_records":""}))
+    #         # print(records_found)
+    #         # if records_found:
+    #         return True
+    #         # else:
+    #         #     new_user_data = {
+    #         #     "user_name":user,
+    #         #     "graph_records" : {
                     
-            #     }
-            # }
-            #     new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
-            #     new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
-            #     return new_user_data_insertion
+    #         #     }
+    #         # }
+    #         #     new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
+    #         #     new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
+    #         #     return new_user_data_insertion
 
         
-        if not user_found:
+    #     if not user_found:
 
-            new_user_data = {
-                "user_name":user,
-                "graph_records" : {"records":{}
-                },
-                "graph_repr":"1_row"
-            }
-            new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
-            new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
-            return new_user_data_insertion
+    #         new_user_data = {
+    #             "user_name":user,
+    #             "graph_records" : {"records":{}
+    #             },
+    #             "graph_repr":"1_row"
+    #         }
+    #         new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
+    #         new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
+    #         return new_user_data_insertion
 
 
     def get_insights(self,collection_name:str,user:str):
