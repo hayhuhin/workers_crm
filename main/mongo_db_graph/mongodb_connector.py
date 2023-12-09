@@ -2,6 +2,7 @@
 from pymongo.mongo_client import MongoClient
 from dataclasses import dataclass,field
 import json
+from random import randint
 
 
 @dataclass
@@ -48,7 +49,7 @@ class MongoDBConstructor:
     class that connecting to the local mongo database and performing CRUD operations 
     with a help of methods and checking methods
     """
-    def __init__(self,uri:str,db:str,collection:str,user:str):
+    def __init__(self,uri:str,db:str,collection:str,user:str,max_records:int):
         """
         Attributes:
             uri (str): uri to connect to the mongodb database.
@@ -87,9 +88,10 @@ class MongoDBConstructor:
 
         #the user name
         self.user = {"name":user}
+        self.max_records = max_records
 
 
-    def user_exists(self):
+    def user_exists(self) ->bool:
         """
         checking if the user ixists in the database
         
@@ -120,67 +122,73 @@ class MongoDBConstructor:
                     'graph_permited': True,
                     'graph_db_type': 'general_graph',
                     'graph_records': {},
-                    'graph_repr': '1_row'
+                    'graph_repr': '1_row',
                     }
             # 
             self.collection.insert_one(data)
             return True
 
 
-    def drop_user_data(self):
+    def drop_user_data(self) -> None:
         self.collection.delete_one(self.user)
 
 
-    def graph_records(self):
+    def graph_records(self) -> dict:
         """
         queries the database to find the records if not found will return empty list
         """
-        found_records = self.collection.find_one(self.user,{"graph_records.records":1})
-        if found_records["graph_records"]:
-            found_records.pop("_id")
-            return found_records["graph_records"]["records"]
+        if self.user_exists():
+            found_records = self.collection.find_one(self.user,{"graph_records.records":1})
+            if found_records["graph_records"]:
+                found_records.pop("_id")
+                return found_records["graph_records"]["records"]
+            else:
+                return {}
         else:
-            return {}
-        
+            raise ValueError("the user not exists")
 
-    def dump_test_records(self):
+
+    def dump_test_records(self) -> None:
         #adding full list of records for TESTING ONLY!!!
         dump_data = {
-                '0': {
+                "1": {
                     'graph_title': 'Graph',
                     'graph_description': 'No Description',
                     'graph_type': 'bar_graph',
                     'created_at': '2023-12-5. 20:15',
                     'x': [ 'December 2023' ],
                     'y': [ 7491 ],
+                    'y_2':[],
+                    'sql_database':'income',
                     'start_date': '2023-11-26',
                     'end_date': '2024-01-06',
-                    'position': 1
                     },
-                '1': {
+                "2": {
                     'graph_title': 'Graph',
                     'graph_description': 'No Description',
                     'graph_type': 'bar_graph',
                     'created_at': '2023-12-5. 20:15',
                     'x': [ 'December 2023' ],
                     'y': [ 7491 ],
+                    'y_2':[],
+                    'sql_database':'income',
                     'start_date': '2023-11-26',
                     'end_date': '2024-01-06',
-                    'position': 2
                     }}
-
+        
         for key in dump_data:
             data = dump_data[key]
             name = key
             new_record_query = {
                 "$set":{
                     f"graph_records.records.{str(name)}":data
+
                 }
             }
             self.collection.update_one(self.user,new_record_query)
-        
 
-    def remove_record(self,required_record:str,delete_all=False) -> any :
+
+    def remove_record(self,required_record:str,delete_all=False) -> None :
         """
         method removes specific record by the record number provided from the arguments.
 
@@ -238,502 +246,224 @@ class MongoDBConstructor:
             raise ValueError("the user not exists")
 
 
-    def graph_positions(self):
+    def graph_positions(self) -> list:
+        """
+        method that returns a list of all positions inside the records
+        if no records will raise ValueError
+
+        Returns:
+            list of positions if exists 
+            ValueError if no records
+        """
 
         if self.user_exists():
             records = self.graph_records()
             if records:
                 positions = []
                 for keys in records:
-                    positions.append(records[keys]["position"])
+                    positions.append(str(keys))
                 return positions
             else:
                 raise ValueError("no records exists")
         raise ValueError("user not exists")
     
-    
-    def switch_records(self,current_graph_id,requested_position):
-        """ this method gets the users current record position and id and switching the places of the records positions.
-            example:user_ben :{
-                                record_1:data,
-                                record_2:data,
-                                record_3:data,
-                                }
-            each record placed in the same order as it will be represented in the web so 
-            to change the position we need to take for example record_3 and switch it with 1-
-            record_3 puts himself like this:
-            record_3:data,
-            record_2:data,
-            record_1:data
-            and add another key and value of the graph position in the web
+
+    def add_record(self,new_record:dict,position:int=0) -> None:
+        """ 
+        adding record to users mongo database 
+        
+        Args:
+            new_record (dict) : the data of the new record that need to be added
+            position (int) : default value is 0 and will do nothing 
+                if the position will have another value it will set the new_record position to this position argument value
         """
 
- #query filter to get the data of the specific user
-
-        #this is the current graph position and the current graph id
-        src_graph_position_cursor = self.db.get_collection(self.collection_name).find(self.user_filter,{f"graph_records.records.{current_graph_id}.position":1})
-        for graph_data in src_graph_position_cursor:
-            src_graph_position = (graph_data["graph_records"]["records"][str(current_graph_id)]["position"])
-        src_graph_id = current_graph_id
-
-        user_collection_records = self.db.get_collection(self.collection_name).find(self.user_filter,{"graph_records.records":1})
 
 
+        #if the user not exists it will create basic user record and then continue
+        if not self.user_exists():
+            self.create_basic_record()
+
+        #records list 
+        records = self.graph_records()
+
+
+        #first we checking if the users max records capacity is full 
+        if len(records) >= self.max_records:
+            max_record_exceded_message = f"you exceded the maximum records in the user. your maximum is: {self.max_records}"
+            print(max_record_exceded_message)
+            raise ValueError(max_record_exceded_message)
         
 
-
-        available_positions = self.available_positions(user=user,collection=self.collection_name)
-        if requested_position not in available_positions:
-            #! need to add some response to the user 
-            raise Exception("invalid position requested ")
-
-        else:
-            #this changes the current graph id to the requested graph position
-            src_record_change = {
-            "$set": {
-                f"graph_records.records.{src_graph_id}.position":requested_position
-            }}
-            # self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
-
-
-            #this changes the requested graph position to the current (switching the current and the requested places)
-            dst_graph_position = requested_position
-            dst_graph_id = self.find_graphID_by_position(collection_name=collection_name,user=user,position_value=requested_position)
-            dst_record_change = {
+        if int(position) > 0:
+            #the format of the new data
+            new_record_query = {
                 "$set":{
-                    f"graph_records.records.{dst_graph_id}.position":int(src_graph_position)
+                    f"graph_records.records.{position}":new_record
                 }
             }
 
-            #this two lines are updating the database with the new positions
-            self.db.get_collection(self.collection_name).update_one(query_filter,dst_record_change)
-            self.db.get_collection(self.collection_name).update_one(query_filter,src_record_change)
+            #the final result that will save the added record in the mongo db database
+            final = self.collection.update_one(self.user,new_record_query)
+            print(f"the record is added successfully. record number : {position}")
+            return None
 
 
-    def compare_record(self,collection_name:str,user:str,src_id:str,user_data:dict,max_record_amount):
+
+        if len(records) ==  0:
+
+            #the new record that will be created
+
+            #if its new record so its the first graph position
+            init_position = 1
+
+            #the format of the new data example:"graph_records.records.1:{"x":[1,2,3],"y":["t","y","l"]...}
+            graph_record = {
+                "$set":{
+                    f"graph_records.records.{init_position}":new_record,
+                }
+            }
+
+            self.collection.update_one(self.user,graph_record)
+            print(f"the record is added successfully. record number : {init_position}")
+            return None
+
+
+        #if user already have records in their mongo database
+        if len(records) > 0:
+
+            #position will be always len-1 and added to the end of the records
+            last_position = int((self.graph_positions())[-1])
+            new_position  = last_position + 1
+
+            #the format of the new data
+            new_record_query = {
+                "$set":{
+                    f"graph_records.records.{new_position}":new_record
+                }
+            }
+
+            #the final result that will save the added record in the mongo db database
+            final = self.collection.update_one(self.user,new_record_query)
+            print(f"the record is added successfully. record number : {position}")
+            return None
+
+
+    def switch_records(self,src_position:str,dst_position:str) -> None:
+        """
+        this method switching places the position number
+
+        Args:
+            src_position (str,int) : the source position
+            dst_position (str,int) : the destination position
+        """
+
+        #getting the user records
+        records = self.graph_records()
+        positions = self.graph_positions()
+        #checking if the src record exists
+
+        if str(src_position) not in positions:
+            raise ValueError("src_position is invalid")
+
+        if str(dst_position) not in positions:
+            raise ValueError("dst_position is invalid")
+
+        else:
+
+            src_data = records[str(src_position)]
+            dst_data = records[str(dst_position)]
+
+            # changing the src to dst
+            src_to_dst = {
+            "$set": {
+                f"graph_records.records.{dst_position}":src_data
+            }}
+            self.collection.update_one(self.user,src_to_dst)
+            
+            dst_to_src = {
+            "$set": {
+                f"graph_records.records.{src_position}":dst_data
+            }}
+            self.collection.update_one(self.user,dst_to_src)
+            return None    
+            
+
+    def compare_record(self,position_1:str,position_2:str) -> None:
         """
         this method checking that the compare record is having the same amount of months and returns 3 lists
         one with first graph y(values)
         second with second graph y_2(values)
         third is a list with the x(months)
         """
-        print("compare_record called")
+
         
-        #* first step i have to validate that there are the same amount of data in both graphs
-        # this is the source graph data
-        src_graph_data = self.db.get_collection(self.collection_name).find({"user_name":user},{f"graph_records.records.{src_id}":1})
+        records = self.graph_records()
+        #if the user dont have recods to compare
+        if not records:
+            raise ValueError("user dont have records")
+        #if the user have available records and more than 1
+        if len(records) > 1 :
+            first_compare_record = records[position_1]
+            second_compare_record_y = records[position_2]["y"]
 
-        dst_position = user_data["dst_position"]
-        #getting the dst_id by its position records
-        dst_id = self.find_graphID_by_position(collection_name="gr",user=user,position_value=dst_position)
-
-        # this is the destination graph data
-        dst_graph_data = self.db.get_collection(self.collection_name).find({"user_name":user},{f"graph_records.records.{dst_id}":1})
-
-        #* the comparement between the src graph and the dst graph
-        src_data = []
-        for src in src_graph_data:
-            src_data.append(src["graph_records"]["records"][src_id])
-        dst_data = []
-        for dst in dst_graph_data:
-            dst_data.append(dst["graph_records"]["records"][dst_id])
-
-
-        #*checking the length of the both keys and values for comparison
-        x_fields_validated = False
-        for index in range(len(src_data[0]["x"])):
-            #checking the values if the x are the same 
-            if src_data[0]["x"][index] == dst_data[0]["x"][index]:
-                #checking the length of both data
-                if len(src_data[0]["x"]) == len(dst_data[0]["x"]):
-                    x_fields_validated = True
-                else:
-                    print( "the src len is not the same")
-                    return "the src len is not the same"
-            else:
-                print("the src data and the dst data not matching")
-                return "the src data and the dst data not matching"
-        y_fields_validated = False
-        for index in range(len(src_data[0]["y"])):
-            #checking the length of both data
-            if len(src_data[0]["y"]) == len(dst_data[0]["y"]):
-                y_fields_validated = True
-            else:
-                print( "the src len is not the same")
-                return "the src len is not the same"
-
-        #
-        if y_fields_validated and x_fields_validated:
-
-            compared_dict = {"src_user_data":{src_id:src_data},"dst_user_data":{dst_id:dst_data}}
-
-
-            #if the fields true i will delete the records to create a new one that compared
-            self.remove_records(collection_name=self.collection_name,user=user,record_number=dst_id)
-            self.remove_records(collection_name=self.collection_name,user=user,record_number=src_id)
-
-
-            #to create a new one we have to add new data
             new_record = {
-                "graph_title":user_data["graph_title"],
-                "graph_description":user_data["graph_description"],
-                "graph_type":user_data["graph_type"],
-                "created_at" : "11-11-11",
-                "x":src_data[0]["x"],
-                "y_2":dst_data[0]["y"],
-                "y":src_data[0]["y"],
-                "start_date":user_data["start"],
-                "end_date":user_data["end"],
-                }
-            
-            #small check if the add compare graph was made from position "1" to something else so the position will be "1"
-            if src_data[0]["position"] == 1:
-                self.add_record(collection_name=self.collection_name,user=user,new_record=new_record,max_record_amount=max_record_amount,set_position=True)   
-            
-            else: 
-                self.add_record(collection_name=self.collection_name,user=user,new_record=new_record,max_record_amount=max_record_amount)
-
-            # return x1_values
-
-
-
-    def find_graphID_by_position(self,collection_name:str,user:str,position_value:int):
-        """this method will search the graph id by its position value inside each graph
-            it does a loop that iterates over the graph records(max graph records for now is 7)
-            the complexity is a o(n+1)
-            the 2 because it have nested for loop tha iterates only once and then enters the second for loop 
-        """
-        self.collection_name = collection_name
-        query_user_filter = {"user_name":user}
-        
-        # Construct the query
-        query = {
-            "graph_records.records":1
-        }
-
-        # Execute the query
-        result = self.db_gr_query.find(query_user_filter,query)
-
-        #first for loop loops only twice over the mongodb cursor object
-        for items in result:
-
-            #here it iterates over the dict and searching for the graph id by the matching position value
-            for record_id in items["graph_records"]["records"]:
-                if items["graph_records"]["records"][record_id]["position"] == position_value:
-                    found_id = record_id
-
-                    return found_id
-
-
-                # else:
-                #     print(items["graph_records"]["records"][record_id]["position"])
-            
-
-        # for i in aggregated_data:
-        #     print(i)
-    
-    def export_csv_data(self,collection_name:str,user:str,graph_id):
-        """this method returns the specific data needed to be exported the by the user """
-        user_filter = {"user_name":user}
-        projection = {f"graph_records.records.{graph_id}":1,"_id":0}
-
-        records_projection = self.db_gr_query.find(user_filter,projection)
-
-# [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
-
-        titles = []
-        content = []
-        for data in records_projection:
-            titles.append((data["graph_records"]["records"][str(graph_id)]).keys())
-            content.append((data["graph_records"]["records"][str(graph_id)]).values())
-
-        return list(titles[0]),list(content[0])
-        # return titles,content
-
-
-    # def import_csv_record(self,csv_data:dict):
-    #     for keys in csv_data:
-
-
-
-    def edit_record(self,collection_name:str,user,record_id:str,new_data:dict):
-        self.collection_name = collection_name
-        query = {"user_name": user}
-        projection = {"graph_records.records": 1, "_id": 0}
-        sort = [("graph_records.records", 1)]
-        query_filter = {"user_name":user} #query filter to get the data of the specific user
-
-
-        #the format of the new data
-        new_record_query = {
-            "$set":{
-                f"graph_records.records.{record_id}":new_data
-            }
-        }
-
-        result = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-        print(f"record: {record_id} is updated successfully")
-
-
-    def add_record(self,max_record_amount,collection_name:str,new_record:dict,user:str,many_records=False,set_position=False):
-        """ add method that creates collection if doesnt exists and writes 
-            data into the collection
-        """
-        self.collection_name = collection_name
-
-        query = {"user_name": user}
-        projection = {"graph_records.records": 1, "_id": 0}
-        sort = [("graph_records.records", 1)]
-
-
-        #this gives me the option to see the keys of the graph_records.records
-        records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
-
-
-
-        #this checking the users permission and its record capacity approved
-        #and return integer of the records approved
-        self.capacity_approved = max_record_amount
-
-
-        if len(records) >= self.capacity_approved:
-            max_record_exceded_message = f"you exceded the maximum records in the user. your maximum is: {self.capacity_approved}"
-            # raise Exception()
-            print(max_record_exceded_message)
-            return max_record_exceded_message
-        
-        #first time creating record
-        if len(records) ==  0:
-
-            #the new record that will be created
-            new_record_name = "0"
-            
-
-            #bellow section is responsible for formating the new record 
-            query_filter = {"user_name":user} #query filter to get the data of the specific user
-
-
-
-            #if its new record so its the first graph position
-            position = 1
-
-            #its the first time that the user dont have records it will create record number
-            # and a graph_position that shows us where it represented in the web-page
-            new_record['position'] = position
-
-
-
-            #the format of the new data example:"graph_records.records.1:{"x":[1,2,3],"y":["t","y","l"]...}
-            first_time_graph = {
-                "$set":{
-                    f"graph_records.records.{new_record_name}":new_record,
-                }
+                "graph_title":first_compare_record["graph_title"],
+                "graph_description":first_compare_record["graph_description"],
+                "graph_type":(first_compare_record["graph_type"])+"_compared",
+                "created_at":first_compare_record["created_at"],
+                "x":first_compare_record["x"],
+                "y":first_compare_record["y"],
+                "y_2":second_compare_record_y,
+                "sql_database":"income",
+                "sql_database_compared":"outcome",
+                "start_date":first_compare_record["start_date"],
+                "end_date":first_compare_record["end_date"],
             }
 
-            final = self.db.get_collection(self.collection_name).update_one(query_filter,first_time_graph)
+            #deleting the existing records and creating new one compared
+            self.remove_record(required_record=position_1)
+            self.remove_record(required_record=position_2)
 
-            #the final result that will save the added record in the mongo db database
+            self.add_record(new_record=new_record,position=position_1)
 
-
-            print(f"the record is added successfully. record number : {new_record_name}")
- 
-
-        
-        else:#this section is if the user already have records in the database 
-
-
-            #the record that saved last in the db
-            prev_record = list(records)[-1]
-
-            #the new record that will be created
-            new_record_name = str(int(prev_record)+1)
-
-            #the position will always be len(records) + 1 besause the add graph will be added to the end
-            #of the page by default
-            position = len(records)+1
-            # user_filter = {"user_name":user}
-            # position_data = {"$set":{"graph_records.position":position}}
-            # self.db.get_collection(self.collection_name).update_one(user_filter,position_data)
-            new_record["position"] = position
-            #bellow section is responsible for formating the new record 
-
-            query_filter = {"user_name":user} #query filter to get the data of the specific user
-
-            #the format of the new data
-            new_record_query = {
-                "$set":{
-                    f"graph_records.records.{new_record_name}":new_record
-                }
-            }
-
-            #the final result that will save the added record in the mongo db database
-            final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-            print(f"the record is added successfully. record number : {new_record_name}")
-
-
-        if set_position:
-
-
-            #the record that saved last in the db
-            if len(records) <= 1:
-                prev_record = list(records)[-1]
-                new_record_name = str(int(prev_record)+1)
-            else:
-                new_record_name = "0"
-            #the new record that will be created
-
-            #the position will always be len(records) + 1 besause the add graph will be added to the end
-            #of the page by default
-            position = 1
-            # user_filter = {"user_name":user}
-            # position_data = {"$set":{"graph_records.position":position}}
-            # self.db.get_collection(self.collection_name).update_one(user_filter,position_data)
-            new_record["position"] = position
-            #bellow section is responsible for formating the new record 
-
-            query_filter = {"user_name":user} #query filter to get the data of the specific user
-
-            #the format of the new data
-            new_record_query = {
-                "$set":{
-                    f"graph_records.records.{new_record_name}":new_record
-                }
-            }
-
-            #the final result that will save the added record in the mongo db database
-            final = self.db.get_collection(self.collection_name).update_one(query_filter,new_record_query)
-
-            print(f"the record is added successfully. record number : {new_record_name}")
-
-
-
-
-    def user_all_records(self,user,collection_name,return_int=True):
-        self.collection_name = collection_name
-
-        query = {"user_name": user}
-        projection = {"graph_records.records": 1, "_id": 0}
-        sort = [("graph_records.records", 1)]
-        if list(self.db.get_collection(self.collection_name).find(query,projection)):
-            records = list(self.db.get_collection(self.collection_name).find(query, projection).sort(sort))[0]["graph_records"]["records"]
-
-            if return_int:
-                return len(records)
-            
-            else:
-                return records
         else:
-            records = []
-            return records
+            raise ValueError("cant compare when have only one record")
 
 
-
-        
-
-
-    # def user_exists(self,collection_name:str,user:str):
-    #     query_filter = {
-    #         "user_name":user
-    #     }
-    #     user_found = list(self.db.get_collection(collection_name).find(query_filter))
-        
-    #     #if user exists
-    #     #! important that ill add another validation that the users exists but without the record and it will add the record
-    #     if user_found:
-    #         #if user have the records
-
-    #         # records_found = list(self.db.get_collection(collection_name).find(query_filter{"graph_records":""}))
-    #         # print(records_found)
-    #         # if records_found:
-    #         return True
-    #         # else:
-    #         #     new_user_data = {
-    #         #     "user_name":user,
-    #         #     "graph_records" : {
-                    
-    #         #     }
-    #         # }
-    #         #     new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
-    #         #     new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
-    #         #     return new_user_data_insertion
-
-        
-    #     if not user_found:
-
-    #         new_user_data = {
-    #             "user_name":user,
-    #             "graph_records" : {"records":{}
-    #             },
-    #             "graph_repr":"1_row"
-    #         }
-    #         new_user_data_insertion = self.db.get_collection(collection_name).insert_one(new_user_data)
-    #         new_user_data_insertion = f"{new_user_data} inserted into the mongodb"
-    #         return new_user_data_insertion
-
-
-    def get_insights(self,collection_name:str,user:str):
+    def edit_record(self,record_position:str,edit_data:dict) -> None:
         """
-        method that represents the insights data and returns it as a dict
+        method that gets the wanted record position and update it with the new data 
 
         Args:
-            collection_name(str) : collection name of the mongo database
-            user(str) : the specific user that we need to get insights
-        """
-        query_filter = {"user_name":user}
-        user_data = self.db_gr_query.find_one(query_filter)
-        print(user_data)
-
-
-    def find_data(self,collection_name:str,data):
-        """thid method is for testing or checking the data 
-            the syntax is the same as with pymongo querying
+            record_position (str) : specific record position that we want to edit.
+            edit_data (dict) : the new data that will be edited
         """
 
-        self.collection_name = collection_name
+        edit_record_query = {
+            "$set":{
+                f"graph_records.records.{record_position}":edit_data
+            }
+        }
+        self.collection.update_one(self.user,edit_record_query)
 
-        self.quered_data = self.db.get_collection(self.collection_name)
 
-        find_result = self.quered_data.find(data)
+    def find_data(self,data:dict) -> None:
+        """
+        mongodb.find wrapper method that can accept any raw mongodb find syntax:
+            filter,projection,sort.
+        
+        Args:
+            data (dict): the structure have to be like : {{filter},{projection},{sort}}
+
+        Returns:
+            print statment with the find result
+        """
+        find_result = self.collection.find_one(data)
 
         print("\n\nfind result ******************")
-        print("\n{}".format(find_result[0]))
+        print(find_result)
         print("\nfind result ********************")
-
-
-    def edit_graph_repr(self,collection_name:str,user:str,new_repr:str):
-        """
-        method that changing the users graph representation to one of these:1 row , 2 rows
-
-        Args:
-            collection_name(str):mongodb collection name
-            user(str):the user name that will be queried in the db
-            new_repr(str):new representation of the users graph page (1 row or 2 rows)        
-        """
-
-        filter_query = {"user_name":user}
-        new_query = {
-                "$set":{
-                    "graph_repr":new_repr,
-                }
-            }
-        self.db_gr_query.update_one(filter_query,new_query)
-
-
-    def save_insights(self,collection_name:str,user:str,insights_data:dict):
-        """
-        this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
-        mongodb and not with sql each get request
-
-        Args:
-            collection_name(str) : the collection name of the mongodb database.
-            user(str) : the user that we will querie in the mongodb
-            insights_data(dict) : this data will be saved in the db each time the method called 
-        """
-        filter_query = {"user_name":user}
-        new_query = {
-                "$set":insights_data
-            }
-        self.db_gr_query.update_one(filter_query,new_query)
 
 
     def get_record(self,collection_name:str,user_name:str,record_count=2):
@@ -840,9 +570,73 @@ class MongoDBConstructor:
                 return items
 
 
+    def edit_graph_repr(self,new_repr:str) -> None:
+        """
+        method that changing the users graph representation to one of these:1 row , 2 rows
+
+        Args:
+            collection_name(str):mongodb collection name
+            user(str):the user name that will be queried in the db
+            new_repr(str):new representation of the users graph page (1 row or 2 rows)        
+        """
+
+        new_query = {
+                "$set":{
+                    "graph_repr":new_repr,
+                }
+            }
+        
+        print(self.graph_records())
+        self.collection.update_one(self.user,new_query)
 
 
+    def get_insights(self,user:str):
+        """
+        method that represents the insights data and returns it as a dict
 
+        Args:
+            collection_name(str) : collection name of the mongo database
+            user(str) : the specific user that we need to get insights
+        """
+        query_filter = {"user_name":user}
+        user_data = self.db_gr_query.find_one(query_filter)
+        print(user_data)
+
+
+    def save_insights(self,collection_name:str,user:str,insights_data:dict):
+        """
+        this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
+        mongodb and not with sql each get request
+
+        Args:
+            collection_name(str) : the collection name of the mongodb database.
+            user(str) : the user that we will querie in the mongodb
+            insights_data(dict) : this data will be saved in the db each time the method called 
+        """
+        filter_query = {"user_name":user}
+        new_query = {
+                "$set":insights_data
+            }
+        self.db_gr_query.update_one(filter_query,new_query)
+
+
+    def export_csv_data(self,collection_name:str,user:str,graph_id):
+        """this method returns the specific data needed to be exported the by the user """
+        user_filter = {"user_name":user}
+        projection = {f"graph_records.records.{graph_id}":1,"_id":0}
+
+        records_projection = self.db_gr_query.find(user_filter,projection)
+
+# [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
+
+        titles = []
+        content = []
+        for data in records_projection:
+            titles.append((data["graph_records"]["records"][str(graph_id)]).keys())
+            content.append((data["graph_records"]["records"][str(graph_id)]).values())
+
+        return list(titles[0]),list(content[0])
+        # return titles,content
 
 ################### testing stages below ######################
 
@@ -870,6 +664,7 @@ my_new_data = [{
         }
     }
 }]
+
 
 
 
