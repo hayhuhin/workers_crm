@@ -24,8 +24,6 @@ class TestMongoDBConnectorClasses(TestCase):
         self.assertEqual(user_exists,False)
 
 
-
-
     def test_user_exists_return_True(self):
         # self.mdb = MongoDBConstructor(uri=self.uri,db="test",collection="test",user="ben")
         # self.mdb.drop_user_data()
@@ -36,7 +34,6 @@ class TestMongoDBConnectorClasses(TestCase):
         self.assertEqual(user_exists,True)
 
 
-
     def test_creating_basic_record_user_notExists(self):
         # self.mdb = MongoDBConstructor(uri=self.uri,db="test",collection="test",user="ben")
         # self.mdb.drop_user_data()
@@ -44,6 +41,7 @@ class TestMongoDBConnectorClasses(TestCase):
         #creating basic record if user not exists
         basic_record_created = self.mdb.create_basic_record()
         self.assertEqual(basic_record_created,True)
+
 
     def test_creating_basic_record_user_exists(self):
         # self.mdb = MongoDBConstructor(uri=self.uri,db="test",collection="test",user="ben")
@@ -91,7 +89,8 @@ class TestMongoDBConnectorClasses(TestCase):
                             'end_date': '2024-01-06',}}
         
         self.assertEqual(records_result,expected_data)
-        
+ 
+       
     def test_graph_records_returns_empty_list(self):
         # self.mdb = MongoDBConstructor(uri=self.uri,db="test",collection="test",user="ben")
         # self.mdb.drop_user_data()
@@ -113,10 +112,9 @@ class TestMongoDBConnectorClasses(TestCase):
         #creating first data
         self.mdb.create_basic_record()
         self.mdb.dump_test_records()
-        
         self.mdb.remove_record(required_record=1,delete_all=False)
         records_result = self.mdb.graph_records()
-        expected_result = {'2': {'graph_title': 'Graph', 
+        expected_result = {'1': {'graph_title': 'Graph', 
                                 'graph_description': 'No Description',
                                 'graph_type': 'bar_graph',
                                 'created_at': '2023-12-5. 20:15',
@@ -126,6 +124,7 @@ class TestMongoDBConnectorClasses(TestCase):
                                 "sql_database":"income",
                                 'start_date': '2023-11-26',
                                 'end_date': '2024-01-06'}}
+        self.maxDiff = None
         self.assertEqual(records_result,expected_result)
 
 
@@ -173,6 +172,7 @@ class TestMongoDBConnectorClasses(TestCase):
         user_exists = self.mdb.user_exists()
         self.assertEqual(user_exists,False)
 
+
     def test_graph_positions(self):
 
         #creating first data
@@ -185,6 +185,7 @@ class TestMongoDBConnectorClasses(TestCase):
 
         self.assertEqual(positions,expected_result)
 
+    
     def test_graph_positions_no_positions(self):
 
         #creating first data
@@ -584,9 +585,212 @@ class TestMongoDBConnectorClasses(TestCase):
         with self.assertRaises(ValueError,msg="cant compare when have only one record"):
             self.mdb.compare_record(position_1="1",position_2="2")
 
+
     def test_edit_graph_repr(self):
         self.mdb.create_basic_record()
         self.mdb.edit_graph_repr("2_row")
         data = self.mdb.find_data({"name":"ben"})
-        print(data)
+        expected_result = {'name': 'ben', 'db': 'test', 'collection': 'test', 'graph_permited': True, 'graph_db_type': 'general_graph', 'graph_records': {}, 'graph_repr': '2_row','ordered_list':[]
+}
+        self.assertEqual(data,expected_result)
 
+
+    def test_remove_record_begining(self):
+        self.mdb.create_basic_record()
+        # data = self.mdb.populate_record()
+        new_record = {
+                    'graph_title': 'test graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        
+        new_record2 = {
+                    'graph_title': 'test graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        new_record3 = {
+                    'graph_title': 'valeri',
+                    'graph_description': 'valeri',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        self.mdb.add_record(new_record=new_record3)
+        self.mdb.add_record(new_record=new_record)
+        self.mdb.add_record(new_record=new_record2)
+
+        self.mdb.remove_record(required_record="1")
+        newest = self.mdb.graph_records()
+        expected_result = {'1':
+                            {'graph_title': 'test graph', 'graph_description': 'some desc', 'graph_type': 'bar_graph', 'created_at': '2023-12-5. 20:15', 'x': ['December 2023', 'January 2023'], 'y': [7491, 22112], 'y_2': [], 'sql_database': 'income', 'start_date': '2023-11-26', 'end_date': '2024-01-06'}, '2': {'graph_title': 'test graph', 'graph_description': 'some desc', 'graph_type': 'bar_graph', 'created_at': '2023-12-5. 20:15', 'x': ['December 2023', 'January 2023'], 'y': [7491, 22112], 'y_2': [], 'sql_database': 'income', 'start_date': '2023-11-26', 'end_date': '2024-01-06'}}
+        self.assertEqual(newest,expected_result)
+
+
+    def test_remove_record_center(self):
+        self.mdb.create_basic_record()
+        # data = self.mdb.populate_record()
+        new_record = {
+                    'graph_title': 'first graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }     
+        new_record2 = {
+                    'graph_title': 'second graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        new_record3 = {
+                    'graph_title': 'third graph',
+                    'graph_description': 'valeri',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        self.mdb.add_record(new_record=new_record)
+        self.mdb.add_record(new_record=new_record2)
+        self.mdb.add_record(new_record=new_record3)
+
+        self.mdb.remove_record(required_record="2")
+        newest = self.mdb.graph_records()
+        expected_result = {'1':
+                                {
+                                'graph_title': 'first graph',
+                                'graph_description': 'some desc',
+                                'graph_type': 'bar_graph',
+                                'created_at': '2023-12-5. 20:15',
+                                'x': [ 'December 2023','January 2023'],
+                                'y': [ 7491,22112],
+                                'y_2':[],
+                                'sql_database':'income',
+                                'start_date': '2023-11-26',
+                                'end_date': '2024-01-06',
+                                },
+                            '2':{
+                                'graph_title': 'third graph',
+                                'graph_description': 'valeri',
+                                'graph_type': 'bar_graph',
+                                'created_at': '2023-12-5. 20:15',
+                                'x': [ 'December 2023','January 2023'],
+                                'y': [ 7491,22112],
+                                'y_2':[],
+                                'sql_database':'income',
+                                'start_date': '2023-11-26',
+                                'end_date': '2024-01-06',
+                            }}
+        self.assertEqual(newest,expected_result)
+
+
+    def test_remove_record_end(self):
+        self.mdb.create_basic_record()
+        # data = self.mdb.populate_record()
+        new_record = {
+                    'graph_title': 'first graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        
+        new_record2 = {
+                    'graph_title': 'second graph',
+                    'graph_description': 'some desc',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        new_record3 = {
+                    'graph_title': 'third',
+                    'graph_description': 'valeri',
+                    'graph_type': 'bar_graph',
+                    'created_at': '2023-12-5. 20:15',
+                    'x': [ 'December 2023','January 2023'],
+                    'y': [ 7491,22112],
+                    'y_2':[],
+                    'sql_database':'income',
+                    'start_date': '2023-11-26',
+                    'end_date': '2024-01-06',
+                    }
+        self.mdb.add_record(new_record=new_record)
+        self.mdb.add_record(new_record=new_record2)
+        self.mdb.add_record(new_record=new_record3)
+
+        self.mdb.remove_record(required_record="3")
+        newest = self.mdb.graph_records()
+        expected_result = {'1':
+                                {
+                                'graph_title': 'first graph',
+                                'graph_description': 'some desc',
+                                'graph_type': 'bar_graph',
+                                'created_at': '2023-12-5. 20:15',
+                                'x': [ 'December 2023','January 2023'],
+                                'y': [ 7491,22112],
+                                'y_2':[],
+                                'sql_database':'income',
+                                'start_date': '2023-11-26',
+                                'end_date': '2024-01-06',
+                                },
+                            '2':{
+                                'graph_title': 'second graph',
+                                'graph_description': 'some desc',
+                                'graph_type': 'bar_graph',
+                                'created_at': '2023-12-5. 20:15',
+                                'x': [ 'December 2023','January 2023'],
+                                'y': [ 7491,22112],
+                                'y_2':[],
+                                'sql_database':'income',
+                                'start_date': '2023-11-26',
+                                'end_date': '2024-01-06',
+                    }}
+        self.assertEqual(newest,expected_result)
+
+
+    

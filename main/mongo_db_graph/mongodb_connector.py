@@ -123,6 +123,7 @@ class MongoDBConstructor:
                     'graph_db_type': 'general_graph',
                     'graph_records': {},
                     'graph_repr': '1_row',
+                    'ordered_list':[]
                     }
             # 
             self.collection.insert_one(data)
@@ -185,8 +186,9 @@ class MongoDBConstructor:
 
                 }
             }
+            self.add_order_item(int(name))
             self.collection.update_one(self.user,new_record_query)
-
+            # self.add_record(dump_data)
 
     def remove_record(self,required_record:str,delete_all=False) -> None :
         """
@@ -227,15 +229,47 @@ class MongoDBConstructor:
                         raise ValueError("this record not exists")
 
                     else:
-                        #create the delte query dict
+                        #delete the requested record
                         delete_query = {
                             "$unset":{
                                 f"graph_records.records.{str(required_record)}":1,
                                 },
                             }
-                        #the final result that will save the added record in the mongo db database
                         self.collection.update_one(self.user,delete_query)
-                        print("the record deleted successfully")
+                        #deleting the ordered list 
+                        list_data = self.find_graph_ordered_list()
+                        target = int(required_record)-1
+                        list_data.pop(target)
+
+
+                        #getting the newest records(after deleting the required record)
+                        new_records = self.graph_records()
+                        
+                        #iterating over the requested index += 1
+                        for index in range(len(list_data)-target):
+                            #updates the list_data from [1,2,4] to [1,2,3]
+                            list_data[target] = list_data[target]-1
+                            
+
+                            #creating vars of new key and the old data {"3(new key)":"old data"}
+                            prev_index = list_data[target]+1
+                            prev_data = new_records[str(prev_index)]
+                            
+
+
+                            self.collection.update_one(self.user,{"$set":
+                                                                    {f"graph_records.records.{str(list_data[target])}":prev_data},
+                                                                    })
+                            #this removing the multiplied record
+                            # self.remove_record(required_record=prev_index)
+                            self.collection.update_one(self.user,{"$unset":{
+                                                                        f"graph_records.records.{prev_index}":1}})
+                            
+                            
+                            target += 1
+
+                        #updating the list data 
+                        self.update_ordered_list(list_data)
                         
                 
                 #if there are not records exists it will raise a ValueError
@@ -267,6 +301,31 @@ class MongoDBConstructor:
                 raise ValueError("no records exists")
         raise ValueError("user not exists")
     
+
+    def add_order_item(self,position:int) -> list:
+
+        ordered_list = (self.collection.find_one(self.user,{"ordered_list":1})["ordered_list"])
+        ordered_list.insert(position-1,position)
+        update_order_list = {
+            "$set":{
+                "ordered_list":ordered_list
+            }
+        }
+        self.collection.update_one(self.user,update_order_list)
+
+
+    def find_graph_ordered_list(self) -> list:
+        ordered_list = self.collection.find_one(self.user,{"ordered_list":1})["ordered_list"]
+        return ordered_list
+
+
+    def update_ordered_list(self,updated_list):
+
+        ordered_list = self.collection.update_one(self.user,
+                                                  {"$set":
+                                                    {"ordered_list":updated_list}
+                                                    })
+
 
     def add_record(self,new_record:dict,position:int=0) -> None:
         """ 
@@ -302,6 +361,9 @@ class MongoDBConstructor:
                     f"graph_records.records.{position}":new_record
                 }
             }
+            
+            #updating the ordered list
+            self.add_order_item(int(position))
 
             #the final result that will save the added record in the mongo db database
             final = self.collection.update_one(self.user,new_record_query)
@@ -324,6 +386,9 @@ class MongoDBConstructor:
                 }
             }
 
+            #updating the ordered list
+            self.add_order_item(int(init_position))
+
             self.collection.update_one(self.user,graph_record)
             print(f"the record is added successfully. record number : {init_position}")
             return None
@@ -343,10 +408,12 @@ class MongoDBConstructor:
                 }
             }
 
+            #updating the ordered list
+            self.add_order_item(int(new_position))
+
             #the final result that will save the added record in the mongo db database
             final = self.collection.update_one(self.user,new_record_query)
             print(f"the record is added successfully. record number : {position}")
-            return None
 
 
     def switch_records(self,src_position:str,dst_position:str) -> None:
@@ -422,8 +489,8 @@ class MongoDBConstructor:
             }
 
             #deleting the existing records and creating new one compared
-            self.remove_record(required_record=position_1)
             self.remove_record(required_record=position_2)
+            self.remove_record(required_record=position_1)
 
             self.add_record(new_record=new_record,position=position_1)
 
@@ -448,7 +515,7 @@ class MongoDBConstructor:
         self.collection.update_one(self.user,edit_record_query)
 
 
-    def find_data(self,data:dict) -> None:
+    def find_data(self,data:dict) -> list:
         """
         mongodb.find wrapper method that can accept any raw mongodb find syntax:
             filter,projection,sort.
@@ -460,114 +527,137 @@ class MongoDBConstructor:
             print statment with the find result
         """
         find_result = self.collection.find_one(data)
-
-        print("\n\nfind result ******************")
-        print(find_result)
-        print("\nfind result ********************")
+        find_result.pop("_id")
+        return find_result
 
 
-    def get_record(self,collection_name:str,user_name:str,record_count=2):
-        """method should return specific users x,y records of the graph
-            ARGS:
-                collection_name:the mongo db collection name as a string
-                user_name:the specific user that we want to extract record from
-                record_count:how many records to extract from the new to old .
-
-            return:
-                returns list of dicts with the records number as a key and the x and y as a value
-                with a date data.
+    def populate_record(self) -> None:
         """
-        collection = self.db[collection_name]
+        this method returns user graph data ordered by the position
+        each time this method called it will sort the data by using the quicksort
+        Returns:
+            returns list of dicts with the records number as a key and the x and y as a value
+            with a date data.
+        """
 
-        # Define the query, projection, and sort
-        query = {"user_name": user_name}
-        projection = {"graph_records.records": 1, "_id": 0}
-        sort = [("graph_records.records", 1)]
-
-        records_amount = 0
-
-        # Execute the query
+        #!###########################
+        #testing records
+        # new_record = {
+        #             'graph_title': 'test graph',
+        #             'graph_description': 'some desc',
+        #             'graph_type': 'bar_graph',
+        #             'created_at': '2023-12-5. 20:15',
+        #             'x': [ 'December 2023','January 2023'],
+        #             'y': [ 7491,22112],
+        #             'y_2':[],
+        #             'sql_database':'income',
+        #             'start_date': '2023-11-26',
+        #             'end_date': '2024-01-06',
+        #             }
         
-        if record_count == 0:
-            return None
+        # new_record2 = {
+        #             'graph_title': 'test graph',
+        #             'graph_description': 'some desc',
+        #             'graph_type': 'bar_graph',
+        #             'created_at': '2023-12-5. 20:15',
+        #             'x': [ 'December 2023','January 2023'],
+        #             'y': [ 7491,22112],
+        #             'y_2':[],
+        #             'sql_database':'income',
+        #             'start_date': '2023-11-26',
+        #             'end_date': '2024-01-06',
+        #             }
+        # new_record3 = {
+        #             'graph_title': 'test graph',
+        #             'graph_description': 'some desc',
+        #             'graph_type': 'bar_graph',
+        #             'created_at': '2023-12-5. 20:15',
+        #             'x': [ 'December 2023','January 2023'],
+        #             'y': [ 7491,22112],
+        #             'y_2':[],
+        #             'sql_database':'income',
+        #             'start_date': '2023-11-26',
+        #             'end_date': '2024-01-06',
+        #             }
+        
+        # self.add_record(new_record=new_record3)
+        # self.add_record(new_record=new_record)
+        # self.add_record(new_record=new_record2)
 
-        records_amount = len(list(collection.find(query, projection).sort(sort))[0]["graph_records"]["records"])
+        # return self.graph_records()
 
- 
-        #validating that the record count is not higher or smaller then the amount of records
-        if record_count > records_amount or record_count <= 0:
+        #quicksort implementation
+        data = self.find_data(self.user)
+        return data
 
-            print(f"you inserted {record_count} and this user has only {records_amount} records . please insert a valid number")
-            return None
 
-        else:
 
-            #! need to add check statment that if the user trying to switch the current position to position that doesnt exists
-            pipe_line = [
-    {
-        "$match": {"user_name": user_name}
-    },
-    {
-        "$project": {
-            "user_name": 1,
-            "graph_repr":1,
-            "current_year_income":1,
-            "current_year_spendings":1,
-            "max_records":1,
-            "total_records":1,
-            "lastrecords": {
-                "$slice": [
-                    {
-                        "$map": {
-                            "input": {"$objectToArray": "$graph_records.records"},
-                            "as": "record",
-                            "in": {
-                                "k": "$$record.k",
-                                "v": "$$record.v"
-                            }
-                        }
-                    },
-                    -record_count
-                ]
-            }
-        }
-    },
-    {
-        "$unwind": "$lastrecords"
-    },
-    {
-        "$sort": {
-            "lastrecords.v.position": 1  # Sort by the keys (assuming they are strings representing numbers)
-        }
-    },
-    {
-        "$group": {
-            "_id": "$_id",
-            "user_name": {"$first": "$user_name"},
-            "graph_repr":{"$first":"$graph_repr"},
-            "max_records":{"$first":"$max_records"},
-            "total_records":{"$first":"$,total_records"},
-            "current_year_income":{"$first":"$current_year_income"},
-            "current_year_spendings":{"$first":"$current_year_spendings"},
-            "lastrecords": {"$push": "$lastrecords"}
-        }
-    }
-]
+
+
+#             #! need to add check statment that if the user trying to switch the current position to position that doesnt exists
+#         pipe_line = [{
+#         "$match": {self.user}},
+#             {
+#             "$project": {
+#                     "user_name": 1,
+#                     "graph_repr":1,
+#                     "current_year_income":1,
+#                     "current_year_spendings":1,
+#                     "max_records":1,
+#                     "total_records":1,
+#                     "lastrecords": {
+#                         "$slice": [
+#                         {
+#                             "$map": {
+#                                 "input": {"$objectToArray": "$graph_records.records"},
+#                                 "as": "record",
+#                                 "in": {
+#                                     "k": "$$record.k",
+#                                     "v": "$$record.v"
+#                                 }
+#                             }
+#                         },
+#                         -record_count
+#                     ]
+#                 }
+#             }
+#         },
+#     {
+#         "$unwind": "$lastrecords"
+#     },
+#     {
+#         "$sort": {
+#             "lastrecords.v.position": 1  # Sort by the keys (assuming they are strings representing numbers)
+#         }
+#     },
+#     {
+#         "$group": {
+#             "_id": "$_id",
+#             "user_name": {"$first": "$user_name"},
+#             "graph_repr":{"$first":"$graph_repr"},
+#             "max_records":{"$first":"$max_records"},
+#             "total_records":{"$first":"$,total_records"},
+#             "current_year_income":{"$first":"$current_year_income"},
+#             "current_year_spendings":{"$first":"$current_year_spendings"},
+#             "lastrecords": {"$push": "$lastrecords"}
+#         }
+#     }
+# ]
             
 
-            aggregated_data = self.db.gr.aggregate(pipeline=pipe_line)
+#             aggregated_data = self.db.gr.aggregate(pipeline=pipe_line)
 
-            # return aggregated_data
-            for items in aggregated_data:
-                #the total records here only for user representation
-                total_records = {"total_records":records_amount}
+#             # return aggregated_data
+#             for items in aggregated_data:
+#                 #the total records here only for user representation
+#                 total_records = {"total_records":records_amount}
 
-                # print(items["max_records"])
-                # print(items["max_records"])
-                # print(items["current_year_income"])
-                # print(items["current_year_spendings"])
-                print(items["lastrecords"][0]["v"])
-                return items
+#                 # print(items["max_records"])
+#                 # print(items["max_records"])
+#                 # print(items["current_year_income"])
+#                 # print(items["current_year_spendings"])
+#                 print(items["lastrecords"][0]["v"])
+#                 return items
 
 
     def edit_graph_repr(self,new_repr:str) -> None:
@@ -586,7 +676,7 @@ class MongoDBConstructor:
                 }
             }
         
-        print(self.graph_records())
+        
         self.collection.update_one(self.user,new_query)
 
 
