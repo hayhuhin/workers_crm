@@ -58,19 +58,20 @@ class MongoDBConstructor:
             user (str):user name that we will query 
         Methods:
             user_exists(self) -> boolean :
-                queries the mongodb database and checking if any record exists with this username
+                queries the mongodb database and checking if \n \t\trecord exists for specific user
             create_basic_record(self) -> True or raises Value error:
-                adding simple first record to the mongo database and returns True.
-                if there is already user exists it will raise ValueError.
+                adding simple first record to the mongo database.
+                returns bool if user already exists or not.
             drop_user_data(self) - None :
-                drops the specific users data
+                drops the specific users data by the user name
             graph_records(self) -> dict:
-                queries the database and searching for user specific records.
-                if no records it will return empty list
+                queries the database and searching for user \n\t\tspecific records.
+                if records exists - > returns dict with the data
+                if no records -> returns empty dict
             dump_test_records(self) - > None:
-                FOR TESTING ONLY-- adds two random records to the users records database.
+                FOR TESTING ONLY-- adds two random records to the \n\t\tusers records database.
             remove_record(self,required_record,delete_all) -> None
-                this method removes specific record or deleting all records.
+                this method removes specific record or deleting all\n\t\t records.
             
 
         """
@@ -93,20 +94,20 @@ class MongoDBConstructor:
 
     def user_exists(self) ->bool:
         """
-        checking if the user ixists in the database
+        checking if the user exists in the database
         
         Returns:
-            if user exists returns True
-            if not exists return False
+            if exists -> True
+            if not exists -> False
         """
         
         #query to find the user
-        records = self.collection.find_one(self.user)
+        user = self.collection.find_one(self.user)
         
-        if not records:
+        if not user:
             return False
 
-        if records:
+        if user:
             return True
 
 
@@ -131,6 +132,13 @@ class MongoDBConstructor:
 
 
     def drop_user_data(self) -> None:
+        """
+        deletes the database of the specific user.
+
+        Returns:
+            None.
+        """
+
         self.collection.delete_one(self.user)
 
 
