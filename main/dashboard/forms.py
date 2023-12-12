@@ -95,8 +95,8 @@ class CompareGraphForm(forms.Form):
         ("outcome","Outcome")]
     
     graph_options = [
-        ("bar_graph_compare","Bar graph"),
-        ("line_graph_compare","Line Graph")]
+        ("bar_graph","Bar graph"),
+        ("line_graph","Line Graph")]
   
     graph_title = forms.CharField(max_length=50,widget=forms.TextInput(attrs={'hidden':'hidden'}))
     graph_description = forms.CharField(max_length=300,widget=forms.TextInput(attrs={'hidden':'hidden'}))

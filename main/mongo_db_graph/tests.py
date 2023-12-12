@@ -563,7 +563,7 @@ class TestMongoDBConnectorClasses(TestCase):
         self.mdb.create_basic_record()
         with self.assertRaises(ValueError):
             data = self.mdb.graph_records()
-            print(data)
+
             self.mdb.compare_record(position_1="1",position_2="2")
 
 
@@ -793,4 +793,136 @@ class TestMongoDBConnectorClasses(TestCase):
         self.assertEqual(newest,expected_result)
 
 
-    
+
+    def test_compare_graph_with_7_records(self):
+        self.mdb.create_basic_record()
+        record1 = {
+            'graph_title': 'first graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record2 = {
+            'graph_title': 'second graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record3 = {
+            'graph_title': 'third graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record4 = {
+            'graph_title': 'forth graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record5 = {
+            'graph_title': 'fifth graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record6 = {
+            'graph_title': 'sixth graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        record7 = {
+            'graph_title': 'sevnth graph',
+            'graph_description': 'some desc',
+            'graph_type': 'bar_graph',
+            'created_at': '2023-12-5. 20:15',
+            'x': [ 'December 2023','January 2023'],
+            'y': [ 7491,22112],
+            'y_2': [],
+            'sql_database':'income',
+            'start_date': '2023-11-26',
+            'end_date': '2024-01-06',
+            }
+        
+        self.mdb.add_record(record1)
+        self.mdb.add_record(record2)
+        self.mdb.add_record(record3)
+        self.mdb.add_record(record4)
+        self.mdb.add_record(record5)
+        self.mdb.add_record(record6)
+        self.mdb.add_record(record7)
+
+        #here im going to check different things in one method
+
+        #comparing last elem with the first
+        self.mdb.compare_record(position_1="7",position_2="1")
+        records = self.mdb.graph_records()
+        records_num = [i for i in records]
+        self.assertEqual(records_num,["1","2","3","4","5","6"])
+
+        #deleting elem in the same index of the compare function
+        self.mdb.remove_record(required_record="3")
+        self.mdb.compare_record("3","5")
+        records = self.mdb.graph_records()
+        records_num = [i for i in records]
+        self.assertEqual(records_num,["1","2","3","4"])
+
+        #adding record and then comparing them togheter
+        self.mdb.add_record(new_record=record1)
+        self.mdb.compare_record(position_1="5",position_2="1")
+        records = self.mdb.graph_records()
+        records_num = [i for i in records]
+        self.assertEqual(records_num,["1","2","3","4"])
+
+
+        #adding record and then comparing the first and the last
+        self.mdb.add_record(new_record=record1)
+        self.mdb.compare_record(position_1="1",position_2="5")
+        records = self.mdb.graph_records()
+        records_num = [i for i in records]
+        self.assertEqual(records_num,["1","2","3","4"])
+
+
+        #adding record and then comparing the first and the last
+        self.mdb.add_record(new_record=record1)
+        self.mdb.compare_record(position_1=1,position_2=5)
+        records = self.mdb.graph_records()
+        records_num = [i for i in records]
+        self.assertEqual(records_num,["1","2","3","4"])

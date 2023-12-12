@@ -190,6 +190,7 @@ class MongoDBConstructor:
             self.collection.update_one(self.user,new_record_query)
             # self.add_record(dump_data)
 
+
     def remove_record(self,required_record:str,delete_all=False) -> None :
         """
         method removes specific record by the record number provided from the arguments.
@@ -211,7 +212,7 @@ class MongoDBConstructor:
             if delete_all:
                 #deletes the whole user data from the database
                     self.collection.delete_one(self.user)
-                    print(f"the {self.user} deleted from the database")
+                    # print(f"the {self.user} deleted from the database")
 
 
             #if delete_all is False
@@ -226,7 +227,7 @@ class MongoDBConstructor:
                 if records:
                     #this checking if the required_record exists inside the  records and if not then it will return an error
                     if str(required_record) not in records:
-                        raise ValueError("this record not exists")
+                        raise ValueError(f"this record  not exists")
 
                     else:
                         #delete the requested record
@@ -244,6 +245,7 @@ class MongoDBConstructor:
 
                         #getting the newest records(after deleting the required record)
                         new_records = self.graph_records()
+
                         
                         #iterating over the requested index += 1
                         for index in range(len(list_data)-target):
@@ -251,11 +253,10 @@ class MongoDBConstructor:
                             list_data[target] = list_data[target]-1
                             
 
+
                             #creating vars of new key and the old data {"3(new key)":"old data"}
                             prev_index = list_data[target]+1
                             prev_data = new_records[str(prev_index)]
-                            
-
 
                             self.collection.update_one(self.user,{"$set":
                                                                     {f"graph_records.records.{str(list_data[target])}":prev_data},
@@ -327,7 +328,7 @@ class MongoDBConstructor:
                                                     })
 
 
-    def add_record(self,new_record:dict,position:int=0) -> None:
+    def add_record(self,new_record:dict,position:int=0,ignore_max:bool=False) -> None:
         """ 
         adding record to users mongo database 
         
@@ -348,7 +349,7 @@ class MongoDBConstructor:
 
 
         #first we checking if the users max records capacity is full 
-        if len(records) >= self.max_records:
+        if len(records) >= self.max_records and ignore_max == False:
             max_record_exceded_message = f"you exceded the maximum records in the user. your maximum is: {self.max_records}"
             print(max_record_exceded_message)
             raise ValueError(max_record_exceded_message)
@@ -367,7 +368,7 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
             final = self.collection.update_one(self.user,new_record_query)
-            print(f"the record is added successfully. record number : {position}")
+            # print(f"the record is added successfully. record number : {position}")
             return None
 
 
@@ -390,7 +391,7 @@ class MongoDBConstructor:
             self.add_order_item(int(init_position))
 
             self.collection.update_one(self.user,graph_record)
-            print(f"the record is added successfully. record number : {init_position}")
+            # print(f"the record is added successfully. record number : {init_position}")
             return None
 
 
@@ -413,7 +414,7 @@ class MongoDBConstructor:
 
             #the final result that will save the added record in the mongo db database
             final = self.collection.update_one(self.user,new_record_query)
-            print(f"the record is added successfully. record number : {position}")
+            # print(f"the record is added successfully. record number : {position}")
 
 
     def switch_records(self,src_position:str,dst_position:str) -> None:
@@ -463,8 +464,13 @@ class MongoDBConstructor:
         second with second graph y_2(values)
         third is a list with the x(months)
         """
+        #transforms it to strings
+        #! ill add another method that will check the types of the inserted data before passing the args 
+        #! into the class/method
+        position_1 = str(position_1)
+        position_2 = str(position_2)
 
-        
+
         records = self.graph_records()
         #if the user dont have recods to compare
         if not records:
@@ -489,11 +495,19 @@ class MongoDBConstructor:
             }
 
             #deleting the existing records and creating new one compared
-            self.remove_record(required_record=position_2)
-            self.remove_record(required_record=position_1)
+            ordered_list = self.find_graph_ordered_list()
+            #adding the new compared graph to the end of the list
+            # ordered_list.append(len(ordered_list))
+            self.update_ordered_list(ordered_list)
 
-            self.add_record(new_record=new_record,position=position_1)
-
+            self.add_record(new_record=new_record,ignore_max=True)
+            if int(position_1) > int(position_2):
+                self.remove_record(required_record=position_1)
+                self.remove_record(required_record=int(position_2))
+            else:
+                self.remove_record(required_record=int(position_2))
+                self.remove_record(required_record=int(position_1))
+          
         else:
             raise ValueError("cant compare when have only one record")
 
@@ -531,7 +545,7 @@ class MongoDBConstructor:
         return find_result
 
 
-    def populate_record(self) -> None:
+    # def return_(self) -> None:
         """
         this method returns user graph data ordered by the position
         each time this method called it will sort the data by using the quicksort
@@ -591,75 +605,6 @@ class MongoDBConstructor:
         return data
 
 
-
-
-
-#             #! need to add check statment that if the user trying to switch the current position to position that doesnt exists
-#         pipe_line = [{
-#         "$match": {self.user}},
-#             {
-#             "$project": {
-#                     "user_name": 1,
-#                     "graph_repr":1,
-#                     "current_year_income":1,
-#                     "current_year_spendings":1,
-#                     "max_records":1,
-#                     "total_records":1,
-#                     "lastrecords": {
-#                         "$slice": [
-#                         {
-#                             "$map": {
-#                                 "input": {"$objectToArray": "$graph_records.records"},
-#                                 "as": "record",
-#                                 "in": {
-#                                     "k": "$$record.k",
-#                                     "v": "$$record.v"
-#                                 }
-#                             }
-#                         },
-#                         -record_count
-#                     ]
-#                 }
-#             }
-#         },
-#     {
-#         "$unwind": "$lastrecords"
-#     },
-#     {
-#         "$sort": {
-#             "lastrecords.v.position": 1  # Sort by the keys (assuming they are strings representing numbers)
-#         }
-#     },
-#     {
-#         "$group": {
-#             "_id": "$_id",
-#             "user_name": {"$first": "$user_name"},
-#             "graph_repr":{"$first":"$graph_repr"},
-#             "max_records":{"$first":"$max_records"},
-#             "total_records":{"$first":"$,total_records"},
-#             "current_year_income":{"$first":"$current_year_income"},
-#             "current_year_spendings":{"$first":"$current_year_spendings"},
-#             "lastrecords": {"$push": "$lastrecords"}
-#         }
-#     }
-# ]
-            
-
-#             aggregated_data = self.db.gr.aggregate(pipeline=pipe_line)
-
-#             # return aggregated_data
-#             for items in aggregated_data:
-#                 #the total records here only for user representation
-#                 total_records = {"total_records":records_amount}
-
-#                 # print(items["max_records"])
-#                 # print(items["max_records"])
-#                 # print(items["current_year_income"])
-#                 # print(items["current_year_spendings"])
-#                 print(items["lastrecords"][0]["v"])
-#                 return items
-
-
     def edit_graph_repr(self,new_repr:str) -> None:
         """
         method that changing the users graph representation to one of these:1 row , 2 rows
@@ -693,7 +638,7 @@ class MongoDBConstructor:
         print(user_data)
 
 
-    def save_insights(self,collection_name:str,user:str,insights_data:dict):
+    def save_insights(self,user:str,insights_data:dict):
         """
         this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
         mongodb and not with sql each get request
@@ -717,7 +662,7 @@ class MongoDBConstructor:
 
         records_projection = self.db_gr_query.find(user_filter,projection)
 
-# [['Column 1', 'Column 2'], ['Value 1', 'Value 2']]
+
 
         titles = []
         content = []
