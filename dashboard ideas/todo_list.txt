@@ -66,10 +66,6 @@ FIX:user can change position when there is no other positions and it breaks the 
 
 task 6:
     << on hold >>
-ADD:change the profile page to look much more updated and nice for the end user - 
-ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
-    1.export CSV - DONE
-    2.import CSV - DONE
 migrate into the django the mongodb database - CANCELED : not needed because the pymongo suits my right needs
 ADD:change graph position - DONE
 
@@ -78,23 +74,23 @@ ADD:another bar/line for comparing - !!! to create a comparing first i must to f
 https://plotly.com/python/bar-charts/
 
 ADD:need to handle the outcome adding data to db !! - DONE
+ADD:smaller data insight on the dashboard page - done
+FIX:refactoring and documentation for all mongodb classes and methods !!!! - done
+ADD:TESTS FOR EACH FUNCTION - done
+ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
+
+
+
+
+
+
+
 
 
 <<working on >>
-ADD:smaller data insight on the dashboard page - done
->>>>>>> 643e20f4f9da1ebf009822bc54e60fd6f75360ce
 
-
-############################################################
-FIX:refactoring and documentation for all classes and methods !!!!
-ADD:TESTS FOR EACH FUNCTION
-############################################################
-
-
-ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
 ADD:visually change the graph presentation to look clean - 
-FIX:dashboard.views hirarcy of the code -
->>>>>>> 643e20f4f9da1ebf009822bc54e60fd6f75360ce
+FIX:dashboard.views hirarcy of the code - done
 
 #MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
 https://docs.djangoproject.com/en/4.2/topics/security/#user-uploaded-content-security
@@ -105,3 +101,10 @@ add logic to the home page that will represent the usage of the crm with a descr
 
 
 ADD:cache/save the data (to prevent the sql querieng every time the user sending get request/refreshing the page)
+
+ADD:change the profile page to look much more updated and nice for the end user - 
+ADD:make the dashboard page look good (ui frameworks or some frontend libraries)
+ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
+    1.export CSV - DONE
+    2.import CSV - DONE
+

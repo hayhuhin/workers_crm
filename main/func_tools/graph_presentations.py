@@ -6,7 +6,6 @@ import plotly.graph_objects as go
 
 
 
-
 class GraphRepresantation(object):
     """
     this class is a wrapper for the plotly library.
@@ -50,7 +49,7 @@ class GraphRepresantation(object):
         self.presentation = presentation
         self.template = 'plotly_dark'
         self.currant_path = Path.cwd()
-        self.graph_repr_sizes = {"1_row":{"x":900,"y":500},"2_row":{"x":480,"y":500}}
+        self.graph_repr_sizes = {"1_row":{"x":900,"y":500},"2_row":{"x":480,"y":300}}
 
         self.visuals_data = {"paper_bgcolor":"rgba(0,0,0,0)",
                               "plot_bgcolor": "rgba(0, 0, 0, 0)",
@@ -86,9 +85,9 @@ class GraphRepresantation(object):
               return self.donut_graph(dict_values=dict_values,path=path,to_html=to_html)
           if graph_type == self.line_graph.__name__:
               return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,graph_repr=graph_repr)
-          if graph_type == "bar_graph_compare":
+          if graph_type == "bar_graph_compared":
               return self.bar_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
-          if graph_type == "line_graph_compare":
+          if graph_type == "line_graph_compared":
               return self.line_graph(dict_values=dict_values,path=path,to_html=to_html,compare=True,graph_repr=graph_repr)
           else:
               raise ValueError("the correct value must be existing graph type")
@@ -126,7 +125,7 @@ class GraphRepresantation(object):
             graph_fig.update_layout(paper_bgcolor=self.visuals_data["paper_bgcolor"],
                                     plot_bgcolor= self.visuals_data["plot_bgcolor"],
                                     modebar=self.visuals_data["modebar"],
-                                    width=x_size,
+                                    # width=x_size,
                                     height=y_size,
     )        #updating the textfont size
             graph_fig.update_traces(textfont_size=12)
@@ -144,7 +143,7 @@ class GraphRepresantation(object):
                   x=dict_values["x"],
                   y=[dict_values["y"], dict_values["y_2"]],
                   labels={'value': 'Income', 'x':'Date','variable': 'amount'},
-                  title=dict_values["graph_description"],
+                  title=f"blue is {dict_values['DB_1']} orange is {dict_values['DB_2']}",
                   color_discrete_sequence=['blue', 'orange'],  # Set custom colors
                   template=self.template,
               )
@@ -153,8 +152,10 @@ class GraphRepresantation(object):
                                       paper_bgcolor=self.visuals_data["paper_bgcolor"],
                                       plot_bgcolor= self.visuals_data["plot_bgcolor"],
                                       modebar=self.visuals_data["modebar"],
-                                      width=x_size,
+                                      # width=x_size,
                                       height=y_size,
+                                      bargap=0.2,
+                                      bargroupgap=0.2,
               )
 
               graph_fig.update_traces(textfont_size=12)
@@ -207,8 +208,8 @@ class GraphRepresantation(object):
           line_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
                                 plot_bgcolor = "rgba(0,0,0,0)",
                                 modebar={'bgcolor':'rgba(0, 0, 0, 0)'},
-                                width=x_size,
-                                height=y_size
+                                # width=x_size,
+                                # height=y_size
                                 )
           line_fig.update_traces(textfont_size=12,text='percent+label')
           line_fig.update_xaxes(tickangle=-45)
@@ -224,7 +225,7 @@ class GraphRepresantation(object):
                 x=group,
                 y=[values_1, values_2],
                 labels={'value': 'Income', 'x':'Date',},
-                title=dict_values["graph_description"],
+                  title=f"blue is {dict_values['DB_1']} orange is {dict_values['DB_2']}",
                 color_discrete_sequence=['blue', 'orange'],  # Set custom colors
                 template=self.template,
             )
@@ -277,7 +278,7 @@ class GraphRepresantation(object):
         """
 
         #first we are validating the dict_values(they must in the list)
-        proper_values = ["graph_title","graph_description","graph_type","created_at","x","y","y_2","start_date","end_date","position"]
+        proper_values = ["graph_title","graph_description","graph_type","created_at","x","y","y_2","start_date","end_date","position","DB_1","DB_2","sql_database_compared","sql_database"]
 
         for key in dict_values:
             if key in proper_values:
@@ -297,15 +298,15 @@ class GraphRepresantation(object):
                 raise ValueError("x/y/y_2 value types are invalid")
             
             #check if the y_2 compare is existing
-            if "y_2" in dict_values:
-                if not isinstance(dict_values["y_2"][index],int):
-                  raise ValueError("x/y/y_2 value types are invalid")
+            # if "y_2" in dict_values:
+            #     if not isinstance(dict_values["y_2"][index],int):
+            #       raise ValueError("x/y/y_2 value types are invalid")
                 
-        #check if the y_2 exists
-        if "y_2" in dict_values:
-            #if y_2 exists and if the len is the same
-            if len(dict_values["y_2"]) != len(dict_values["x"]):
-                raise ValueError("len x is not the same as y")
+        # #check if the y_2 exists
+        # if "y_2" in dict_values:
+        #     #if y_2 exists and if the len is the same
+        #     if len(dict_values["y_2"]) != len(dict_values["x"]):
+        #         raise ValueError("len x is not the same as y")
         #check if the len(x) same as len(y)
         if len(dict_values["x"]) != len(dict_values["y"]):
             raise ValueError("len x is not the same as y")

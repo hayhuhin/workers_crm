@@ -1,24 +1,5 @@
 import csv
-import datetime
-import re
-import json
-
-
-            # class AddGraphForm(forms.Form):
-
-            #     graph_title = forms.CharField(max_length=50,initial="Graph")
-            #     graph_description = forms.CharField(max_length=400,initial="No Description")
-            #     start_date = forms.DateField()
-            #     end_date = forms.DateField()
-            #     # db = forms.CharField(max_length=100)
-            #     db = forms.CharField(
-            #         max_length=100,
-            #         widget=forms.TextInput(attrs={'hidden': 'hidden'})
-            #     )
-            #     graph = forms.CharField(
-            #         max_length=100,
-            #         widget=forms.TextInput(attrs={'hidden': 'hidden'})
-        #     )
+import datetime,re,json,io
 
 
 
@@ -234,3 +215,11 @@ test_class_validation = FileValidator(file_data=["sasa","sasa"],file_max_size=1)
 graph_default_data_test = ["graph_title","graph_description","graph_type","created_at","x","y","position"]
 # result = test_class_validation.validate_keys(keys_data=graph_default_data_test,ordered_check=True)
 # print(result)
+
+
+def generate_csv(graph_data):
+    # Your data source (replace this with your data retrieval logic)
+    csv_data = io.StringIO()
+    csv_writer = csv.writer(csv_data)
+    csv_writer.writerows(graph_data)
+    return csv_data.getvalue()

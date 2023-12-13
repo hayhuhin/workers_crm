@@ -106,7 +106,7 @@ class GraphCalculator:
 
         if db == "income":
             full_amount_summary = self.db[0].objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
-            month_year_repr= first_day_datetime_object.strftime("%B %Y")
+            month_year_repr= (first_day_datetime_object.strftime("%B")[0:3] +" "+ (first_day_datetime_object.strftime("%Y"))[2:])
 
             if full_amount_summary: 
                 return month_year_repr,full_amount_summary
@@ -116,7 +116,7 @@ class GraphCalculator:
             
         if db == "outcome":
             full_amount_summary = self.db[1].objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
-            month_year_repr= first_day_datetime_object.strftime("%B %Y")
+            month_year_repr= (first_day_datetime_object.strftime("%B")[0:3] +" "+ (first_day_datetime_object.strftime("%Y"))[2:])
 
             if full_amount_summary: 
                 return month_year_repr,full_amount_summary

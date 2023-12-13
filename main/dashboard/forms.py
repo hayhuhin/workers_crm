@@ -43,17 +43,14 @@ class EditGraphForm(forms.Form):
         # widget=forms.TextInput(attrs={'style':'visibility: hidden; position: absolute;'}),
 
     graph = forms.ChoiceField(choices=graph_options
-        # max_length=100,
-        # widget=forms.TextInput(attrs={'hidden':'hidden'}),
-
 
     )
 
 class DeleteGraphForm(forms.Form):
-    graph_id = forms.IntegerField(widget=forms.HiddenInput())
+    graph_position = forms.IntegerField(widget=forms.HiddenInput())
 
 
-class ChangeGraphPosition(forms.Form):
+class ChangeGraphPositionForm(forms.Form):
     src_graph_id = forms.IntegerField(widget=forms.TextInput(attrs={'hidden':'hidden'}))
     dst_graph_id = forms.IntegerField(max_value=8)
 
@@ -109,14 +106,14 @@ class CompareGraphForm(forms.Form):
     dst_position = forms.IntegerField(max_value=8)
 
 
-class EditGraphRow(forms.Form):
+class EditGraphRowForm(forms.Form):
     row_options = [
         ("graph_representation","Graph Representation"),("1_row","One Row"),("2_row","Two Row")
     ]
     row_repr = forms.ChoiceField(choices=row_options)
     
 
-class AddInsights(forms.Form):
+class AddInsightsForm(forms.Form):
     year_choices = [
         (0,"0"),(2023,"2023"),(2024,"2024"),(2025,"2025")
     ]

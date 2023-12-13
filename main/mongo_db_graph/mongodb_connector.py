@@ -57,21 +57,57 @@ class MongoDBConstructor:
             collection (str) : collection name.
             user (str):user name that we will query 
         Methods:
-            user_exists(self) -> boolean :
+            user_exists() -> boolean :
                 queries the mongodb database and checking if \n \t\trecord exists for specific user
-            create_basic_record(self) -> True or raises Value error:
+
+            create_basic_record() -> True or raises Value error:
                 adding simple first record to the mongo database.
                 returns bool if user already exists or not.
-            drop_user_data(self) - None :
+
+            drop_user_data() - None :
                 drops the specific users data by the user name
-            graph_records(self) -> dict:
+
+            graph_records() -> dict:
                 queries the database and searching for user \n\t\tspecific records.
                 if records exists - > returns dict with the data
                 if no records -> returns empty dict
-            dump_test_records(self) - > None:
+
+            add_record(new_record:list,position:ont=0,ignore_max:bool=False):
+                method that adds the record adds the record to the end of the list
+                this makes it o(1) and updating the database accordingly with the internal functions
+                
+            switch_records(src_position:str,dst_position:str)
+                switching the positions of the records
+
+            compare_record(position_1:str,position_2:str)
+                this method creating a new record combined with the ones parsed in the args 
+                and removes the seperated from the database with the remove_record() method
+
+            remove_record(required_record:str,delete_all:bool):
+                this method removes the items and then sorting the list by degrading the records
+                to the start the time complexity is o(n-len(n))
+
+            edit_record(record_position:str,edit_data:dict):
+                saving the parsed data in the requested record_position
+            find_data(data:dict):
+                wrapper method that acts as a find function in mongodb
+            graph_positions() -> list:
+                method that returns a list of all positions inside the records.
+                this method is used internally to have better sorting with CRUD operations
+                if no records will raise ValueError.
+
+            find_graph_ordered_list() -> list:
+                queries the database and represents the saved positions list.
+
+            update_ordered_list() -> None:
+                internal functionallity for updating the ordered list.
+
+            dump_test_records() -> None:
                 FOR TESTING ONLY-- adds two random records to the \n\t\tusers records database.
-            remove_record(self,required_record,delete_all) -> None
+
+            remove_record(required_record,delete_all) -> None
                 this method removes specific record or deleting all\n\t\t records.
+            
             
 
         """
@@ -144,7 +180,11 @@ class MongoDBConstructor:
 
     def graph_records(self) -> dict:
         """
-        queries the database to find the records if not found will return empty list
+        returning dict with records
+
+        Returns:
+            if user have records -> dict with data
+            if user dont have records -> empty dict
         """
         if self.user_exists():
             found_records = self.collection.find_one(self.user,{"graph_records.records":1})
@@ -158,7 +198,13 @@ class MongoDBConstructor:
 
 
     def dump_test_records(self) -> None:
-        #adding full list of records for TESTING ONLY!!!
+        """
+        adds two records to the users database.
+        used for unittesting only.
+
+        Returns:
+            None
+        """
         dump_data = {
                 "1": {
                     'graph_title': 'Graph',
@@ -311,7 +357,14 @@ class MongoDBConstructor:
         raise ValueError("user not exists")
     
 
-    def add_order_item(self,position:int) -> list:
+    def add_order_item(self,position:int) -> None:
+        """
+        adding the item to the last index of the list
+        the position must be int and by the right order
+
+        Returns:
+            None
+        """
 
         ordered_list = (self.collection.find_one(self.user,{"ordered_list":1})["ordered_list"])
         ordered_list.insert(position-1,position)
@@ -324,12 +377,23 @@ class MongoDBConstructor:
 
 
     def find_graph_ordered_list(self) -> list:
+        """
+        returns the ordered_list from the mongodb.
+
+        Returns:
+            list of the last updated ordered_list from the mongodb 
+        """
         ordered_list = self.collection.find_one(self.user,{"ordered_list":1})["ordered_list"]
         return ordered_list
 
 
-    def update_ordered_list(self,updated_list):
+    def update_ordered_list(self,updated_list:list) -> None:
+        """
+        updating the whole ordered_list with the new list that will provided as the argument
 
+        Args:
+            updated_list(list):the new list that will be saved in the database as "ordered_list"
+        """
         ordered_list = self.collection.update_one(self.user,
                                                   {"$set":
                                                     {"ordered_list":updated_list}
@@ -346,8 +410,6 @@ class MongoDBConstructor:
                 if the position will have another value it will set the new_record position to this position argument value
         """
 
-
-
         #if the user not exists it will create basic user record and then continue
         if not self.user_exists():
             self.create_basic_record()
@@ -357,6 +419,29 @@ class MongoDBConstructor:
 
 
         #first we checking if the users max records capacity is full 
+
+        if not records:
+
+            #the new record that will be created
+
+            #if its new record so its the first graph position
+            init_position = 1
+
+            #the format of the new data example:"graph_records.records.1:{"x":[1,2,3],"y":["t","y","l"]...}
+            graph_record = {
+                "$set":{
+                    f"graph_records.records.{init_position}":new_record,
+                }
+            }
+
+            #updating the ordered list
+            self.add_order_item(int(init_position))
+
+            self.collection.update_one(self.user,graph_record)
+            # print(f"the record is added successfully. record number : {init_position}")
+            return None
+        
+
         if len(records) >= self.max_records and ignore_max == False:
             max_record_exceded_message = f"you exceded the maximum records in the user. your maximum is: {self.max_records}"
             print(max_record_exceded_message)
@@ -379,28 +464,6 @@ class MongoDBConstructor:
             # print(f"the record is added successfully. record number : {position}")
             return None
 
-
-
-        if len(records) ==  0:
-
-            #the new record that will be created
-
-            #if its new record so its the first graph position
-            init_position = 1
-
-            #the format of the new data example:"graph_records.records.1:{"x":[1,2,3],"y":["t","y","l"]...}
-            graph_record = {
-                "$set":{
-                    f"graph_records.records.{init_position}":new_record,
-                }
-            }
-
-            #updating the ordered list
-            self.add_order_item(int(init_position))
-
-            self.collection.update_one(self.user,graph_record)
-            # print(f"the record is added successfully. record number : {init_position}")
-            return None
 
 
         #if user already have records in their mongo database
@@ -432,6 +495,9 @@ class MongoDBConstructor:
         Args:
             src_position (str,int) : the source position
             dst_position (str,int) : the destination position
+
+        Returns:
+            None.
         """
 
         #getting the user records
@@ -522,7 +588,7 @@ class MongoDBConstructor:
 
     def edit_record(self,record_position:str,edit_data:dict) -> None:
         """
-        method that gets the wanted record position and update it with the new data 
+        saving the parsed data in the requested record_position
 
         Args:
             record_position (str) : specific record position that we want to edit.
@@ -633,7 +699,7 @@ class MongoDBConstructor:
         self.collection.update_one(self.user,new_query)
 
 
-    def get_insights(self,user:str):
+    def get_insights(self,user:str) -> None:
         """
         method that represents the insights data and returns it as a dict
 
@@ -646,7 +712,7 @@ class MongoDBConstructor:
         print(user_data)
 
 
-    def save_insights(self,user:str,insights_data:dict):
+    def save_insights(self,insights_data:dict) -> None:
         """
         this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
         mongodb and not with sql each get request
@@ -656,87 +722,25 @@ class MongoDBConstructor:
             user(str) : the user that we will querie in the mongodb
             insights_data(dict) : this data will be saved in the db each time the method called 
         """
-        filter_query = {"user_name":user}
-        new_query = {
+        insights_data= {
                 "$set":insights_data
             }
-        self.db_gr_query.update_one(filter_query,new_query)
+        self.collection.update_one(self.user,insights_data)
 
 
-    def export_csv_data(self,collection_name:str,user:str,graph_id):
-        """this method returns the specific data needed to be exported the by the user """
-        user_filter = {"user_name":user}
-        projection = {f"graph_records.records.{graph_id}":1,"_id":0}
-
-        records_projection = self.db_gr_query.find(user_filter,projection)
-
-
-
+    def export_csv_data(self,graph_position) -> list:
+        """
+        this method returns the specific data needed to be exported the by the user as csv
+        Returns:
+            two lists - one with titles.
+                        second with the data.
+        """
+        records = self.graph_records()
         titles = []
         content = []
-        for data in records_projection:
-            titles.append((data["graph_records"]["records"][str(graph_id)]).keys())
-            content.append((data["graph_records"]["records"][str(graph_id)]).values())
+        for data in records[graph_position]:
 
-        return list(titles[0]),list(content[0])
-        # return titles,content
+            titles.append(data)
+            content.append(records[graph_position][data])
 
-################### testing stages below ######################
-
-
-my_new_data = [{
-    "user_id":"3",
-    "user_name":"david",
-    "graph_records" : {
-        "records":{
-            "1000":{
-                "created_at":"YYYY-MM-DD",
-                "x":[1,2,3,4,5],
-                "y":["a","b","c","d","e"]
-            },
-            "1001":{
-                "created_at":"YYYY-MM-DD",
-                "x":[1,2,3,4,5],
-                "y":["a","b","c","d","e"]
-            },
-            "1002":{
-                "created_at":"YYYY-MM-DD",
-                "x":[1,2,3,4,5],
-                "y":["a","b","c","d","e"]
-            }
-        }
-    }
-}]
-
-
-
-
-# test_class = MongoDBConstructor(uri,"test")
-# add_record_test = test_class.extract_record("gr","david",2)
-
-
-
-# test_dict = {
-#     "created_at":"YYYY-MM-DD",
-#     "x":[1,1,1,1],
-#     "y":["q","w","e","r"]
-# }
-
-
-#checking if the add record working - done
-# add_record_test = test_class.add_record(collection_name="gr",user="ben",new_record=test_dict,many_records=False)
-
-#checking the delete record method - done
-# del_record_test = test_class.remove_records(collection_name="gr",user="david",record_number="1006")
-
-#checking the get_record method - done
-# get_record_test = test_class.get_record(collection_name="gr",user_name="david",record_count=1)
-
-#checking the find_record method - done
-# test_class.find_data(collection_name="gr",data={"user_name":"david"})
-
-
-
-
-
-# test_class.remove_records(collection_name="gr",user="ben",record_number="1")
+        return titles,content

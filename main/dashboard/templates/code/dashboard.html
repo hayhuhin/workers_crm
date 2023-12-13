@@ -31,7 +31,7 @@
 
 
 {% block content %}
-<div class='container p-4 pt-5'>
+<div class='container p-1 pt-5' style='margin-left:4rem'>
 <!-- ################################## test for add insights form ############################################ -->
 <div class="form-control">
 <form method="POST">
@@ -148,7 +148,7 @@
           </div>
           <div class="col">
             <div class="row">Total Graphs</div>
-            <div class="row">{{information_insight.max_records}}</div>
+            <div class="row">{{insights_data.max_records}}</div>
           </div>
         </div>
       </div>
@@ -160,13 +160,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#ffffff" d="M32 32c17.7 0 32 14.3 32 32V400c0 8.8 7.2 16 16 16H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-44.2 0-80-35.8-80-80V64C0 46.3 14.3 32 32 32zM160 224c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32s-32-14.3-32-32V256c0-17.7 14.3-32 32-32zm128-64V320c0 17.7-14.3 32-32 32s-32-14.3-32-32V160c0-17.7 14.3-32 32-32s32 14.3 32 32zm64 32c17.7 0 32 14.3 32 32v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V224c0-17.7 14.3-32 32-32zM480 96V320c0 17.7-14.3 32-32 32s-32-14.3-32-32V96c0-17.7 14.3-32 32-32s32 14.3 32 32z"/></svg>        </div>
           <div class="col">
             <div class="row">Graphs Made</div>
-            <div class="row">{{information_insight.total_records}}</div>
+            <div class="row">{{insights_data.total_records}}</div>
           </div>
         </div>
       </div>
   
       <!-- here the income loop starts-->
-      {% for year,income in information_insight.current_year_income.items %}
+      {% for year,income in insights_data.current_year_income.items %}
       <div class="col">
         <div class="row">
           <div class="col-auto align-self-center">
@@ -181,7 +181,7 @@
       {% endfor %}
   
   <!-- here the Outcoe loop starts-->
-  {% for year,outcome in information_insight.current_year_spendings.items %}
+  {% for year,outcome in insights_data.current_year_spendings.items %}
       <div class="col">
         <div class="row">
           <div class="col-auto align-self-center">
@@ -312,26 +312,26 @@
 
 <!-- GRAPH REPRESENTATION -->
 </div><!-- this div must be here its a part of the container in the top -->
-<div class="cotainer">
-<div class="whole_graph row row-cols-1 row-cols-md-{{graph_repr}} g-4 ">
+<div class="cotainer position-start">
+<div class="whole_graph row row-cols-1 row-cols-md-{{graph_repr}} m-5 g-1 ">
 
-{% for graph in graph_chart%}
-<div class="col maina border border-secondary rounded border-1 " style="background:#212529">
-<div class="" style="background:#212529">
+{% for graph in graph_chart %}
+<div class="col maina border border-secondary rounded border-1 p-2 " style="background:#212529;height:32rem;">
+<!-- <div class="" style="background:#212529;"> -->
 <!-- <div class="graph m-1 p-3 my-5 border border-secondary rounded border-1" style="background:#212529"> -->
 
 
-        <h3>{{graph.graph_data.v.graph_title}}</h3>
+        <h3>{{graph.graph_data.graph_title}}</h3>
 
-          <div style="width: 100%; height: 30rem">
+          <div style="width: 100%; height: 18rem">
           {{ graph.graph_html|safe }}
           </div>
 
     <div class='text-body-secondary mt-3'>
-          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>{{ graph.graph_data.v.graph_description }}</p>
-          <p class=''><BOLD class="text-light-emphasis">Created At </BOLD>{{graph.graph_data.v.created_at}}</p>
+          <p class=''><BOLD class="text-light-emphasis">Description: </BOLD>{{ graph.graph_data.graph_description }}</p>
+          <p class=''><BOLD class="text-light-emphasis">Created At </BOLD>{{graph.graph_data.created_at}}</p>
       <div class='' style='margin-top: 15px'>
-        <small class='text-body-secondary m-1' >{{graph.graph_data.v.date}}</small>
+        <small class='text-body-secondary m-1' >{{graph.graph_data.date}}</small>
       </div><!-- end of -->
 
     </div><!-- end of text-body secondery-->
@@ -339,11 +339,11 @@
       <form method="POST">
         <button  name='' class='btn btn-secondary' member_id='' id=''>Refresh Query</button>
         {% csrf_token %}
-        {% render_field delete_graph_form.graph_id value=graph.graph_data.k %}
-        <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
-        <button type='submit' class='btn btn-secondary text-uppercase' name='export_csv'value='export_csv'> Export CSV </button>
-         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#change_position_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Change Position</button>
-         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_compare_modal_{{graph.graph_data.k}}' data-bs-whatever='@getbootstrap'>Compare Graph</button>
+        {% render_field delete_graph_form.graph_position value=graph.graph_position %}
+        <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_edit_modal_{{graph.graph_position}}' data-bs-whatever='@getbootstrap'> Edit Graph </button>
+        <button type='submit' class='btn btn-secondary text-uppercase' name='export_csv' value='export_csv'> Export CSV </button>
+         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#change_position_modal_{{graph.graph_position}}' data-bs-whatever='@getbootstrap'>Change Position</button>
+         <button type='button' class='btn btn-secondary text-uppercase' data-bs-toggle='modal' data-bs-target='#graph_compare_modal_{{graph.graph_position}}' data-bs-whatever='@getbootstrap'>Compare Graph</button>
         <button type='submit'  name='remove_graph' class='btn btn-danger' value='remove_graph'>Remove Graph</button>
 
       </form>
@@ -353,7 +353,7 @@
 
 
           <div class=''>
-              <div class='modal' id='graph_edit_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
+              <div class='modal' id='graph_edit_modal_{{graph.graph_position}}' tabindex='-1' aria-labelledby='graph_edit_modal_label' aria-hidden='true'>
                 <div class='modal-dialog'>
                   <div class='modal-content'>
                     <div class='modal-header'>
@@ -364,7 +364,7 @@
                 <!-- form of adding new task --> 
                 <div class='modal-body'>
 
-                  <form method='POST' class="edit-graph-form" data-form-id="{{graph.graph_data.k}}">
+                  <form method='POST' class="edit-graph-form" data-form-id="{{graph.graph_position}}">
 
                     {% csrf_token %}
 
@@ -373,30 +373,30 @@
                     <!-- graph title -->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Graph Title</label>
-                        {% render_field edit_graph_form.graph_title type='title' id=graph.graph_data.k class='form-control' value=graph.graph_data.v.graph_title %}
+                        {% render_field edit_graph_form.graph_title type='title' id=graph.graph_position class='form-control' value=graph.graph_data.graph_title %}
                     </div>
                     <!-- end of graph title -->
 
                     <!-- graph description-->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Graph Description</label>
-                        {% render_field edit_graph_form.graph_description type='text' id='graph_description_{{graph.graph_data.k}}' class='form-control' value=graph.graph_data.v.graph_description %}
+                        {% render_field edit_graph_form.graph_description type='text' id='graph_description_{{graph.graph_position}}' class='form-control' value=graph.graph_data.graph_description %}
                     </div>
                     <!-- end of graph description-->
 
                     <!-- start of start_date-->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Start Date</label>
-                      <p>previous date was : {{graph.graph_data.v.x|last}}</p>
-                        {% render_field edit_graph_form.start_date type='date' value=graph.graph_data.v.start_date id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                      <p>previous date was : {{graph.graph_data.x|last}}</p>
+                        {% render_field edit_graph_form.start_date type='date' value=graph.graph_data.start_date id='graph_date_{{graph_position}}' class='form-control'%}
                     </div>
                     <!-- end of start_date div -->
 
                     <!-- start of the end_date div-->
                       <div class='mb-3'>
                         <label for='graph_title' class='col-form-label'>End Date</label>
-                        <p>previous date was : {{graph.graph_data.v.x|first}}</p>
-                        {% render_field edit_graph_form.end_date type='date' id='graph_date_{{graph.graph_data.k}}' value=graph.graph_data.v.end_date class='form-control'%}
+                        <p>previous date was : {{graph.graph_data.x|first}}</p>
+                        {% render_field edit_graph_form.end_date type='date' id='graph_date_{{graph.graph_position}}' value=graph.graph_data.end_date class='form-control'%}
                     </div>
                     <!-- end of the end_date div-->
 
@@ -404,12 +404,7 @@
                   <div class="mb-3 row">
                   <label for="data_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
                     <div class="col-sm-auto">
-                      {% comment %} <select class="form-select selected_edit_graph" aria-label="Default select example">
-                        <option selected class="select" value="select" name="bar_graph">Select One</option>
-                        <option class="graph_choose" value="bar_graph" name="bar_graph">Bar Graph</option>
-                        <option class="graph_choose" value="line_graph" name="line_graph">Line Graph</option>
-                      </select> {% endcomment %}
-                        {% render_field edit_graph_form.graph type='text' class='form-control-plaintext' id='graph_edit_option'%}
+                        {% render_field edit_graph_form.graph type='text' class='form-select' id='graph_edit_option'%}
                       </div>
                     </div> 
                       
@@ -419,24 +414,15 @@
                       <div class="mb-3 row">
                       <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
                           <div class="col-sm-auto">
-                            {% comment %} <select class="form-select selected_edit_data" aria-label="Default select example">
-                              <option selected class="select_one" name="select">Select One</option>
-                              <option class="income" 
-                                value="income" id="choosed_db" name="income">Income</option>
-                              <option class="outcome" value="outcome" 
-                                id="choosed_db"
-                                name="outcome">Outcome</option>
-                              </select> {% endcomment %}
-
-                            {% render_field edit_graph_form.db type='text' class='form-control-plaintext' id='data_edit_option' %}
+                            {% render_field edit_graph_form.db type='text' class='form-select' id='data_edit_option' %}
                           </div>
                       </div><!-- end of the database div--> 
 
 
                 <!-- test test test test test -->
 
-                {% render_field edit_graph_form.graph_id type='text' value=graph.graph_data.k %}
-                {% render_field edit_graph_form.graph_position type='text' value=graph.graph_data.v.position %}
+                {% render_field edit_graph_form.graph_id type='text' value=graph.graph_position %}
+                {% render_field edit_graph_form.graph_position type='text' value=graph.graph_position %}
 
                 <!-- test test test test test -->
 
@@ -458,12 +444,12 @@
             </div><!-- end of graph div-->
 
         </div>
-      </div>
+     
 
           <!-- this is the compare graph position modal-->
 
           <div class=''>
-              <div class='modal' id='graph_compare_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='graph_compare_modal_label' aria-hidden='true'>
+              <div class='modal' id='graph_compare_modal_{{graph.graph_position}}' tabindex='-1' aria-labelledby='graph_compare_modal_label' aria-hidden='true'>
                 <div class='modal-dialog'>
                   <div class='modal-content'>
                     <div class='modal-header'>
@@ -474,7 +460,7 @@
                 <!-- form of adding new task --> 
                 <div class='modal-body'>
 
-                  <form method='POST' class="compare-graph-form" data-form-id="{{graph.graph_data.k}}">
+                  <form method='POST' class="compare-graph-form" data-form-id="{{graph.graph_position}}">
 
                     {% csrf_token %}
 
@@ -483,14 +469,14 @@
                     <!-- graph title -->
                     <div class='mb-3'>
  
-                        {% render_field compare_graph_form.graph_title type='title' id=graph.graph_data.k class='form-control' value=graph.graph_data.v.graph_title %}
+                        {% render_field compare_graph_form.graph_title type='title' id=graph.graph_position class='form-control' value=graph.graph_data.graph_title %}
                     </div>
                     <!-- end of graph title -->
 
                     <!-- graph description-->
                     <div class='mb-3'>
 
-                        {% render_field compare_graph_form.graph_description type='text' id='graph_description_{{graph.graph_data.k}}' class='form-control' value=graph.graph_data.v.graph_description %}
+                        {% render_field compare_graph_form.graph_description type='text' id='graph_description_{{graph.graph_position}}' class='form-control' value=graph.graph_data.graph_description %}
                     </div>
                     <!-- end of graph description-->
 
@@ -498,7 +484,7 @@
                     <div class='mb-3'>
 
 
-                        {% render_field compare_graph_form.start_date type='date' value=graph.graph_data.v.start_date id='graph_date_{{graph.graph_data.k}}' class='form-control'%}
+                        {% render_field compare_graph_form.start_date type='date' value=graph.graph_data.start_date id='graph_date_{{graph.graph_position}}' class='form-control'%}
                     </div>
                     <!-- end of start_date div -->
 
@@ -506,7 +492,7 @@
                       <div class='mb-3'>
 
 
-                        {% render_field compare_graph_form.end_date type='date' id='graph_date_{{graph.graph_data.k}}' value=graph.graph_data.v.end_date class='form-control'%}
+                        {% render_field compare_graph_form.end_date type='date' id='graph_date_{{graph.graph_position}}' value=graph.graph_data.end_date class='form-control'%}
                     </div>
                     <!-- end of the end_date div-->
 
@@ -514,24 +500,16 @@
                   <div class="mb-3 row">
                   <label for="data_option" class="col-sm-auto col-form-label">Choose The Graph:</label>
                     <div class="col-sm-auto">
-                        {% render_field compare_graph_form.graph type='text' class='form-control-plaintext' id='graph_edit_option'%}
+                        {% render_field compare_graph_form.graph type='text' class='form-select' id='graph_edit_option'%}
                       </div>
                     </div> 
                       
                     <!-- test of the options section-->
 
-                    <!-- edit database div -->
-                      {% comment %} <div class="mb-3 row">
-                      <label for="data_option" class="col-sm-auto col-form-label">Choose The Data:</label>
-                          <div class="col-sm-auto">
-
-                            {% render_field compare_graph_form.db type='text' class='form-control-plaintext' id='data_edit_option' %}
-                          </div>
-                      </div><!-- end of the database div-->  {% endcomment %}
 
 
-                {% render_field compare_graph_form.graph_id type='text' value=graph.graph_data.k %}
-                {% render_field compare_graph_form.graph_position type='text' value=graph.graph_data.v.position %}
+                {% render_field compare_graph_form.graph_id type='text' value=graph.graph_position %}
+                {% render_field compare_graph_form.graph_position type='text' value=graph.graph_position %}
               
               
               <div class='mb-3'>
@@ -560,7 +538,7 @@
 
           <!-- this is the change position modal section-->
           <div class='col-sm-auto'>
-              <div class='modal' id='change_position_modal_{{graph.graph_data.k}}' tabindex='-1' aria-labelledby='change_position_modal_label' aria-hidden='true'>
+              <div class='modal' id='change_position_modal_{{graph.graph_position}}' tabindex='-1' aria-labelledby='change_position_modal_label' aria-hidden='true'>
                 <div class='modal-dialog'>
                   <div class='modal-content'>
                     <div class='modal-header'>
@@ -571,7 +549,7 @@
                 <!-- form of adding new task --> 
                 <div class='modal-body'>
 
-                  <form method='POST' class="change-position-form" data-form-id="{{graph.graph_data.k}}">
+                  <form method='POST' class="change-position-form" data-form-id="{{graph.graph_position}}">
 
                     {% csrf_token %}
 
@@ -580,15 +558,15 @@
                     <!-- graph src id -->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>Graph current Position</label>
-                        <p>{{ graph.graph_data.v.position }}</p>
-                        {% render_field change_position_form.src_graph_id type='title' id=graph.graph_data.k class='form-control' value=graph.graph_data.k %}
+                        <p>{{graph.graph_position}}</p>
+                        {% render_field change_position_form.src_graph_id type='title' id=graph.graph_position class='form-control' value=graph.graph_position %}
                     </div>
                     <!-- end of graph title -->
 
                     <!-- graph new position-->
                     <div class='mb-3'>
                       <label for='graph_title' class='col-form-label'>New Position</label>
-                        {% render_field change_position_form.dst_graph_id type='title' id=graph.graph_data.k class='form-control'%}
+                        {% render_field change_position_form.dst_graph_id type='title' id=graph.graph_position class='form-control'%}
                     </div>
 
                 <!-- test test test test test -->
@@ -618,10 +596,10 @@
 </div><!-- this is the full graph position-->
 </div>
 </div>
-
 </div>
-    {% endfor %}
-  </div><!-- end of the whole_graph div-->
+{% endfor %}
+</div>
+  <!-- </div>end of the whole_graph div -->
 
 
 
@@ -629,7 +607,7 @@
 
 </div><!-- end of 'container' -->
 
-</div>
+<!-- </div> -->
 
 
 

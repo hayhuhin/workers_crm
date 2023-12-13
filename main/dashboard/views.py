@@ -1,17 +1,16 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,HttpResponse
 from  pathlib import Path
 from django.contrib.auth.decorators import login_required
-from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPosition,ImportCSVForm,CompareGraphForm,EditGraphRow,AddInsights
+from .forms import AddGraphForm,EditGraphForm,DeleteGraphForm,ChangeGraphPositionForm,ImportCSVForm,CompareGraphForm,EditGraphRowForm,AddInsightsForm
 from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph_calculations import GraphCalculator
 from func_tools.graph_presentations import GraphRepresantation
-from func_tools.file_validation import FileValidator
+from func_tools.file_validation import FileValidator,generate_csv
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
 from user.models import Employer
-import csv
-import io
+
 
 
 curr_path = Path.cwd()
@@ -31,138 +30,95 @@ def dashboard(request):
     gmtime_dict = time.gmtime()
     time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dict[3]}:{gmtime_dict[4]}")
 
-
     #database user specific instance
     employer_db_inst = Employer.objects.get(user=request.user)
-
 
     #class that have methods and can query the sqlite for all the records of the db
     graph_calculator = GraphCalculator( user=request.user,db=[Income,Outcome],db_func=[Sum],last_save = "")
 
-
     #max records gives me the max graph mermission
-    max_records = employer_db_inst.graph_permission.all().values("max_record_amount")[0]
+    max_records = employer_db_inst.graph_permission.all().values("max_record_amount")[0]["max_record_amount"]
+
     #uri is the url to that im connecting to mongodb
     uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
     #mongodb wrapper class that have CRUD methods
     mongodb_handler = MongoDBConstructor(uri=uri,db="test",collection="gr",user=str(request.user),max_records=max_records)
-
-
-    #the graph html representation class
     graph_repr = GraphRepresantation()
+
+
+    #* the initialising of the forms 
 
     income_form = AddGraphForm()
 
-    #instance of a "edit graph form"
     edit_graph_form = EditGraphForm()
 
-    #delete graph form class instance
     delete_graph_form = DeleteGraphForm()
 
-    change_positon_form = ChangeGraphPosition()
+    change_positon_form = ChangeGraphPositionForm()
 
     import_csv_form = ImportCSVForm()
 
     compare_graph_form = CompareGraphForm()
 
-    edit_graph_repr_form = EditGraphRow()
+    edit_graph_repr_form = EditGraphRowForm()
 
-    add_insights_form = AddInsights()
-
-
-
-    
-
-    #####################!testing in the get method section #############################
-    # mongodb_handler.remove_records(collection_name="gr",user=str(request.user),record_number="3")
-
-    #! uncomment this and refresh the dashboard page to delete all ben records
-    # mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
+    add_insights_form = AddInsightsForm()
 
 
-    #! uncomment this if you want to see a repr of the user data
-    # mongodb_handler.find_data("gr",{"user_name":str(request.user)})
-    #!###################################################################################
+    #this list will parse graph data and graph html into the template
+    graph_chart = []
+    #this list will parse insights data and graph html into the template
+    insights_data = []
 
-
-
-    #* this section is querying the mongo db for records and saves the graphs as a dict of keys and values
-    #* the key is the graph_name and the value is the html(with plotly lib) of the graph
-
-    ######################################
-    #this section will have a method that checking if the user exists already or not and add a simple first data into the db
-    # res = mongodb_handler.user_exists(collection_name="gr",user=str(request.user))
-    #checking if the user exists of not creating basic_record for him 
 
     #*need to check later if the user have all permission from sql first -  models.GraphPermissions
     if not mongodb_handler.user_exists():
         mongodb_handler.create_basic_record()
 
-    ######################################
-
-
     #method returns dict with records or empty dict if records not exist
     graph_records_dict = mongodb_handler.graph_records()
 
+    #users first basic data
+    user_basic_data = mongodb_handler.find_data({"name":user})
 
-    information_insight = []
-    graph_chart = []
-    #checking if there is any data at all from the mongodb query
+    #saving the insights data to be parsed into the template
+    if "insights_data" in user_basic_data:
+        insights_data = user_basic_data["insights_data"]
 
+    #checking if the user have records
     if graph_records_dict:
-
-        #this dict structures the group and values data into a dict
-
-        graph_values = {}
-        #loops over the mongodb data and then using the graph_repr class to generate visual plotly graph and
-        #save it as html
-
+        #itarates over the records keys
         for record in graph_records_dict:
-
-            #graph_repr dict with values
-            dict_values = {"x":record["x"],"y":record["y"],"y_2":record["y_2"]}
-
-            #for each record it will create graph repr as html and parse its data tp a graph_chart list that will be used in the page 
-            graph_html = graph_repr.graph_options(graph_type=record["graph_type"],dict_values=dict_values,graph_repr=record["graph_repr"])  
-
-            #this is the graph chart list that pushed to the html template with its graph data
-            graph_chart.append({"graph_data":record,"graph_html":graph_html})
-
             
-        ########################################################################################
-        # yearly_income_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"income"})
-        # yearly_outcome_summary = graph_calculator.get_data_by_year(args=["2024","2025"],kwargs={"db":"outcome"})
+            #for comparison methods i should parse "sql_database_compared" even if empty
+            #checking if there are any sql_comparison records in the db
+            if "sql_database_compared" in graph_records_dict[record]:
+                sql_comparison = graph_records_dict[record]["sql_database_compared"]
+            else:
+                sql_comparison = []
 
-        # information_insight.append({
-        #     "total_records":total_graph,
-        #     "max_records" :record_amount["record_amount"],
-        #     "current_year_income":yearly_income_summary,
-        #     "current_year_spendings":yearly_outcome_summary,
-            
-        # })
-        ########################################################################################
+            #this is how the structure if the "dict_values" argument have to look like
+            dict_values = {"x":graph_records_dict[record]["x"],
+                           "y":graph_records_dict[record]["y"],
+                           "y_2":graph_records_dict[record]["y_2"],
+                           "graph_description":graph_records_dict[record]["graph_description"],
+                           "DB_1":graph_records_dict[record]["sql_database"],
+                           "DB_2":sql_comparison}
 
+            #this method creating graph html with the data extracted from the mongodb 
+            graph_html = graph_repr.graph_options(graph_type=graph_records_dict[record]["graph_type"],dict_values=dict_values,graph_repr=user_basic_data["graph_repr"])  
 
-    #! this is only for testing 
-#!################################################################################
-    values=[20, 20, 20, 20, 20,13,51]
-    names= ['sunday', 'monday', 'tuesday', 'wednesday','thursday','friday','saturday']
-    weekly_donut_graph = graph_repr.donut_graph(values=values,names= names)
-    weekly_donut_graph2 = graph_repr.donut_graph(values=values,names= names)
-    weekly_pie_graph = graph_repr.pie_graph(values=values,names=names)
-
-    weekly_graph_card = graph_repr.graph_card('weekly lead',user_calc=weekly_donut_graph)
-    weekly_graph_card2 = graph_repr.graph_card('weekly lead',user_calc=weekly_donut_graph2)
-    weekly_pie_card = graph_repr.graph_card('weekly lead',user_calc=weekly_pie_graph)
+            #appending the graph_html to the graph_chart list and the list will be parsed into the html template
+            graph_chart.append({"graph_data":graph_records_dict[record],"graph_position":record,"graph_html":graph_html})
 
 
-    #! only for testing for now (later it will be queried and represented)
+
+    #! in the future it will be automaticly gathered from the users graph permissions
     databases = ["Income","Outcome"]
-    #! this is only for testing 
-#!################################################################################
 
 
 
+    #* the get request scope
     if request.method == "GET":            
         context= {  'databases':databases,
                     'income_form':income_form,
@@ -173,13 +129,14 @@ def dashboard(request):
                     'graph_chart':graph_chart,
                     'compare_graph_form':compare_graph_form,
                     'edit_graph_row':edit_graph_repr_form,
-                    # 'graph_repr':mongodb_getting_data["graph_repr"],
-                    'add_insights_form':add_insights_form}
+                    'graph_repr':user_basic_data["graph_repr"][0],
+                    'add_insights_form':add_insights_form,
+                    'insights_data':insights_data}
 
         return render(request,'code/dashboard.html',context)
 
 
-    #checking if the request method is POST
+    #* the post request scope
     if request.method == "POST":
 
 
@@ -221,12 +178,8 @@ def dashboard(request):
                     "end_date":str(end),
                     }
 
-                ######################################
-                #this section will have a method that checking if the user exists already or its new
-                res = mongodb_handler.user_exists(collection_name="gr",user=str(request.user))
-
                 #adding the record to mongodb
-                mongodb_added_record = mongodb_handler.add_record(new_record=new_record)
+                mongodb_handler.add_record(new_record=new_record)
                 #reloads the same page
                 return HttpResponseRedirect('/dashboard')
 
@@ -240,8 +193,8 @@ def dashboard(request):
             
             #for is valid
             else:
-                graph_id = form_inst.cleaned_data.get("graph_id")
-                mongodb_handler.remove_record(record_number=str(graph_id))
+                graph_position = form_inst.cleaned_data.get("graph_position")
+                mongodb_handler.remove_record(required_record=graph_position)
                 return HttpResponseRedirect("/dashboard")
 
 
@@ -265,6 +218,7 @@ def dashboard(request):
 
                 #calculates the x and the y of the graph and returns it as two lists
                 edit_graph_data = graph_calculator.sum_by_range(start_date=edit_start,end_date=edit_end,db=edit_db)
+                
                 edited_data = {
                         "graph_title":edit_graph_title,
                         "graph_description":edit_graph_description,
@@ -274,17 +228,17 @@ def dashboard(request):
                         "y":edit_graph_data[0],
                         "y_2":[],
                         "sql_database":edit_db,
-                        "start_date":edit_start,
-                        "end_date":edit_end
+                        "start_date":str(edit_start),
+                        "end_date":str(edit_end)
                 }
                 
-                final = mongodb_handler.edit_record(record_position=edit_graph_position,new_data=edited_data)        
+                final = mongodb_handler.edit_record(record_position=edit_graph_position,edit_data=edited_data)        
                 return HttpResponseRedirect("/dashboard")
                 
 
         #* switch graph position post
         if request.POST.get("change_position_graph") == "change_position_graph":
-            form_inst = ChangeGraphPosition(request.POST)
+            form_inst = ChangeGraphPositionForm(request.POST)
             if not form_inst.is_valid():
                 return HttpResponse("form is invalid")
 
@@ -295,6 +249,7 @@ def dashboard(request):
                 mongodb_handler.switch_records(src_position=src_position,dst_position=dst_position)
 
                 return HttpResponseRedirect("/dashboard")
+
 
        #* compare graph records post 
         if request.POST.get("compare_graph_data") == "compare_graph_data":
@@ -322,96 +277,92 @@ def dashboard(request):
                 return HttpResponseRedirect("/dashboard")
 
 
-
-        
         #* delete all records post
         if request.POST.get("delete_all_records") == "delete_all_records":
             mongodb_handler.remove_records("gr",str(request.user),record_number="*",delete_all=True)
             return HttpResponseRedirect("/dashboard")
 
-
-
         #! later add here form validation 
         if request.POST.get("export_csv") == "export_csv":
-            graph_id = request.POST.get("graph_id")
-            graph_csv_model_data = mongodb_handler.export_csv_data(collection_name="gr",user=str(request.user),graph_id=graph_id)
+            graph_id = request.POST.get("graph_position")
+            graph_csv_model_data = mongodb_handler.export_csv_data(graph_position=graph_id)
             csv_data = generate_csv([graph_csv_model_data[0],graph_csv_model_data[1]])
 
-            # print(graph_csv_model_data)
             response = HttpResponse(csv_data,content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="graph_1_data.csv"'
             return response
 
+        #! for now this feature is disabled 
         if request.POST.get("import_csv_file") == "import_csv_file":
             #*here its passing into the file form the data
             form_inst = ImportCSVForm(request.POST,request.FILES)
 
             #*in the form is validated
-            if form_inst.is_valid():
-                csv_file = request.FILES['csv_file']
+            # if form_inst.is_valid():
+            #     csv_file = request.FILES['csv_file']
 
-                #*this is the file validator that checking the file contents and validate it
-                validation_proccess_instance = FileValidator(csv_file,2)
-                validated_data = validation_proccess_instance.start_validation()
-                if validated_data:
-                    mongodb_added_record = mongodb_handler.add_record(collection_name="gr",user=str(request.user),new_record=validated_data,max_record_amount=int(record_amount["record_amount"]))
-                    return HttpResponseRedirect("/dashboard")
-                
+            #     #*this is the file validator that checking the file contents and validate it
+            #     validation_proccess_instance = FileValidator(csv_file,2)
+            #     validated_data = validation_proccess_instance.start_validation()
+            #     if validated_data:
+            #         mongodb_added_record = mongodb_handler.add_record(collection_name="gr",user=str(request.user),new_record=validated_data,max_record_amount=int(record_amount["record_amount"]))
+            #         return HttpResponseRedirect("/dashboard")
+            return HttpResponseRedirect("/dashboard")
 
-                else:
-                    return HttpResponse("the record is not added because the file content is invalid")
+                # else:
+                #     return HttpResponse("the record is not added because the file content is invalid")
                     
 
                 
-            else:
-                return HttpResponse("file form is invalid")
+            # else:
+            #     return HttpResponse("file form is invalid")
+
 
         if request.POST.get("set_row") == "set_row":
-            form_inst = EditGraphRow(request.POST)
+            form_inst = EditGraphRowForm(request.POST)
             if form_inst.is_valid():
                 row_repr = form_inst.cleaned_data.get("row_repr")
                 if row_repr == "graph_representation":
                     return HttpResponseRedirect("/dashboard")
                 else:
-                    mongodb_handler.edit_graph_repr(collection_name="gr",user=str(request.user),new_repr=row_repr)
+                    mongodb_handler.edit_graph_repr(new_repr=row_repr)
                     return HttpResponseRedirect("/dashboard")
                 
             if not form_inst.is_valid():
                 return HttpResponse("the form is invalid")
         
+
         if request.POST.get("add_insights_btn") == "add_insights_btn":
 
-            form_inst = AddInsights(request.POST)
+            form_inst = AddInsightsForm(request.POST)
             print(request.POST)
 
-            if form_inst.is_valid():
+            if not form_inst.is_valid():
+                return HttpResponse("invalid form")
+
+            #form is valid
+            else:
 
                 income_year_1 = form_inst.cleaned_data.get("income_year_1")
                 income_year_2 = form_inst.cleaned_data.get("income_year_2")
                 outcome_year_1 = form_inst.cleaned_data.get("outcome_year_1")
                 outcome_year_2 = form_inst.cleaned_data.get("outcome_year_2")
-                total_graph = mongodb_getting_data[1]["total_records"]
+                total_graph = len(user_basic_data["ordered_list"])
                 yearly_income_summary = graph_calculator.get_data_by_year(args=[income_year_1,income_year_2],kwargs={"db":"income"})
                 yearly_outcome_summary = graph_calculator.get_data_by_year(args=[outcome_year_1,outcome_year_2],kwargs={"db":"outcome"})
 
 
                 insights_data = {
-                    "total_records":total_records,
-                    "max_records" :total_graph,
+                    "total_records":total_graph,
+                    "max_records" :max_records,
                     "current_year_income":yearly_income_summary,
                     "current_year_spendings":yearly_outcome_summary,                    
                 }
 
-                mongodb_handler.save_insights(collection_name="gr",user=str(request.user),insights_data=insights_data)
+                mongodb_handler.save_insights(insights_data={"insights_data":insights_data})
                 return HttpResponseRedirect("/dashboard")
 
-
-
-            if not form_inst.is_valid():
-                return HttpResponse("invalid form")
-
-
-
+    #* the delete request scope
     if request.method == "DELETE":
         print("the requested method is DELETE")
     
@@ -424,12 +375,3 @@ def dashboard(request):
         return render(request,'code/dashboard.html',context)
 
 
-    #? here its the response in the get scope
-
-
-def generate_csv(graph_data):
-    # Your data source (replace this with your data retrieval logic)
-    csv_data = io.StringIO()
-    csv_writer = csv.writer(csv_data)
-    csv_writer.writerows(graph_data)
-    return csv_data.getvalue()

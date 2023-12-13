@@ -11,7 +11,26 @@ tests created:
                 all graphs independently - visual not done 
     mongo_db_graph
         mongodb_connector.py
-            MongoDBConstructor class -
+            MongoDBConstructor class :
+                user_exists - done 
+                create_basic_record - done
+                drop_user_data - done
+                graph_records - done 
+                dump_test_records - done
+                remove_record - done
+                graph_positions - done
+                add_order_item - done
+                find_graph_ordered_list - done
+                update_ordered_list - done
+                add_record - done
+                switch_records - done
+                compare_record - done
+                edit_record - done
+                find_data - done
+                edit_graph_repr - done
+                get_insights - done
+                save_insights - done
+                export_csv_data - NOT DONE
                 
 
 
@@ -32,7 +51,29 @@ documentation:
         forms
         urls
 
-
+    mongo_db_graph:
+        mongodb_connector.py:
+            MongoDBConstructor class :
+                user_exists - done 
+                create_basic_record - done
+                drop_user_data - done
+                graph_records - done 
+                dump_test_records - done
+                remove_record - done
+                graph_positions - done
+                add_order_item - done
+                find_graph_ordered_list - done
+                update_ordered_list - done
+                add_record - done
+                switch_records - done
+                compare_record - done
+                edit_record - done
+                find_data - done
+                edit_graph_repr - done
+                get_insights - done
+                save_insights - done
+                export_csv_data - NOT DONE
+                
 
 
 

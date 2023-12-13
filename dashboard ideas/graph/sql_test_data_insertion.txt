@@ -26,7 +26,7 @@ Income(month='2025-5-7',amount=19888)
 
 
 
-data = [
+data2 = [
 Outcome(month='2023-10-7',amount=555),
 Outcome(month='2023-11-7',amount=333),
 Outcome(month='2023-12-7',amount=12122),
