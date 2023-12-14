@@ -88,8 +88,8 @@ ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
 
 
 <<working on >>
-
 ADD:visually change the graph presentation to look clean - 
+
 FIX:dashboard.views hirarcy of the code - done
 
 #MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
