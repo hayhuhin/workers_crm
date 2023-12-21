@@ -1,3 +1,49 @@
 
-get http://localhost:8000
-sessionid: "tata"
+
+
+
+
+
+post http://127.0.0.1:8000/api/user/register
+    Accept: application/json
+    Content-Type: application/json
+
+    {
+        "email":"ta@ta.com",
+        "username":"kaka",
+        "password":"Aa1122!!"
+    }
+
+
+###
+
+post http://127.0.0.1:8000/api/user/login
+    Accept: application/json
+    Content-Type: application/json
+    
+    {
+        "email":"ta@ta.com",
+        "password":"Aa1122!!"
+    }
+
+###
+get http://127.0.0.1:8000/api/user/user
+    Accept: application/json
+    Content-Type: application/json
+    
+    {
+        "email":"ta@ta.com",
+        "password":"Aa1122!!"
+    }
+
+
+
+###
+get http://127.0.0.1:8000/api/user/user
+    Accept: application/json
+    Content-Type: application/json
+    
+    {
+        "email":"ta@ta.com",
+        "password":"Aa1122!!"
+    }

@@ -19,10 +19,9 @@ class UserManager(BaseUserManager):
 
         #this setups the django username as email
     
-        user = self.model(email=email)
+        user = self.model(email=email,username=username)
         #setting the password
-    
-        user = self.model(username=username)
+
 
         user.set_password(password)
         #saving the user
@@ -40,7 +39,7 @@ class UserManager(BaseUserManager):
         
 
         #this method checking that the email is in correct format
-        user = self.create_user(email,username,password)
+        user = self.create_user(email=email,username=username,password=password)
         #this setups the user as a super user
         user.is_superuser = True
         #saving the user
@@ -56,7 +55,6 @@ class User(AbstractBaseUser,PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     is_superuser = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -66,7 +64,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     @property
     def is_staff(self):
-        return self.is_stuff
+        return self.is_superuser
 
     
     def __str__(self) -> str:
