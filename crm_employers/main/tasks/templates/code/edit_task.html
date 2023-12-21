@@ -1,0 +1,31 @@
+{% extends 'code/base.html' %}{% block content %}{% load widget_tweaks %}
+
+<!-- LOGIN FORM INPUTS -->
+<div class="container-sm mt-5 p-4 border border-success" style="width: 32rem">
+  <form method="POST" class="form-group">
+    {% csrf_token %}
+
+    <!-- username field -->
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      {% render_field edit_task_form.title type="text" id="title" value=task_data.title class="form-control" %}
+    </div>
+    <!-- password field -->
+
+    <div class="mb-3">
+      <label for="{{edit_task_form.id}}" class="form-label">Description</label>
+      {% render_field edit_task_form.description type="text" id=edit_task_form.id placeholder=task_data.description class="form-control" %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{edit_task_form.id}}" class="form-label">Additional Description</label>
+      {% render_field edit_task_form.additional_description type="text" id=edit_task_form.id placeholder=task_data.additional_description class="form-control" %}
+    </div>
+    <!-- submit button -->
+    <button class="btn btn-success" id="liveAlertPlaceholder" type="submit" name="test" value="test" >Save</button>
+    <a class="btn btn-danger" href='/tasks' type="submit">Cancel</a>
+
+  </form>
+  <!--end of container div-->
+</div>
+{% endblock content %}

@@ -1,0 +1,103 @@
+
+this text is only for a test data to insert into the income/outcome sql database.
+
+data = [
+Income(month='2023-10-7',amount=1000),
+Income(month='2023-11-7',amount=5789),
+Income(month='2023-12-7',amount=3451),
+Income(month='2024-1-7',amount=9606),
+Income(month='2024-2-7',amount=922),
+Income(month='2024-3-7',amount=24000),
+Income(month='2024-4-7',amount=3345),
+Income(month='2024-5-7',amount=9876),
+Income(month='2024-6-7',amount=578),
+Income(month='2024-7-7',amount=1212),
+Income(month='2024-8-7',amount=9686),
+Income(month='2024-9-7',amount=19786),
+Income(month='2024-10-7',amount=55992),
+Income(month='2024-11-7',amount=16987),
+Income(month='2024-12-7',amount=13900),
+Income(month='2025-1-7',amount=7899),
+Income(month='2025-2-7',amount=764),
+Income(month='2025-3-7',amount=540),
+Income(month='2025-4-7',amount=13900),
+Income(month='2025-5-7',amount=19888)
+]
+
+
+
+data2 = [
+Outcome(month='2023-10-7',amount=555),
+Outcome(month='2023-11-7',amount=333),
+Outcome(month='2023-12-7',amount=12122),
+Outcome(month='2024-1-7',amount=7756),
+Outcome(month='2024-2-7',amount=19765),
+Outcome(month='2024-3-7',amount=76900),
+Outcome(month='2024-4-7',amount=4600),
+Outcome(month='2024-5-7',amount=9816),
+Outcome(month='2024-6-7',amount=5711),
+Outcome(month='2024-7-7',amount=122),
+Outcome(month='2024-8-7',amount=9986),
+Outcome(month='2024-9-7',amount=19786),
+Outcome(month='2024-10-7',amount=75992),
+Outcome(month='2024-11-7',amount=36987),
+Outcome(month='2024-12-7',amount=900),
+Outcome(month='2025-1-7',amount=7599),
+Outcome(month='2025-2-7',amount=7643),
+Outcome(month='2025-3-7',amount=567),
+Outcome(month='2025-4-7',amount=13865),
+Outcome(month='2025-5-7',amount=19000)
+]
+
+
+
+
+query example:
+>>> i.objects.filter(month__range=("2023-10-01","2023-11-01")).all().aggregate(Sum('amount'))
+{'amount__sum': 3000}
+
+
+<!-- circle att-->
+          <a class="nav-link 
+                    close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline
+                    link-opacity-25-hover mb-5" data-bs-dismiss="#small_off_canvas" href="">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg></a>
+
+<!-- triangle att-->
+          <a class="nav-link 
+                    close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline
+                    link-opacity-25-hover mb-5" data-bs-dismiss="#small_off_canvas" href="">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>                    </a>
+
+<!-- arrow up-->
+          <a class="nav-link 
+                    close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline
+                    link-opacity-25-hover mb-5" data-bs-dismiss="#small_off_canvas" href="">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>                    </a>
+
+
+
+
+<!-- arrow down-->
+          <a class="nav-link 
+                    close_small_navbar 
+                    icon-link
+                    link-body-emphasis 
+                    link-offset-2
+                    link-underline
+                    link-opacity-25-hover mb-5" data-bs-dismiss="#small_off_canvas" href="">
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+
+

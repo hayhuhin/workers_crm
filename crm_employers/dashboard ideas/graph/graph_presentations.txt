@@ -1,0 +1,30 @@
+how the graph page works behind the scenes
+
+we have 2 states : one is the get method and second is the post method.
+
+GET METHOD - the basic method that used when the user reaching the dashboard page.
+
+get method behind the scenes:
+    class structure:
+        GraphCalculator - this class queries the sql by the user needs and returns a data in a structured way.
+        MongoDBConstructor - this class connects to the mongodb server and have CRUD methods .
+        GraphRepresantation - this class getting x and y and returning a graph representation
+        as html.
+
+    GET scope actions:
+    1.i get the users data and hes DB records  
+    2.mongodbconstructor class - checking if the user exists and if not it will create
+       new basic record for the user without the graph data(because if the user
+       not exists he never created a graph before)
+    3.if there is a data of the specific user so the data will be parsed to the 
+       GraphRepresantation that returns a graph html to the dashboard page
+    
+    POST scope actions:
+    here we have a delete button,add graph button and edit button.
+    the users input is validated and parsed to the mongodbconstructor methods that handle 
+    the CRUD operations and updates the DB data.
+    after the data is updated the page refreshed so in the get scope the new data is represented.
+
+    also there is a mongodbconstructor method that checking if the user is exists 
+    and validates it.
+    

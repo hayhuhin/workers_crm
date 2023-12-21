@@ -1,0 +1,2 @@
+create user handle for api:
+    1.permissions handle with session auth and csrftoken included

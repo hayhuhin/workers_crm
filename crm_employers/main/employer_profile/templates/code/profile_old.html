@@ -1,0 +1,124 @@
+{% extends 'code/base.html' %}{% block content %} {% load static %}
+<div class="container text-left" style="margin-top: 8rem">
+  <div class="row row-cols-1 row-cols-md-4 g-1">
+    <div class="col border border-light border-1">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">James Jameson</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">Sales Team</h6>
+
+          <img
+            src="{% static 'employer/images/photo.png'%}"
+            class="card-img-top"
+            alt="..."
+          />
+          <p class="card-text">100 leads - this month.</p>
+          <p class="card-text">100,000 revenue - this month.</p>
+        </div>
+        <div class="card-footer text-body-secondary">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-auto" style="margin-top: 15px">
+                <a href="#" class="btn btn-success">EDIT</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+        <div class="col border border-info border-1">
+         <div class="ms-1" style="width:300px;height:370px"> 
+          <h3>monthly lead profit</h3>
+          <img src={% static 'employer/images/pie.png' %} style='width:100%'/>
+          </div>
+        </div> 
+
+          <div class="col border border-info border-1">
+            <div  style="width:300px;height:370px">
+              <h3>weakly lead profit</h3>
+          <img src="{% static 'employer/images/donut.png'%}"style='width:100%'/>
+
+            </div>
+          </div>
+
+            <!-- tasks window -->
+            <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">contribution</h5>
+                <p class="card-text">
+                  This is a longer card with supporting text below as a natural
+                  lead-in to additional content.
+                </p>
+              </div>
+            </div>
+
+            <!-- another tasks window-->
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">contribution</h5>
+                <p class="card-text">
+                  This is a longer card with supporting text below as a natural
+                  lead-in to additional content.
+                </p>
+              </div>
+            </div>
+          </div>
+
+      <!-- the container end div-->
+    </div>
+  </div>
+</div>
+</div>
+
+<div class='container'style='margin-top:4rem'>
+<h3>Weekly Task Completion</h3>
+<div class='row'style='margin-bottom:15px'>
+
+    <div class='col-sm-auto'>
+      <p> 01/10/23</p>
+    </div><!-- col end div-->
+
+    <div class='col'>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar" style="width: 0%">0%</div>
+    </div>
+    </div>
+    <div class='row'style='margin-bottom:15px'>
+
+    <div class='col-sm-auto'>
+      <p>   08/10/23</p>
+    </div><!-- col end div-->
+
+    <div class='col'>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar" style="width: 25%">25%</div>
+    </div>
+    </div>
+    <div class='row'style='margin-bottom:15px'>
+
+    <div class='col-sm-auto'>
+      <p>   17/10/23</p>
+    </div><!-- col end div-->
+
+    <div class='col'>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar" style="width: 50%">50%</div>
+    </div>
+    </div>
+    <div class='row'style='margin-bottom:15px'>
+
+      <div class='col-sm-auto'>
+        <p>   25/10/23</p>
+      </div><!-- col end div-->
+
+      <div class='col'>
+      <div class="progress" role="progressbar" aria-label="basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar" style="width: 75%">75%</div>
+      </div>
+      </div>
+    </div>
+
+{% endblock content %}

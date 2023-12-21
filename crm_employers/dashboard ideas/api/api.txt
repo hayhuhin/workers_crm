@@ -1,0 +1,72 @@
+what the api is doing?
+1.  users + permission handling
+2.tasks CRUD operations
+3.leads CRUD operations
+4.income/outcome CRUD operations
+5.database income/outcome calculations
+6.company insights data
+6.teams tracking by their profit and accomplishments
+
+
+constraints:
+1.the code must be DRY
+2.speed complexity must be good as possible(cache/search engines...)
+3.api endpoints have to be understandable
+4.session authentication + csrftoken must be used
+5.directories structure have to be understandable as possible
+6.each class and functions have to be documented well
+7.each app have to be tested with unittest
+
+
+api structure:
+
+first goes the app and then the method/functionality that we need.
+
+in the production the api calls might look like this:
+
+https://www.valar.api.com/user/register
+
+and the json might look like this:
+
+{
+username:(waiting to be filled with data),
+password:(waiting to be filled with data)
+}
+
+the request sent to the backend as post request and creates the user and returns the sessionid to the frontend
+
+after that the user can access many api calls .
+
+for example:
+
+https://valar.api.com/task
+
+this endpoint is returning all options that the user have for creating editing or deleting tasks
+
+when the user want to delete specific task for example he clicking the specific task that he want to delete and it sending its id to api endpoint:
+https://www.valar.api.com/task/delete
+and updates the frontend with the new data
+
+thats how all the pages with CRUD operations will work.
+
+
+the dashboard have multiple options so its going to be different:
+bar and line dashboard are the same with the type of the data structure so 
+its not hard to implement the logic.
+the backend implementation:
+the user going to https://valar.api.com/dashboard
+
+user have the option to create dashboard for himself ,he choosing the start date,end date which database etc...
+user click submit button then it sends to the backend - validating the data queries the database summarize it and saves it as a dict in mongodb for this specific user(meaning each user can create a graph for himself and can share it between employers)
+when the graph created it will be displayed in the :
+https://www.valar.api.com/dashboard
+
+
+-----------------------------------
+user permissions
+groups of admins,managers,workers,basic.
+
+admins have all permissions, managers have access to specific databases and rule managing for specific users.
+
+
+

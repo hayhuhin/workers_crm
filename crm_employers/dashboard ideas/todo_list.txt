@@ -1,0 +1,110 @@
+tasks model
+
+tasks-delete-add-edit-methods
+display user specific - leads,job tasks,personal tasks
+
+
+
+1.fix:in tasks views all if statements and form validation is wrong - FIXED
+2.add:tasks - complete method- DONE , leads - complete and edit methods - DONE
+
+
+------------------------
+
+VISUALS:
+1.make the tasks page look better with spacings ,positioning and sizing - DONE
+2.ajax method that will not refresh the page - DONE
+3.messaging after submiting forms - DONE
+
+FIX:
+1.security- research ways to edit cards without exposing the id of the card in the url 
+
+
+tasks 1:
+add proper names to each tag and function - DONE
+add ajax method to all submits in the task page - DONE
+add proper messages after submitting a form - DONE
+
+
+tasks 2:
+add function that handle progress bar in and can be reused - DONE
+fix:lead complete and on progress bar :multiplies its submits again the adds the same task to the window - FIXED
+add more fields for leads and tasks to all tasks that will be represented -  DONE
+add hide/show tasks when the windows is too large - DONE
+fix:edit window doesnt work - DONE
+
+
+
+tasks 3:
+add login_required function to each url that the user must be authenticated - DONE
+add progress bar to the leads,sided nav bar,appropriate button names,appropriate colors - DONE
+
+
+
+
+tasks 4:
+add:change the dashboard to be represented much bigger and nice for the client end - DONE
+
+task 5
+ADD:the user can modify as he wants the graph to be represented (choose which graph style(pie/chart/lines) - DONE
+>>then what to query from the DB - income/outcome/timeline/) - more details in graph_builder.txt - DONE
+
+
+add fields to the add graph form :
+    a.title of the graph - DONE
+    b.sub-title - DONE
+
+create edit graph functionallity - DONE
+
+
+create remove graph functionallity in the dashboard page - DONE
+
+
+make the dashboard page look much better 
+FIX:the date should look like this :DD-MM-YYYY and not YYYY-MM-DD + change the method to use timestamps - DONE
+FIX:user can change position when there is no other positions and it breaks the page - DONE
+
+task 6:
+    << on hold >>
+migrate into the django the mongodb database - CANCELED : not needed because the pymongo suits my right needs
+ADD:change graph position - DONE
+
+ADD:in the edit form it will automaticly fill the date - DONE
+ADD:another bar/line for comparing - !!! to create a comparing first i must to fix the timestamps and another graph bugs - DONE
+https://plotly.com/python/bar-charts/
+
+ADD:need to handle the outcome adding data to db !! - DONE
+ADD:smaller data insight on the dashboard page - done
+FIX:refactoring and documentation for all mongodb classes and methods !!!! - done
+ADD:TESTS FOR EACH FUNCTION - done
+ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
+
+
+
+
+
+
+
+
+
+<<working on >>
+ADD:visually change the graph presentation to look clean - 
+
+FIX:dashboard.views hirarcy of the code - done
+
+#MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
+https://docs.djangoproject.com/en/4.2/topics/security/#user-uploaded-content-security
+ITS THE FILE HANDLING AND SECURITY
+
+task 5:
+add logic to the home page that will represent the usage of the crm with a description - 
+
+
+ADD:cache/save the data (to prevent the sql querieng every time the user sending get request/refreshing the page)
+
+ADD:change the profile page to look much more updated and nice for the end user - 
+ADD:make the dashboard page look good (ui frameworks or some frontend libraries)
+ADD:export CSV and Import CSV - in the import must be a option to watch without saving the data
+    1.export CSV - DONE
+    2.import CSV - DONE
+
