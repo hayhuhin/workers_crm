@@ -1,5 +1,7 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group,User
+from django.contrib.auth.models import Group
+from .models import User
+
 from .models import Employer,Department
 from tasks.models import Lead,DepartmentTask,Task
 from dashboard.models import Income,GraphPermission
@@ -17,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
     fields = ['username','password']
     inlines = [EmployerInline]
 
-admin.site.unregister(User)
+
 admin.site.register(User,UserAdmin)
 admin.site.register(Department)
 admin.site.register(Lead)
