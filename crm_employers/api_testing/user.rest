@@ -31,19 +31,35 @@ get http://127.0.0.1:8000/api/user/user
     Accept: application/json
     Content-Type: application/json
     
-    {
-        "email":"ta@ta.com",
-        "password":"Aa1122!!"
-    }
+    # {
+    #     "email":"va@va.com",
+    #     "password":"Aa1122!!"
+    # }
+
 
 
 
 ###
-get http://127.0.0.1:8000/api/user/user
+
+
+post http://127.0.0.1:8000/api/user/logout
     Accept: application/json
     Content-Type: application/json
+
     
-    {
-        "email":"ta@ta.com",
-        "password":"Aa1122!!"
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

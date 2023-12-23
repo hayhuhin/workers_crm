@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
 from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer
-
+from django.views.decorators.csrf import ensure_csrf_cookie,csrf_protect
 
 
 
@@ -45,7 +45,7 @@ from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializ
 #     return render(request,'code/base_test.html')
 
 
-
+@csrf_protect
 class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 	authentication_classes = (SessionAuthentication,)
@@ -77,8 +77,8 @@ class UserLogin(APIView):
 
 
 class UserLogout(APIView):
-	permission_classes = (permissions.AllowAny)
-	authentication_classes = ()
+	permission_classes = (permissions.AllowAny,)
+	authentication_classes = (SessionAuthentication,)
 
 	def post(self, request):
 		logout(request)
