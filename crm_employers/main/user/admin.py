@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group,Permission
 from .models import User
 
 from .models import Employer,Department
@@ -27,5 +27,7 @@ admin.site.register(Task)
 admin.site.register(DepartmentTask)
 admin.site.register(Income)
 admin.site.register(GraphPermission)
+admin.site.register(Group)
+admin.site.register(Permission)
 
 

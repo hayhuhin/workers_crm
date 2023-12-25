@@ -1,0 +1,9 @@
+notes:
+the request.auth propery of the user class can show me the users auth token he sended the request
+
+each request it runs the request.user and request.auth if no class authenticates then it will return :
+django.contrib.auth.models.AnonymousUser and request.auth to None
+
+When an unauthenticated request is denied permission there are two different error codes that may be appropriate.
+HTTP 401 Unauthorized
+HTTP 403 Permission Denied

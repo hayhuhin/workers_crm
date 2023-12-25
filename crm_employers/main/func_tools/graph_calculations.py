@@ -104,6 +104,9 @@ class GraphCalculator:
         first_day = first_day_datetime_object.strftime("%Y-%m-%d")
         last_day = last_day_datetime_object.strftime("%Y-%m-%d")
 
+        #varifing that the string is lower case
+        db = db.lower()
+
         if db == "income":
             full_amount_summary = self.db[0].objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
             month_year_repr= (first_day_datetime_object.strftime("%B")[0:3] +" "+ (first_day_datetime_object.strftime("%Y"))[2:])
@@ -147,7 +150,7 @@ class GraphCalculator:
 
         #checking if the input of the start and end date was valid if not raises exeption
         if not months_query_set:
-            raise Exception("invalid records input")
+            raise Exception("invalid records input or the record not exists")
 
         #checking if the sql query is valid 
         if months_query_set:

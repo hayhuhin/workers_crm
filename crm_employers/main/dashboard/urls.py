@@ -6,7 +6,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 
-    path('dashboard',dashboard_views.dashboard),
+    path('getRecord',dashboard_views.GetRecord.as_view(),name='get_record'),
+    path('AddRecord',dashboard_views.AddRecord.as_view(),name='add_record'),
+    path('UpdateRecord',dashboard_views.UpdateRecord.as_view(),name='update_record'),
+    # path('edit_graph',dashboard_views.dashboard),
+    # path('switch_graph',dashboard_views.dashboard),
 ]
 
 if settings.DEBUG:

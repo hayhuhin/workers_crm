@@ -1,5 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model,authenticate
+from rest_framework.authtoken.models import Token
+
+
+
 
 UserModel = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -8,9 +12,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = "__all__"
     
     def create(self,clean_data):
+        data = {}
         user_obj = UserModel.objects.create_user(email=clean_data["email"],username=clean_data["username"],password=clean_data["password"])
         user_obj.save()
-        return user_obj
+        token = Token.objects.get(user=user_obj).key
+        data["username"] = user_obj.username
+        data["email"] = user_obj.email
+        data["token"] = token
+        return data
     
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:

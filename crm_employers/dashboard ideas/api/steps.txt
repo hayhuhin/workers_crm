@@ -1,3 +1,35 @@
 create user handle for api:
     1.permissions handle with session auth and csrftoken included
     https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/
+
+
+first tasks:
+1.handle user token auth - added token creation
+2.understand the cors-headers 
+3.handle the django settings folder with the new api changes
+
+api best practices
+have versioning in the uri path
+    api/v1/graph/1
+
+implement pagination to handle large datasets efficiently
+    api/v1/graph/?status=merged&sort=position
+
+response format must be always a json even the errors
+
+implement caching mechanism to improve api performance
+    example: http caching headers like-cache-control
+
+implement logging to capture relevant information for debugging and monitoring.
+
+add rate limit per api request
+
+large amount of tests 
+
+create logging system that logs for each user what did he do and when 
+    example: user1 deleted record at 01/01/01 12:12:12 utc+2 with the permission:staff.
+
+
+security:
+    user token-based auth.
+        token refresh HANDLING

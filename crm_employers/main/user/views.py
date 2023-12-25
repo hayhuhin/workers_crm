@@ -1,54 +1,19 @@
-# from django.shortcuts import render,redirect,HttpResponse
-# from django.contrib.auth import authenticate,login
-# from django.contrib import messages
-# from django.contrib.auth.forms import UserCreationForm
-# from .models import Employer
 
-#---------restwramewok lib
+#---------  restframewok library
 from django.contrib.auth import get_user_model,login,logout
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
 from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer
-from django.views.decorators.csrf import ensure_csrf_cookie,csrf_protect
+from rest_framework.authtoken.models import Token
 
 
 
 
-# def home(request):
-#     if request.user.is_authenticated:
-#         test = Employer.objects.get(user=request.user)
-#         return render(request,'code/home.html',{'test':test})
-#     else:
-#         return redirect('/login')
-
-
-
-
-# # def login(request):
-# #     return render(request,'code/login.html')
-
-# def sign_up(request):
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#         return redirect('/dashboard')
-#     else:
-#         form=UserCreationForm()
-
-#     return render(request,'code/signup.html',{'form':form})
-
-# def test(request):
-#     return render(request,'code/base_test.html')
-
-
-@csrf_protect
 class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
-	authentication_classes = (SessionAuthentication,)
+
 
 	def post(self, request):
 		clean_data = custom_validation(request.data)
@@ -56,14 +21,12 @@ class UserRegister(APIView):
 		if serializer.is_valid(raise_exception=True):
 			user = serializer.create(clean_data)
 			if user:
-				return Response(serializer.data, status=status.HTTP_201_CREATED)
+				return Response(user, status=status.HTTP_201_CREATED)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogin(APIView):
 	permission_classes = (permissions.AllowAny,)
-	authentication_classes = (SessionAuthentication,)
-
 	
 	def post(self, request):
 		data = request.data
@@ -73,12 +36,18 @@ class UserLogin(APIView):
 		if serializer.is_valid(raise_exception=True):
 			user = serializer.check_user(data)
 			login(request, user)
-			return Response(serializer.data, status=status.HTTP_200_OK)
+
+			data = {}
+			data["username"] = user.username
+			data["email"] = user.email
+			data["token"] = str(Token.objects.get(user=user))
+			return Response(data, status=status.HTTP_200_OK)
+
 
 
 class UserLogout(APIView):
 	permission_classes = (permissions.AllowAny,)
-	authentication_classes = (SessionAuthentication,)
+
 
 	def post(self, request):
 		logout(request)
@@ -87,7 +56,6 @@ class UserLogout(APIView):
 
 class UserView(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
 
 	def get(self, request):
 		serializer = UserSerializer(request.user)

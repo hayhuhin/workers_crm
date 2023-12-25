@@ -1,42 +1,59 @@
 
-
-
-
-
-
-post http://127.0.0.1:8000/api/user/register
+post http://127.0.0.1:8000/v1/api/user/login
     Accept: application/json
     Content-Type: application/json
 
     {
-        "email":"ta@ta.com",
-        "username":"kaka",
+        "email":"va@va.com",
         "password":"Aa1122!!"
     }
 
 
 ###
 
-post http://127.0.0.1:8000/api/user/login
+post http://127.0.0.1:8000/v1/api/user/register
     Accept: application/json
     Content-Type: application/json
-    
+
     {
-        "email":"ta@ta.com",
+        "email":"ben@ben.com",
+        "username":"ben",
         "password":"Aa1122!!"
     }
+
+
+
+
+###
+get http://127.0.0.1:8000/v1/api/user/user
+    Accept: application/json
+    Content-Type: application/json
+    Authorization: Token 2a55f991ed03969c4217733616e5f2e2100c7455
+
+###
+
+get http://127.0.0.1:8000/v1/api/dashboard/getRecord
+    Accept: application/json
+    Content-Type: application/json
+    Authorization: Token 2a55f991ed03969c4217733616e5f2e2100c7455
+
+
 
 ###
 get http://127.0.0.1:8000/api/user/user
     Accept: application/json
     Content-Type: application/json
     
+
     # {
     #     "email":"va@va.com",
     #     "password":"Aa1122!!"
     # }
+#va token
+# 6635d50d4529dfe54c167018a6c543733f9687b1
 
-
+#ben token
+##4dfa87a1348542fc1c1c2feeeb6512cc27b10426
 
 
 ###
@@ -47,16 +64,40 @@ post http://127.0.0.1:8000/api/user/logout
     Content-Type: application/json
 
     
+###
+
+post http://127.0.0.1:8000/v1/api/dashboard/AddRecord
+    Accept: application/json
+    Content-Type: application/json
+    Authorization: Token 4dfa87a1348542fc1c1c2feeeb6512cc27b10426
+
+{
+    "graph_title": "test title",
+    "graph_description": "test description",
+    "graph_type": "general_graph",
+    "db": "Income",
+    "start": "2023-11-01",
+    "end": "2024-11-01"
+}
 
 
+###
 
 
+post http://127.0.0.1:8000/v1/api/dashboard/UpdateRecord
+    Accept: application/json
+    Content-Type: application/json
+    Authorization: Token 4dfa87a1348542fc1c1c2feeeb6512cc27b10426
 
-
-
-
-
-
+{
+    "graph_title": "test title",
+    "graph_description": "test description",
+    "graph_type": "general_graph",
+    "db": "Income",
+    "start": "2023-08-01",
+    "end": "2023-11-01",
+    "graph_position":"6"
+}
 
 
 

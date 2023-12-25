@@ -1,5 +1,5 @@
 from django.test import TestCase
-from mongodb_connector import MongoDBConstructor
+from .mongodb_connector import MongoDBConstructor
 
 class TestMongoDBConnectorClasses(TestCase):
     def setUp(self):

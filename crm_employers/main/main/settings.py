@@ -19,7 +19,7 @@ import json
 WINDOWS_PATH_FOR_DJANGO = 'D:\git_shell\Git\etc\crm_secret_key.json'
 MAC_PATH_FOR_DJANGO = '/etc/workers_crm.json'
 BASE_DIR = Path(__file__).resolve().parent.parent
-with open(WINDOWS_PATH_FOR_DJANGO) as json_file:
+with open(MAC_PATH_FOR_DJANGO) as json_file:
     read_data = json.load(json_file)
     DJANGO_KEY = read_data['SECRET_KEY']
     DATABASE_KEY = read_data["DB_PASSWORD"]
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'rest_framework',
     'corsheaders',
     'widget_tweaks',
@@ -112,8 +113,12 @@ DATABASES = {
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated'),
-    'DEFAULT_AUTHENTICATION_CLASSES':('rest_framework.authentication.SessionAuthentication'),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
 # Password validation

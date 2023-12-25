@@ -101,3 +101,22 @@ query example:
 <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
 
 
+
+
+#!!! first user creation models comands
+
+from user.models import User as u
+from django.contrib.auth.models import Group as g
+from rest_framework.authtoken.models import Token as t
+from dashboard.models import GraphPermission as gp
+
+u.objects.create(email="ben@ben.com",username="ben",password="Aa1122!!")
+ben = u.objects.get(username="ben")
+g.objects.all().create(name="full_graph_permission")
+permission = g.objects.get(name="full_graph_permission")
+ben.groups.add(permission)
+token = t.objects.filter(user=ben)
+
+gp.objects.create(name="one_record",permited=True,max_record_amount=1,no_sql_db="test",collection="test")
+
+

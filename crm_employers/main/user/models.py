@@ -4,6 +4,11 @@ from tasks.models import Lead,Task,DepartmentTask
 from dashboard.models import GraphPermission
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
+from rest_framework.authtoken.models import Token
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.conf import settings
+
 
 
 class UserManager(BaseUserManager):
@@ -16,12 +21,9 @@ class UserManager(BaseUserManager):
         
         #this method checking that the email is in correct format
         email = self.normalize_email(email)
-
-        #this setups the django username as email
-    
+         #this setups the django username as email
         user = self.model(email=email,username=username)
         #setting the password
-
 
         user.set_password(password)
         #saving the user
@@ -71,7 +73,6 @@ class User(AbstractBaseUser,PermissionsMixin):
         return self.username
     
 
-
 class Employer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50,blank=False)
@@ -104,3 +105,9 @@ class Department(models.Model):
         return self.position
 
 
+
+
+@receiver(post_save,sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender,instance=None,created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)

@@ -10,10 +10,51 @@ from func_tools.file_validation import FileValidator,generate_csv
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
 import time
 from user.models import Employer
+from django.contrib.auth import get_user_model,login,logout
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import permissions,status
+from .serializers import GraphViewSerializer,AddRecordSerializer,UpdateRecordSerializer
+from rest_framework.authtoken.models import Token
+from user.permissions import GraphGroupPermission
+
 
 
 
 curr_path = Path.cwd()
+
+
+# class GraphRecordsRouter:
+    # """
+    # this class is handling the graph calculator and the mongodb in one place and makes it more understandble and clean
+    # for usage.
+    # """
+
+    # def __init__(self,mongodb_settings:dict,calculator_settings:dict):
+    #     self.mongodb_settings = mongodb_settings
+    #     self.calculator_settings = calculator_settings
+
+    #     ############        mongodb init
+    #     self.mongodb_uri = self.mongodb_settings["uri"]
+    #     self.mongodb_name = self.mongodb_settings["db"]
+    #     self.mongodb_collection = self.mongodb_settings["collection"]
+    #     self.mongodb_user_id = self.mongodb_settings["user"]
+    #     self.mongodb_max_records = self.mongodb_settings["max_records"]
+
+    #     ############        calculations init
+    #     self.calc_db = self.calculator_settings["database_objects"]
+    #     self.db_func = self.calculator_settings["db_func"]
+
+    #     #initilising the mongodbconstructor class
+    #     self.mongodb_handler = MongoDBConstructor(uri=self.mongodb_uri,db=self.mongodb_name,collection=self.mongodb_collection,user=self.mongodb_user_id,max_records=self.mongodb_max_records)
+
+    #     #initialising the GraphCalculator class
+    #     self.calculation_handler = GraphCalculator(user=self.mongodb_user_id,last_save="",db=[obj for obj in self.calc_db],db_func=[self.db_func]) 
+
+    # def add_record(self,created_record):
+    #     self.mongodb_handler.add_record(created_record)
+
+
 
 
 @login_required
@@ -367,11 +408,167 @@ def dashboard(request):
         print("the requested method is DELETE")
     
 
-
-
-
         #? here its response in the post scope
         context = {'databases':databases,'income_form':income_form,"graph_chart":graph_chart}
         return render(request,'code/dashboard.html',context)
 
+class UserSetUp:
+    """
+    class that creating instantiating mongodb and the user sql database permission
+    """
+
+
+
+class AddRecord(APIView):
+    permission_classes = (permissions.IsAuthenticated,GraphGroupPermission)
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    def post(self,request):
+        #if the user posted any data
+        if request.data:
+            serializer = AddRecordSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                
+                #the graph calculator class
+                graph_calculator = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
+
+                #the graph mongodb CRUD operations class
+                #the db,collection,max_amount will be accessed from the user database
+                mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
+
+                #serializing the data
+                graph_calculated_data = graph_calculator.sum_by_range(db=serializer.data["db"],start_date=serializer.data["start"],end_date=serializer.data["end"])
+
+                created_record = serializer.serialize(graph_data=graph_calculated_data)
+                if created_record:
+                    mongodb_handler.add_record(created_record)
+                    return Response(created_record,status=status.HTTP_201_CREATED)
+                
+                return Response({"error":"cant create record"},status=status.HTTP_404_NOT_FOUND)
+            return Response(request.data,status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=[{"error":"invalid input. the input have to look like in the example below:"},{
+                    "graph_title":"graph_title",
+                    "graph_description":"graph_description",
+                    "graph_type":"graph_type",
+                    "db":"db",
+                    "start":"%Y-%m-%d",
+                    "end":"%Y-%m-%d",
+                    }],status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class SwitchPosition(APIView):
+    permission_classes = (permissions.IsAuthenticated,GraphGroupPermission)
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    def post(self,request):
+        #if the user posted any data
+        if request.data:
+            #the graph mongodb CRUD operations class
+            #the db,collection,max_amount will be accessed from the user database
+            mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
+            src = request.data["src_position"]
+            dst = request.data["dst_position"]
+            mongodb_handler.switch_records(src_position=src,dst_position=dst)
+
+            return Response({"success":"the records have switched successfuly"},status=status.HTTP_201_CREATED)
+        return Response({"error":"cant create record"},status=status.HTTP_404_NOT_FOUND)
+        
+
+class UpdateRecord(APIView):
+    permission_classes = (permissions.IsAuthenticated,GraphGroupPermission)
+
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+    def post(self,request):
+        #if the user posted any data
+        if request.data:
+            serializer = UpdateRecordSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                
+                #the graph calculator class
+                graph_calculator = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
+
+                #the graph mongodb CRUD operations class
+                #the db,collection,max_amount will be accessed from the user database
+                mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
+
+                #serializing the data
+                graph_calculated_data = graph_calculator.sum_by_range(db=serializer.data["db"],start_date=serializer.data["start"],end_date=serializer.data["end"])
+
+                updated_record = serializer.update_record(graph_data=graph_calculated_data)
+                if updated_record:
+                    mongodb_handler.edit_record(record_position=serializer.data["graph_position"],edit_data=updated_record)
+                    updated_record["graph_position"] = serializer.data["graph_position"]
+                    return Response(updated_record,status=status.HTTP_201_CREATED)
+                
+                return Response({"error":"cant update record"},status=status.HTTP_404_NOT_FOUND)
+            
+            return Response(request.data,status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(data=[{"error":"invalid input. the input have to look like in the example below:"},
+                {
+                    "graph_title":"graph_title",
+                    "graph_description":"graph_description",
+                    "graph_type":"graph_type",
+                    "db":"db",
+                    "start":"%Y-%m-%d",
+                    "end":"%Y-%m-%d",
+                    "graph_position":"graph_position"
+                }],status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class GetRecord(APIView):
+    #this handles the connection to the mongodb database
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+
+
+    def get(self,request):
+
+        graph_data = []
+
+        mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=str(request.user.username),max_records=7)
+        #this checking if the user already have basic record in the mongodb graph
+        if not mongodb_handler.user_exists():
+            mongodb_handler.create_basic_record()
+        
+        #method returns dict with records or empty dict if records not exist
+        graph_records_dict = mongodb_handler.graph_records()
+
+        #users first basic data
+        user_basic_data = mongodb_handler.find_data({"name":request.user.username})
+
+        #saving the insights data to be parsed into the template
+        if "insights_data" in user_basic_data:
+            insights_data = user_basic_data["insights_data"]
+
+        #checking if the user have records
+        if graph_records_dict:
+            #itarates over the records keys
+            for record in graph_records_dict:
+                
+                #for comparison methods i should parse "sql_database_compared" even if empty
+                #checking if there are any sql_comparison records in the db
+                if "sql_database_compared" in graph_records_dict[record]:
+                    sql_comparison = graph_records_dict[record]["sql_database_compared"]
+                else:
+                    sql_comparison = []
+
+                #this is how the structure if the "dict_values" argument have to look like
+                dict_values = {"x":graph_records_dict[record]["x"],
+                            "y":graph_records_dict[record]["y"],
+                            "y_2":graph_records_dict[record]["y_2"],
+                            "graph_description":graph_records_dict[record]["graph_description"],
+                            "DB_1":graph_records_dict[record]["sql_database"],
+                            "DB_2":sql_comparison}
+
+                #this method creating graph html with the data extracted from the mongodb 
+
+                #appending the graph_html to the graph_chart list and the list will be parsed into the html template
+                graph_data.append({"graph_data":graph_records_dict[record],"graph_position":record})
+
+
+            # serializer = GraphViewSerializer(graph_data[])
+
+            return Response(graph_data,status=status.HTTP_200_OK)
+            
+        return Response({"error":"user dont have records"},status=status.HTTP_204_NO_CONTENT)
 
