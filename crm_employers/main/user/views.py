@@ -29,6 +29,7 @@ class UserLogin(APIView):
 	permission_classes = (permissions.AllowAny,)
 	
 	def post(self, request):
+		print(request.data)
 		data = request.data
 		assert validate_email(data)
 		assert validate_password(data)

@@ -29,6 +29,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField()
 
     def check_user(self,clean_data):
+        print(clean_data["email"])
         user = authenticate(username=clean_data["email"],password=clean_data["password"])
         if not user:
             raise ValueError("user not found")
