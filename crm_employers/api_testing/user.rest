@@ -4,7 +4,7 @@ post http://127.0.0.1:8000/v1/api/user/login
     Content-Type: application/json
 
     {
-        "email":"va@va.com",
+        "email":"ben@ben.com",
         "password":"Aa1122!!"
     }
 
@@ -28,7 +28,7 @@ post http://127.0.0.1:8000/v1/api/user/register
 get http://127.0.0.1:8000/v1/api/user/user
     Accept: application/json
     Content-Type: application/json
-    Authorization: Token 2a55f991ed03969c4217733616e5f2e2100c7455
+    Authorization: Token feb39a8f78dfc39b2bc1cc1fc805cf9e17972a9e
 
 ###
 

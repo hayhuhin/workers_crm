@@ -102,6 +102,12 @@ query example:
 
 
 
+#########
+
+db.test.updateOne({"name":"ben"},{"$set":{"insights":{"income_year":[2020,2021],"income_amount":[1111,2222],"outcome_year":[2020,2021],"outcome_amount":[3333,4444] }}})
+
+#########
+
 
 #!!! first user creation models comands
 
@@ -112,9 +118,14 @@ from dashboard.models import GraphPermission as gp
 
 u.objects.create(email="ben@ben.com",username="ben",password="Aa1122!!")
 ben = u.objects.get(username="ben")
+
 g.objects.all().create(name="full_graph_permission")
-permission = g.objects.get(name="full_graph_permission")
-ben.groups.add(permission)
+graph_per = g.objects.get(name="full_graph_permission")
+insight_per = g.objects.create(name="full_insight_permission")
+
+ben.groups.add(graph_per)
+ben.groups.add(insight_per)
+
 token = t.objects.filter(user=ben)
 
 gp.objects.create(name="one_record",permited=True,max_record_amount=1,no_sql_db="test",collection="test")

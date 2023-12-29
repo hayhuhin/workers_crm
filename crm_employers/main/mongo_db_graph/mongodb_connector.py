@@ -707,12 +707,12 @@ class MongoDBConstructor:
             collection_name(str) : collection name of the mongo database
             user(str) : the specific user that we need to get insights
         """
-        query_filter = {"user_name":user}
-        user_data = self.db_gr_query.find_one(query_filter)
-        print(user_data)
+        query_filter = {"name":user}
+        user_data = self.collection.find_one(query_filter,{"insights":1})
+        return user_data["insights"]
 
 
-    def save_insights(self,insights_data:dict) -> None:
+    def update_insights(self,insights_data:dict) -> None:
         """
         this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
         mongodb and not with sql each get request
@@ -722,12 +722,12 @@ class MongoDBConstructor:
             user(str) : the user that we will querie in the mongodb
             insights_data(dict) : this data will be saved in the db each time the method called 
         """
-        insights_data= {
-                "$set":insights_data
+
+        json_data= {
+                "$set":{"insights":insights_data}
             }
-        self.collection.update_one(self.user,insights_data)
 
-
+        self.collection.update_one(self.user,json_data)
     def export_csv_data(self,graph_position) -> list:
         """
         this method returns the specific data needed to be exported the by the user as csv

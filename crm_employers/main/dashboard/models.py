@@ -53,10 +53,16 @@ class GraphPermission(models.Model):
     no_sql_db = models.CharField(max_length=50,default="test")
     collection = models.CharField(max_length=50,default="test")
 
-
     description = f"name - {name} permited - {permited} max_amount - {max_record_amount}"
 
     def __str__(self):
         return self.description
         
+
+class GraphInsights(models.Model):
+    name = models.CharField(max_length=300)
+    permited = models.BooleanField(default=False)
+    no_sql_db = models.CharField(max_length=50,default="test")
+    collection = models.CharField(max_length=50,default="test")
+
 
