@@ -100,10 +100,10 @@ class UpdateInsightsSerializer(serializers.Serializer):
 
 
 class AddInsightsSerializer(serializers.Serializer):
-    choices = [
-        (),()
-    ]
-    insight_type = serializers.ChoiceField()
-    outcome_year = serializers.ListField()
-    income_amount = serializers.ListField()
-    outcome_amount = serializers.ListField()
+    db_options = [
+        ("income","Income"),
+        ("outcome","Outcome")]
+    
+    db = serializers.ChoiceField(choices=db_options)
+    year = serializers.ListField()
+    # amount = serializers.ListField()

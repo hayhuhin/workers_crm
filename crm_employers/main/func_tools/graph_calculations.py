@@ -185,7 +185,7 @@ class GraphCalculator:
             return full_summary,period
 
 
-    def get_data_by_year(self,args:list,**kwargs:str):
+    def get_data_by_year(self,year:list(),db:str):
         """
         sum of all the dates in the specified year.
 
@@ -195,29 +195,40 @@ class GraphCalculator:
         """
 
         #the choosen database
-        database = kwargs["kwargs"]["db"]
+        choosen_db = db
         #the choosen year list
-        year_range = args
+        year_range = year
 
-        if database == "income":
-            yearly_sum_dict = {}
-            for year in year_range:
-                start = f"{year}-01-01"
-                end = f"{year}-12-31"
+        #saving the year data
+        yearly_sum_dict = {}
 
-                full_sum = self.db[0].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
-                yearly_sum_dict[year] = full_sum
 
-            return yearly_sum_dict
+        for db in self.db:
+            lower_db = str(db.__name__)
 
-        if database == "outcome":
-            yearly_sum_dict = {}
-            for year in year_range:
-                start = f"{year}-01-01"
-                end = f"{year}-12-31"
+            # dbs_name_lower = dbs_name_lower.lower()
+            # print(dbs.__name__,choosen_db)
+            if lower_db.lower() == choosen_db:
+                for year in year_range:
+                    start = f"{year}-01-01"
+                    end = f"{year}-12-31"
 
-                full_sum = self.db[1].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
-                yearly_sum_dict[year] = full_sum
+                    full_sum = db.objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
+                    yearly_sum_dict[year] = full_sum
 
-        return yearly_sum_dict
+
+                
+
+        return yearly_sum_dict,choosen_db
+
+        # if database == "outcome":
+        #     yearly_sum_dict = {}
+        #     for year in year_range:
+        #         start = f"{year}-01-01"
+        #         end = f"{year}-12-31"
+
+        #         full_sum = self.db[1].objects.filter(month__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
+        #         yearly_sum_dict[year] = full_sum
+
+        # return yearly_sum_dict
     

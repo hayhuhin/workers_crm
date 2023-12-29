@@ -13,6 +13,8 @@ urlpatterns = [
     path('DeleteRecord',dashboard_views.DeleteRecord.as_view(),name='delete_position'),
     path('CompareRecord',dashboard_views.CompareRecord.as_view(),name='compare_record'),
     path('UpdateInsights',dashboard_views.UpdateInsights.as_view(),name='update_insights'),
+    path('AddInsights',dashboard_views.AddInsights.as_view(),name='add_insights'),
+
 
 
 ]

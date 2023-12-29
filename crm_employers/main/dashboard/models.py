@@ -64,5 +64,7 @@ class GraphInsights(models.Model):
     permited = models.BooleanField(default=False)
     no_sql_db = models.CharField(max_length=50,default="test")
     collection = models.CharField(max_length=50,default="test")
+    max_record_amount = models.IntegerField(default=4)
+
 
 

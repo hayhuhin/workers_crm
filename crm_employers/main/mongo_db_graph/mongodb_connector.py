@@ -728,6 +728,37 @@ class MongoDBConstructor:
             }
 
         self.collection.update_one(self.user,json_data)
+
+
+
+    def add_insights(self,insights_data:dict,max_amount:int) -> None:
+        """
+        this method is saving the insights of the user in a mongodb table so it will be queried faster to a 
+        mongodb and not with sql each get request
+
+        Args:
+            collection_name(str) : the collection name of the mongodb database.
+            user(str) : the user that we will querie in the mongodb
+            insights_data(dict) : this data will be saved in the db each time the method called 
+        """
+
+        # insight_format = {str(randint(1,10000000)):insights_data}
+        current_insight_amount = self.collection.find_one(self.user,{"insights":1})
+        if "insights" not in current_insight_amount:
+            self.collection.update_one(self.user,{"$set":{"insights":{}}})
+
+
+        current_insight_amount = self.collection.find_one(self.user,{"insights":1})
+        if (len(current_insight_amount["insights"])) >= max_amount:
+            return False
+        else:
+            json_data= {
+                    "$set":{f"insights.{str(randint(1,100000))}":insights_data}
+                        }
+            self.collection.update_one(self.user,json_data)
+            return True
+
+
     def export_csv_data(self,graph_position) -> list:
         """
         this method returns the specific data needed to be exported the by the user as csv
@@ -744,3 +775,5 @@ class MongoDBConstructor:
             content.append(records[graph_position][data])
 
         return titles,content
+    
+    

@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from tasks.models import Lead,Task,DepartmentTask
-from dashboard.models import GraphPermission
+from dashboard.models import GraphPermission,GraphInsights
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
 from rest_framework.authtoken.models import Token
@@ -85,6 +85,7 @@ class Employer(models.Model):
     lead = models.ManyToManyField(Lead)
     task = models.ManyToManyField(Task)
     graph_permission = models.ManyToManyField(GraphPermission)
+    insights_permission = models.ManyToManyField(GraphInsights)
 
 
 

@@ -254,7 +254,7 @@ class UpdateInsights(APIView):
             #graph calculator instance
             graph_calculations = GraphCalculator(user=request.user.usernamem,last_save="",db=[Income,Outcome],db_func=[Sum])
 
-            calculated_data = graph_calculations.get_data_by_year(income_year = serializer.data["income_year"],outcome_year = serializer.data["outcome_year"])
+            calculated_data = graph_calculations.get_data_by_year(years = serializer.data["year"],db = serializer.data["db"])
 
             mongodb_handler.update_insights(calculated_data)
 
@@ -266,7 +266,37 @@ class UpdateInsights(APIView):
 
 
 class AddInsights(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,GraphGroupPermission,InsightsGroupPermission)
+    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+
+    def post(self,request):
+
+        serializer = AddInsightsSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+
+            #the mongodb handler with CRUD operations
+            mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=str(request.user.username),max_records=7)
+
+
+            #graph calculator instance
+            graph_calculations = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
+
+
+            calculated_data = graph_calculations.get_data_by_year(year = serializer.data["year"],db = serializer.data["db"])
+            
+
+            calculated_dict = {"db":calculated_data[1],"data":calculated_data[0]}
+
+
+            added_record = mongodb_handler.add_insights(calculated_dict,max_amount=4)
+            if added_record:
+                return Response(calculated_dict,status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error":"max capacity exceded"},status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error":"user input vas invalid"},status=status.HTTP_404_NOT_FOUND)
+
+ 
 
 # class GraphRecordsRouter:
     # """
