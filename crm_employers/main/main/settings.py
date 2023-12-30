@@ -55,14 +55,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'corsheaders',
-    'widget_tweaks',
     'user',
     'dashboard',
-    'teams',
-    'employer_profile',
-    'tasks',
-    'func_tools',
-    'mongo_db_graph'
+    'func_tools.graph_calculations',
     
     
 ]

@@ -1,3 +1,6 @@
+
+#! this file is only for basic website usage
+#* this code was written before i mooved to api solution
 import plotly.express as px
 import pandas as pd
 from pathlib import Path
