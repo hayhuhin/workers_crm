@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
 import time
 
 gmtime_dict = time.gmtime()
@@ -8,7 +7,7 @@ time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dic
 
 
 
-
+    #* later it will be usefull for our graph repr 
 class GraphViewSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
     name = serializers.CharField(max_length=50)
@@ -74,7 +73,6 @@ class DeleteRecordSerializer(serializers.Serializer):
     position = serializers.CharField(max_length=5)
 
 
-
 class CompareRecordSerializer(serializers.Serializer):
     src_position = serializers.CharField(max_length=5)
     dst_position = serializers.CharField(max_length=5)
@@ -87,7 +85,6 @@ class GetInsightsSerializer(serializers.Serializer):
     outcome_amount = serializers.ListField()
 
 
-
 class UpdateInsightsSerializer(serializers.Serializer):
     income_year = serializers.ListField()
     outcome_year = serializers.ListField()
@@ -98,7 +95,6 @@ class UpdateInsightsSerializer(serializers.Serializer):
         pass
 
 
-
 class AddInsightsSerializer(serializers.Serializer):
     db_options = [
         ("income","Income"),
@@ -107,3 +103,7 @@ class AddInsightsSerializer(serializers.Serializer):
     db = serializers.ChoiceField(choices=db_options)
     year = serializers.ListField()
     # amount = serializers.ListField()
+
+
+class DeleteInsightsSerializer(serializers.Serializer):
+    insights_id = serializers.CharField(max_length=12)

@@ -14,8 +14,8 @@ urlpatterns = [
     path('CompareRecord',dashboard_views.CompareRecord.as_view(),name='compare_record'),
     path('UpdateInsights',dashboard_views.UpdateInsights.as_view(),name='update_insights'),
     path('AddInsights',dashboard_views.AddInsights.as_view(),name='add_insights'),
-
-
+    path('GetInsights',dashboard_views.GetInsights.as_view(),name='get_insights'),
+    path('DeleteInsights',dashboard_views.DeleteInsights.as_view(),name='delete_insights'),
 
 ]
 

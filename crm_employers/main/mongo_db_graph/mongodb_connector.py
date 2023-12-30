@@ -619,66 +619,6 @@ class MongoDBConstructor:
         return find_result
 
 
-    # def return_(self) -> None:
-        """
-        this method returns user graph data ordered by the position
-        each time this method called it will sort the data by using the quicksort
-        Returns:
-            returns list of dicts with the records number as a key and the x and y as a value
-            with a date data.
-        """
-
-        #!###########################
-        #testing records
-        # new_record = {
-        #             'graph_title': 'test graph',
-        #             'graph_description': 'some desc',
-        #             'graph_type': 'bar_graph',
-        #             'created_at': '2023-12-5. 20:15',
-        #             'x': [ 'December 2023','January 2023'],
-        #             'y': [ 7491,22112],
-        #             'y_2':[],
-        #             'sql_database':'income',
-        #             'start_date': '2023-11-26',
-        #             'end_date': '2024-01-06',
-        #             }
-        
-        # new_record2 = {
-        #             'graph_title': 'test graph',
-        #             'graph_description': 'some desc',
-        #             'graph_type': 'bar_graph',
-        #             'created_at': '2023-12-5. 20:15',
-        #             'x': [ 'December 2023','January 2023'],
-        #             'y': [ 7491,22112],
-        #             'y_2':[],
-        #             'sql_database':'income',
-        #             'start_date': '2023-11-26',
-        #             'end_date': '2024-01-06',
-        #             }
-        # new_record3 = {
-        #             'graph_title': 'test graph',
-        #             'graph_description': 'some desc',
-        #             'graph_type': 'bar_graph',
-        #             'created_at': '2023-12-5. 20:15',
-        #             'x': [ 'December 2023','January 2023'],
-        #             'y': [ 7491,22112],
-        #             'y_2':[],
-        #             'sql_database':'income',
-        #             'start_date': '2023-11-26',
-        #             'end_date': '2024-01-06',
-        #             }
-        
-        # self.add_record(new_record=new_record3)
-        # self.add_record(new_record=new_record)
-        # self.add_record(new_record=new_record2)
-
-        # return self.graph_records()
-
-        #quicksort implementation
-        data = self.find_data(self.user)
-        return data
-
-
     def edit_graph_repr(self,new_repr:str) -> None:
         """
         method that changing the users graph representation to one of these:1 row , 2 rows
@@ -729,6 +669,22 @@ class MongoDBConstructor:
 
         self.collection.update_one(self.user,json_data)
 
+
+    def delete_insights(self,insights_id:str):
+
+
+
+        id_exists = self.collection.find_one(self.user,{f"insights.{insights_id}":1})["insights"]
+
+        if id_exists:
+
+            query = {
+                "$unset":{f"insights.{insights_id}":1}
+            }
+
+            result = self.collection.update_one(self.user,query)
+            return True
+        return False
 
 
     def add_insights(self,insights_data:dict,max_amount:int) -> None:
