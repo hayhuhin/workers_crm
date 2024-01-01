@@ -11,3 +11,18 @@ class InsightsGroupPermission(BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name="full_insight_permission")
     
+
+class CanCreateEployers(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="can_create_employers")
+    
+
+class CanCreateDepartments(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="can_create_departments")
+    
+
+class CanUpdateGetEmployers(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name="can_update_get_employers")
+    

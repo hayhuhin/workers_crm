@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import DepartmentTask,Lead,Task
-from user.models import Employer
+from employer.models import Employer
 from .forms import CreateLead,CreateTask,EditTaskForm,EditLeadForm
 from func_tools.graph_calculations import graph_percentage_presentation
 

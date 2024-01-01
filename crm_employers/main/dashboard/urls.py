@@ -6,16 +6,16 @@ from django.conf.urls.static import static
 
 urlpatterns = [
 
-    path('GetRecord',dashboard_views.GetRecord.as_view(),name='get_record'),
-    path('AddRecord',dashboard_views.AddRecord.as_view(),name='add_record'),
-    path('UpdateRecord',dashboard_views.UpdateRecord.as_view(),name='update_record'),
-    path('SwitchPosition',dashboard_views.SwitchPosition.as_view(),name='switch_position'),
-    path('DeleteRecord',dashboard_views.DeleteRecord.as_view(),name='delete_position'),
-    path('CompareRecord',dashboard_views.CompareRecord.as_view(),name='compare_record'),
-    path('UpdateInsights',dashboard_views.UpdateInsights.as_view(),name='update_insights'),
-    path('AddInsights',dashboard_views.AddInsights.as_view(),name='add_insights'),
-    path('GetInsights',dashboard_views.GetInsights.as_view(),name='get_insights'),
-    path('DeleteInsights',dashboard_views.DeleteInsights.as_view(),name='delete_insights'),
+    path('record/get',dashboard_views.GetRecord.as_view(),name='get_record'),
+    path('record/add',dashboard_views.AddRecord.as_view(),name='add_record'),
+    path('record/update',dashboard_views.UpdateRecord.as_view(),name='update_record'),
+    path('record/position/update',dashboard_views.SwitchPosition.as_view(),name='switch_position'),
+    path('record/position/compare',dashboard_views.CompareRecord.as_view(),name='compare_record'),
+    path('record/delete',dashboard_views.DeleteRecord.as_view(),name='delete_position'),
+    path('insights/update',dashboard_views.UpdateInsights.as_view(),name='update_insights'),
+    path('insights/get',dashboard_views.GetInsights.as_view(),name='get_insights'),
+    path('insights/add',dashboard_views.AddInsights.as_view(),name='add_insights'),
+    path('insights/delete',dashboard_views.DeleteInsights.as_view(),name='delete_insights'),
 
 ]
 

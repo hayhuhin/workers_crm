@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group,Permission
 from .models import User
 
-from .models import Employer,Department
+from employer.models import Employer,Department
 from tasks.models import Lead,DepartmentTask,Task
 from dashboard.models import Income,GraphPermission
 

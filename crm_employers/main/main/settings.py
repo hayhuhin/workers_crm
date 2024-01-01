@@ -56,6 +56,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'user',
+    'employer',
+    'employer_profile',
+    'tasks',
     'dashboard',
     'func_tools.graph_calculations',
     

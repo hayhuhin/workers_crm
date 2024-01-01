@@ -120,11 +120,16 @@ u.objects.create(email="ben@ben.com",username="ben",password="Aa1122!!")
 ben = u.objects.get(username="ben")
 
 g.objects.all().create(name="full_graph_permission")
-graph_per = g.objects.get(name="full_graph_permission")
+g.objects.all().create(name="can_create_employers")
+g.objects.create(name="can_update_get_employers")
+
+update_get_per = g.objects.get(name="can_update_get_employers")
 insight_per = g.objects.create(name="full_insight_permission")
+graph_per = g.objects.get(name="full_graph_permission")
 
 ben.groups.add(graph_per)
 ben.groups.add(insight_per)
+ban.groups.add(update_get_per)
 
 token = t.objects.filter(user=ben)
 

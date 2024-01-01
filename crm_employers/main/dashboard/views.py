@@ -4,7 +4,7 @@ from .models import Income,Outcome
 from django.db.models import Sum
 from func_tools.graph_calculations import GraphCalculator
 from mongo_db_graph.mongodb_connector import MongoDBConstructor
-from user.models import Employer
+from employer.models import Employer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
