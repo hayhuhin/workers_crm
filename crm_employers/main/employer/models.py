@@ -1,11 +1,11 @@
 from django.db import models
-from tasks.models import Lead,Task,DepartmentTask
-from dashboard.models import GraphPermission,GraphInsights
+#! need to uncomment it after fixing the dashboard application
+# from dashboard.models import GraphPermission,GraphInsights
 from user.models import User
 
 
 
-# Create your models here.
+#* employer and department section models 
 
 class Employer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -16,10 +16,11 @@ class Employer(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     profile_pic = models.ImageField(default='profile_pics/profile_picture.jpeg',upload_to='profile_pics')
     job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
-    lead = models.ManyToManyField(Lead,default=None)
-    task = models.ManyToManyField(Task,default=None)
-    graph_permission = models.ManyToManyField(GraphPermission,default=None)
-    insights_permission = models.ManyToManyField(GraphInsights,default=None)
+    lead = models.ManyToManyField("Lead",default=None)
+    task = models.ManyToManyField("Task",default=None)
+    #! need to uncomment it after fixing the dashboard application
+    # graph_permission = models.ManyToManyField(GraphPermission,default=None)
+    # insights_permission = models.ManyToManyField(GraphInsights,default=None)
 
 
 
@@ -33,11 +34,51 @@ class Department(models.Model):
     rank = models.IntegerField(null=True)
     started_at = models.DateTimeField()
     salary = models.IntegerField()
-    task = models.ManyToManyField(DepartmentTask,blank=True)
+    task = models.ManyToManyField("DepartmentTask",blank=True)
 
 
     def __str__(self):
         return self.position
 
+
+
+#* specific employer or department operations
+    
+class Lead(models.Model):
+    title = models.CharField(max_length=50)
+    costumer_name = models.CharField(max_length=50,null=True)
+    costumer_id = models.CharField(max_length=50,null=True)
+    description = models.TextField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+
+class Task(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.TextField(max_length=350)
+    additional_description = models.TextField(max_length=350,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+
+
+
+    def __str__(self):
+        return self.title
+
+
+class DepartmentTask(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=350)
+    additional_description = models.CharField(max_length=350,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+
+
+
+    def __str__(self):
+        return self.title
 
 

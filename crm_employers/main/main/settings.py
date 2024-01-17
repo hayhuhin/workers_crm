@@ -57,11 +57,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'user',
     'employer',
-    'employer_profile',
-    'tasks',
-    'dashboard',
-    'func_tools.graph_calculations',
-    
+    'finance',
     
 ]
 
