@@ -114,7 +114,6 @@ db.test.updateOne({"name":"ben"},{"$set":{"insights":{"income_year":[2020,2021],
 from user.models import User as u
 from django.contrib.auth.models import Group as g
 from rest_framework.authtoken.models import Token as t
-from dashboard.models import GraphPermission as gp
 
 u.objects.create(email="ben@ben.com",username="ben",password="Aa1122!!")
 ben = u.objects.get(username="ben")
@@ -129,10 +128,9 @@ graph_per = g.objects.get(name="full_graph_permission")
 
 ben.groups.add(graph_per)
 ben.groups.add(insight_per)
-ban.groups.add(update_get_per)
+ben.groups.add(update_get_per)
 
 token = t.objects.filter(user=ben)
 
-gp.objects.create(name="one_record",permited=True,max_record_amount=1,no_sql_db="test",collection="test")
 
 
