@@ -42,3 +42,11 @@ class GetProfileSerializer(serializers.Serializer):
         fields = "__all__"
 
         
+
+class DeleteProfileSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    
+    def validate_user_id(self,value):
+        if not Employer.objects.get(pk=value).exists():
+            raise serializers.ValidationError("this user is not exists")
+        return value
