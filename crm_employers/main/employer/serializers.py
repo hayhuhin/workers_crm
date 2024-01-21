@@ -35,13 +35,27 @@ class AddProfileSerializer(serializers.ModelSerializer):
             return error_message,status
 
 
-
+#! fic the class output
 class GetProfileSerializer(serializers.Serializer):
-    class Meta:
-        model = Employer
-        fields = "__all__"
 
+    choices = [
+    ("specific","Specific"),
+    ("all","All")]
+    request_options = serializers.ChoiceField(choices=choices)
+    specific_user_data = serializers.CharField(max_length=100,default="specific_data_not_provided")
+
+    def get_request(self,cleaned_data):
         
+        if cleaned_data["request_options"] == "specific":
+            specific_employer = Employer.objects.get(cleaned_data["specific_user_data"])
+            return specific_employer
+        
+        if cleaned_data["request_options"] == "all":
+            all_employers = Employer.objects.all().values()
+            json_data = {"all_employers":all_employers}
+            return json_data
+
+
 
 class DeleteProfileSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()

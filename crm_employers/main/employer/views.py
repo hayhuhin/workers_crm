@@ -6,8 +6,7 @@ from rest_framework import permissions,status
 from .serializers import AddProfileSerializer
 from rest_framework.authtoken.models import Token
 from user.permissions import CanCreateEployers,CanUpdateGetEmployers
-from .serializers import AddProfileSerializer,GetProfileSerializer,DeleteProfileSerializer
-# from .custom_validation import custom_validation
+from .serializers import AddProfileSerializer,DeleteProfileSerializer,GetProfileSerializer
 from user.models import User
 from employer.models import Employer
 
@@ -55,6 +54,25 @@ class DeleteProfile(APIView):
 		return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
 
 
+class GetProfile(APIView):
+	permission_classes = (permissions.IsAuthenticated,CanCreateEployers)
+	
+
+	def get(self, request):
+		# cleaned_data = custom_validation(request.data)
+		#! later it will have custom method to handle the input data
+		
+		cleaned_data = request.data
+		serializer = GetProfileSerializer(data=cleaned_data)
+		
+		if serializer.is_valid(raise_exception=True):
+
+			response_data = serializer.get_request(cleaned_data=cleaned_data)
+			return Response(response_data,status=status.HTTP_202_ACCEPTED)
+		return Response({"error":"invalid inputs"},status=status.HTTP_404_NOT_FOUND)
+
+
+
 
 # class UpdateProfile(APIView):
 # 	permission_classes = (permissions.IsAuthenticated,CanModifyEmployer)
@@ -95,23 +113,5 @@ class DeleteProfile(APIView):
 			
 # 			return Response(created_data[0],status=status.HTTP_404_NOT_FOUND)
 # 		return Response({"error":"invalid inputs"},status=status.HTTP_404_NOT_FOUND)
-
-
-
-class GetProfile(APIView):
-	permission_classes = (permissions.IsAuthenticated,CanCreateEployers)
-	
-
-	def get(self, request):
-		# cleaned_data = custom_validation(request.data)
-		#! later it will have custom method to handle the input data
-		
-		cleaned_data = request.data
-		serializer = GetProfileSerializer(data=cleaned_data)
-		
-		if serializer.is_valid(raise_exception=True):
-			
-			return Response(serializer.data,status=status.HTTP_404_NOT_FOUND)
-		return Response({"error":"invalid inputs"},status=status.HTTP_404_NOT_FOUND)
 
 
