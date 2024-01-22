@@ -79,9 +79,15 @@ class GetProfileSerializer(serializers.Serializer):
 
 
 class DeleteProfileSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
+    email = serializers.EmailField(default="no email provided")
     
-    def validate_user_id(self,value):
-        if not Employer.objects.get(pk=value).exists():
-            raise serializers.ValidationError("this user is not exists")
-        return value
+    def validate_employer_exists(self,cleaned_data):
+
+        try:
+            employer = Employer.objects.get(email=cleaned_data["email"])
+            serializer = EmployerSerializer(employer)
+            return True,serializer.data["email"]
+        
+        except:
+            error_message = {"error":"employer not exists"}
+            return False,error_message

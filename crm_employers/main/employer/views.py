@@ -45,13 +45,15 @@ class DeleteProfile(APIView):
 		serializer = DeleteProfileSerializer(data=cleaned_data)
 		
 		if serializer.is_valid(raise_exception=True):
-			user_id = serializer.validate_user_id(cleaned_data)
-			if user_id:
-				Employer.objects.delete(user_id) 
+			employer_exists = serializer.validate_employer_exists(cleaned_data)
+
+			if employer_exists[0] == True:
+				Employer.objects.get(email=employer_exists[1]).delete()
 				return Response({"success":"deleted successfuly"},status=status.HTTP_202_ACCEPTED)
+			else:
+				return Response(employer_exists[1],status=status.HTTP_404_NOT_FOUND)
 			
-			return Response({"error":"user not exists"},status=status.HTTP_204_NO_CONTENT)
-		return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+		return Response({"error":"user not exists"},status=status.HTTP_204_NO_CONTENT)
 
 
 class GetProfile(APIView):
