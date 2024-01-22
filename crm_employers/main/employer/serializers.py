@@ -5,6 +5,12 @@ from .models import Employer
 from user.models import User
 
 
+class EmployerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employer
+        fields = ["first_name","last_name","email","phone"]
+
+
 class AddProfileSerializer(serializers.ModelSerializer):
     # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
@@ -42,18 +48,33 @@ class GetProfileSerializer(serializers.Serializer):
     ("specific","Specific"),
     ("all","All")]
     request_options = serializers.ChoiceField(choices=choices)
-    specific_user_data = serializers.CharField(max_length=100,default="specific_data_not_provided")
+    email = serializers.EmailField(default="no email provided")
 
     def get_request(self,cleaned_data):
-        
+
+        #* specific user search
         if cleaned_data["request_options"] == "specific":
-            specific_employer = Employer.objects.get(cleaned_data["specific_user_data"])
-            return specific_employer
-        
+
+            #* have to make sure that the user is exists
+            try:
+                specific_employer = Employer.objects.get(email=cleaned_data["email"])
+                serializer = EmployerSerializer(specific_employer)
+                employer_json = {"first_name":serializer.data["first_name"],"email":serializer.data["email"]}
+                return employer_json
+            
+            except:
+                error_message = {"error":"employer not exists"}
+                return error_message
+            
+        #* all users search
         if cleaned_data["request_options"] == "all":
-            all_employers = Employer.objects.all().values()
-            json_data = {"all_employers":all_employers}
-            return json_data
+            all_employers = Employer.objects.all()
+            employer_json = {}
+            for employer in all_employers:
+                serializer = EmployerSerializer(employer)
+                repr_data = {"first_name":serializer.data["first_name"],"email":serializer.data["email"]}
+                employer_json[str(employer)] = repr_data
+            return employer_json
 
 
 

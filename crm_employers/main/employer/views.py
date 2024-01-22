@@ -11,7 +11,7 @@ from user.models import User
 from employer.models import Employer
 
 
-# Create your views here.
+
 
 class AddProfile(APIView):
 	permission_classes = (permissions.IsAuthenticated,CanCreateEployers)
