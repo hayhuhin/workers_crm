@@ -5,8 +5,8 @@ from rest_framework.authtoken.models import Token
 
 
 
+#* user serializer section
 UserModel = get_user_model()
-
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -44,3 +44,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("email","username")
 
 
+#* assign rules serializer section
+class AssignFinanceFullPermissionSerializer(serializers.Serializer):
+	pass
+	
+
+class AssignFinanceViewPermissionSerializer(serializers.Serializer):
+	pass
+
+	
+class AssignFinanceUpdatePermissionSerializer(serializers.Serializer):
+	pass
+
+	
+class AssignFinanceViewPermissionSerializer(serializers.Serializer):
+	pass

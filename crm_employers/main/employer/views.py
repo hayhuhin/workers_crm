@@ -9,7 +9,8 @@ from .serializers import CreateEmployerSerializer,DeleteEmployerSerializer,GetEm
 from user.models import User
 from employer.models import Employer
 
-#* all tmployer classes are for the high previleges workers that can create,delete,edit,update employers all fields
+
+#* employer section
 
 class CreateEmployer(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
@@ -84,8 +85,10 @@ class UpdateEmployer(APIView):
 		
 		return Response({"error":"the input is invalid"},status=status.HTTP_404_NOT_FOUND)
 
-#* this two classes are basicaly for the employers themself 
-	
+
+
+#* profile section 
+
 class GetProfile(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 	
@@ -118,7 +121,6 @@ class GetProfile(APIView):
 		return Response({"error":"invalid inputs"},status=status.HTTP_404_NOT_FOUND)
 
 
-
 class UpdateProfile(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 
@@ -142,3 +144,6 @@ class UpdateProfile(APIView):
 			return Response(updated_data[1],status=status.HTTP_404_NOT_FOUND)
 		
 		return Response({"error":"invalid input data"},status=status.HTTP_404_NOT_FOUND)
+
+
+

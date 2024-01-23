@@ -7,10 +7,11 @@ from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
 from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer
 from rest_framework.authtoken.models import Token
+from .permissions import SystemAdminPermission,ITAdminPermission,FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission,MediumPermission
 
 
 
-
+#*user section
 class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 
@@ -45,7 +46,6 @@ class UserLogin(APIView):
 			return Response(data, status=status.HTTP_200_OK)
 
 
-
 class UserLogout(APIView):
 	permission_classes = (permissions.AllowAny,)
 
@@ -61,3 +61,36 @@ class UserView(APIView):
 	def get(self, request):
 		serializer = UserSerializer(request.user)
 		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+	
+
+
+
+#* assign rules to employer
+
+#TODO 
+	#1.assign rules to employer
+
+	#constraints:
+		#the user that assigning must have the specific permission of assiggning
+		#the assignment must be protected as much as posible
+	
+	#questions?
+		#which assigning?
+		#how much ?
+	
+
+class AssignFinanceFullPermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+	
+
+class AssignFinanceViewPermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
+
+
+	
+class AssignFinanceUpdatePermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
+
+	
+class AssignFinanceViewPermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,MediumPermission,)

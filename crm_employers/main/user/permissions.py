@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-class SystemAdmin(BasePermission):
+class SystemAdminPermission(BasePermission):
     """
     permission:
     general database permission for system admin
@@ -11,7 +11,7 @@ class SystemAdmin(BasePermission):
         return request.user.groups.filter(name="admin_permission")
     
 
-class IT(BasePermission):
+class ITAdminPermission(BasePermission):
     """
     permission:
     general database permission for IT
