@@ -111,33 +111,4 @@ db.test.updateOne({"name":"ben"},{"$set":{"insights":{"income_year":[2020,2021],
 
 #!!! first user creation models comands
 
-from user.models import User as u
-from django.contrib.auth.models import Group as g
-from rest_framework.authtoken.models import Token as t
-
-u.objects.create(email="ben@ben.com",username="ben",password="Aa1122!!")
-u.objects.create(email="hr@hr.com,username="hr",password="Aa1122!!")
-ben = u.objects.get(username="ben")
-hr = u.objects.get(username="hr")
-
-
-g.objects.all().create(name="full_graph_permission")
-g.objects.all().create(name="can_create_employers")
-g.objects.create(name="can_update_get_employers")
-
-update_get_per = g.objects.get(name="can_update_get_employers")
-insight_per = g.objects.create(name="full_insight_permission")
-graph_per = g.objects.get(name="full_graph_permission")
-can_create_employers = g.objects.get(name="can_create_employers")
-
-ben.groups.add(graph_per)
-ben.groups.add(insight_per)
-ben.groups.add(update_get_per)
-
-hr.groups.add(can_create_employers)
-
-
-token = t.objects.filter(user=ben)
-
-
 

@@ -6,9 +6,10 @@ from rest_framework.authtoken import views
 
 
 urlpatterns = [
-    path('profile/add',employer_views.AddProfile.as_view()),
-    path('profile/delete',employer_views.DeleteProfile.as_view()),
-    # path('profile/Delte',employer_views.DeleteProfile.as_view()),
+    path('create',employer_views.CreateEmployer.as_view()),
+    path('delete',employer_views.DeleteEmployer.as_view()),
+    path('update',employer_views.UpdateEmployer.as_view()),
+    path('get',employer_views.GetEmployer.as_view()),
     path('profile/get',employer_views.GetProfile.as_view()),
-
+    path('profile/update',employer_views.UpdateProfile.as_view()),
 ]

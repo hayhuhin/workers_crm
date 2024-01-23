@@ -6,11 +6,12 @@ from rest_framework.authtoken.models import Token
 
 
 UserModel = get_user_model()
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = "__all__"
-    
+
     def create(self,clean_data):
         data = {}
         user_obj = UserModel.objects.create_user(email=clean_data["email"],username=clean_data["username"],password=clean_data["password"])
@@ -20,7 +21,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         data["email"] = user_obj.email
         data["token"] = token
         return data
-    
+
+
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -34,9 +36,11 @@ class UserLoginSerializer(serializers.ModelSerializer):
         if not user:
             raise ValueError("user not found")
         return user
-    
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ("email","username")
+
+
