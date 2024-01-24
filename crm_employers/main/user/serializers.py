@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
 
 
+
 #* user serializer section
 UserModel = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -50,22 +51,23 @@ class AssignFinanceFullPermissionSerializer(serializers.Serializer):
     def assign(self,cleaned_data):
         
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
             permission_found = Group.objects.get(name="finance_full_permission")
 
             #checking if the user is already have the group permission
             user_have_permission = user_found.groups.filter(name="finance_full_permission").exists()
             if user_have_permission:
-                message = {"error":"the user already have this permission"}    
+                message = {"error":f" {user_found} already have this permission"}    
                 return False,message
 
             #if the user added the first time
             user_found.groups.add(permission_found)
-            message = {"success":"added the user to finance full permission"}
+            message = {"success":f"added  {user_found} to finance full permission"}
             return True,message
         
         except:
-             message = {"error":"no user or permission is found"}
+             message = {"error":f"no {user_found} or permission is found"}
              return False,message
      	
 
@@ -75,22 +77,29 @@ class AssignFinanceViewPermissionSerializer(serializers.Serializer):
     def assign(self,cleaned_data):
         
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
+
+            #checking if the user is admin or staff
+            if user_found.is_superuser or user_found.is_staff:
+                message = {"error":"cant assign to this user permissions"}
+                return False,message
+
             permission_found = Group.objects.get(name="finance_view_permission")
 
             #checking if the user is already have the group permission
             user_have_permission = user_found.groups.filter(name="finance_view_permission").exists()
             if user_have_permission:
-                message = {"error":"the user already have this permission"}    
+                message = {"error":f" {user_found} already have this permission"}    
                 return False,message
 
 
             user_found.groups.add(permission_found)
-            message = {"success":"added the user to finance view permission"}
+            message = {"success":f"added  {user_found} to finance view permission"}
             return True,message
         
         except:
-             message = {"error":"no user or permission is found"}
+             message = {"error":f"no {user_found} or permission is found"}
              return False,message
      
 	
@@ -100,22 +109,29 @@ class AssignFinanceUpdatePermissionSerializer(serializers.Serializer):
     def assign(self,cleaned_data):
         
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
+
+            #checking if the user is admin or staff
+            if user_found.is_superuser or user_found.is_staff:
+                message = {"error":"cant assign to this user permissions"}
+                return False,message
+            
             permission_found = Group.objects.get(name="finance_update_permission")
 
             #checking if the user is already have the group permission
             user_have_permission = user_found.groups.filter(name="finance_update_permission").exists()
             if user_have_permission:
-                message = {"error":"the user already have this permission"}    
+                message = {"error":f" {user_found} already have this permission"}    
                 return False,message
 
 
             user_found.groups.add(permission_found)
-            message = {"success":"added the user to finance update permission"}
+            message = {"success":f"added  {user_found} to finance update permission"}
             return True,message
         
         except:
-             message = {"error":"no user or permission is found"}
+             message = {"error":f"no {user_found} or permission is found"}
              return False,message
      
 
@@ -126,21 +142,28 @@ class DisallowFinanceFullPermissionSerializer(serializers.Serializer):
     
     def disallow(self,cleaned_data):
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
+
+            #checking if the user is admin or staff
+            if user_found.is_superuser or user_found.is_staff:
+                message = {"error":"cant disallow this user permissions"}
+                return False,message
+            
             permission_found = Group.objects.get(name="finance_full_permission")
 
             #checking if the user is already not in the group permission
             user_have_permission = user_found.groups.filter(name="finance_full_permission").exists()
             if not user_have_permission:
-                message = {"error":"the user already dont have this permission"}    
+                message = {"error":f" {user_found} already dont have this permission"}    
                 return False,message
             
             user_found.groups.remove(permission_found)
-            message = {"success":"removed the user from finance full permission"}
+            message = {"success":f"removed  {user_found} from finance full permission"}
             return True,message
 
         except:
-            message = {"error":"no user or permission is found"}
+            message = {"error":f"no {user_found} or permission is found"}
             return False,message
 
 
@@ -149,21 +172,29 @@ class DisallowFinanceViewPermissionSerializer(serializers.Serializer):
 
     def disallow(self,cleaned_data):
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
+
+            #checking if the user is admin or staff
+            if user_found.is_superuser or user_found.is_staff:
+                message = {"error":"cant disallow this user permissions"}
+                return False,message
+            
+            
             permission_found = Group.objects.get(name="finance_view_permission")
 
-            #checking if the user is already not in the group permission
+            #checking iff the {user_found} is already not in the group permission
             user_have_permission = user_found.groups.filter(name="finance_view_permission").exists()
             if not user_have_permission:
-                message = {"error":"the user already dont have this permission"}    
+                message = {"error":f" {user_found} already dont have this permission"}    
                 return False,message
             
             user_found.groups.remove(permission_found)
-            message = {"success":"removed the user from finance view permission"}
+            message = {"success":f"removed  {user_found} from finance view permission"}
             return True,message
 
         except:
-            message = {"error":"no user or permission is found"}
+            message = {"error":f"no {user_found} or permission is found"}
             return False,message
 
 
@@ -172,20 +203,27 @@ class DisallowFinanceUpdatePermissionSerializer(serializers.Serializer):
 
     def disallow(self,cleaned_data):
         try:
+            #the user that we want to perform the actions
             user_found = UserModel.objects.get(email=cleaned_data["email"])
+
+            #checking if the user is admin or staff
+            if user_found.is_superuser or user_found.is_staff:
+                message = {"error":"cant disallow this user permissions"}
+                return False,message
+            
             permission_found = Group.objects.get(name="finance_update_permission")
 
-            #checking if the user is already not in the group permission
+            #checking iff the {user_found} is already not in the group permission
             user_have_permission = user_found.groups.filter(name="finance_update_permission").exists()
             if not user_have_permission:
-                message = {"error":"the user already dont have this permission"}    
+                message = {"error":f" {user_found} already dont have this permission"}    
                 return False,message
             
             user_found.groups.remove(permission_found)
-            message = {"success":"removed the user from finance update permission"}
+            message = {"success":f"removed  {user_found} from finance update permission"}
             return True,message
 
         except:
-            message = {"error":"no user or permission is found"}
+            message = {"error":f"no {user_found} or permission is found"}
             return False,message
 

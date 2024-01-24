@@ -11,8 +11,10 @@ urlpatterns = [
     path('logout',user_view.UserLogout.as_view()),
     path('user',user_view.UserView.as_view()),
     path('assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
-    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
-    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
-    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
+    path('assign/finance/view',user_view.AssignFinanceViewPermission.as_view()),
+    path('assign/finance/update',user_view.AssignFinanceUpdatePermission.as_view()),
+    path('disallow/finance/full',user_view.DisallowFinanceFullPermission.as_view()),
+    path('disallow/finance/view',user_view.DisallowFinanceViewPermission.as_view()),
+    path('disallow/finance/update',user_view.DisallowFinanceUpdatePermission.as_view()),
 
 ]
