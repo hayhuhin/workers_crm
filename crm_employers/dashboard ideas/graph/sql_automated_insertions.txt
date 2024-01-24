@@ -8,8 +8,12 @@ ben = u.objects.get(username="ben")
 hr = u.objects.get(username="hr")
 
 
+g.objects.all().create(name="finance_full_permission")
 g.objects.all().create(name="finance_view_permission")
+g.objects.all().create(name="finance_update_permission")
 g.objects.all().create(name="medium_permission")
+g.objects.all().create(name="IT_permission")
+g.objects.all().create(name="admin_permission")
 
 
 finance_view_permission = g.objects.get(name="finance_view_permission")

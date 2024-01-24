@@ -10,6 +10,9 @@ urlpatterns = [
     path('register',user_view.UserRegister.as_view()),
     path('logout',user_view.UserLogout.as_view()),
     path('user',user_view.UserView.as_view()),
-
+    path('assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
+    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
+    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
+    # path('user/assign/finance/full',user_view.AssignFinanceFullPermission.as_view()),
 
 ]

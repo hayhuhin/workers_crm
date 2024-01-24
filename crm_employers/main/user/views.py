@@ -5,9 +5,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
-from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer
+from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer,AssignFinanceFullPermissionSerializer,AssignFinanceUpdatePermissionSerializer,AssignFinanceViewPermissionSerializer,DisallowFinanceFullPermissionSerializer,DisallowFinanceUpdatePermissionSerializer,DisallowFinanceViewPermissionSerializer
 from rest_framework.authtoken.models import Token
-from .permissions import SystemAdminPermission,ITAdminPermission,FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission,MediumPermission
+from .permissions import SystemAdminPermission,ITAdminPermission,MediumPermission
+from .models import User
 
 
 
@@ -81,16 +82,109 @@ class UserView(APIView):
 
 class AssignFinanceFullPermission(APIView):
 	permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
-	
+
+	def post(self,request):
+		user_email = request.user.email
+		user_data = request.data
+		serializer = AssignFinanceFullPermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.assign(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
+
 
 class AssignFinanceViewPermission(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
 
+	def post(self,request):
+		user_data = request.data
+		serializer = AssignFinanceViewPermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.assign(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
 
 	
 class AssignFinanceUpdatePermission(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
 
-	
-class AssignFinanceViewPermission(APIView):
+	def post(self,request):
+		user_data = request.data
+		serializer = AssignFinanceUpdatePermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.assign(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
+
+
+
+#*disallow section
+
+class DisallowFinanceFullPermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+
+	def post(self,request):
+		user_data = request.data
+		serializer = DisallowFinanceFullPermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.disallow(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
+
+
+
+class DisallowFinanceViewPermission(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
+
+	def post(self,request):
+		user_data = request.data
+		serializer = DisallowFinanceViewPermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.disallow(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
+
+
+class DisallowFinanceUpdatePermission(APIView):
+	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
+
+	def post(self,request):
+		user_data = request.data
+		serializer = DisallowFinanceUpdatePermissionSerializer(data=user_data)
+
+		if serializer.is_valid():
+			assigned_user = serializer.disallow(user_data)
+			if all(assigned_user):
+				return Response(assigned_user[1],status=status.HTTP_202_ACCEPTED)
+			
+			return Response(assigned_user[1],status=status.HTTP_404_NOT_FOUND)
+
+		return Response(assigned_user[1],status=status.HTTP_403_FORBIDDEN)
+
