@@ -23,22 +23,20 @@ class Employer(models.Model):
     # insights_permission = models.ManyToManyField(GraphInsights,default=None)
 
 
-
-
     def __str__(self):
         return self.first_name
 
 
 class Department(models.Model):
-    position = models.CharField(max_length=50,null=True)
+    name = models.CharField(max_length=50,null=True)
     rank = models.IntegerField(null=True)
-    started_at = models.DateTimeField()
+    started_at = models.DateTimeField(auto_now=True)
     salary = models.IntegerField()
     task = models.ManyToManyField("DepartmentTask",blank=True)
 
 
     def __str__(self):
-        return self.position
+        return self.name
 
 
 
