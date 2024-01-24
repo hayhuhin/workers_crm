@@ -136,7 +136,7 @@ class AssignFinanceUpdatePermissionSerializer(serializers.Serializer):
      
 
 
-#*disallow section seralizers
+#* disallow section seralizers
 class DisallowFinanceFullPermissionSerializer(serializers.Serializer):
     email = serializers.EmailField()
     
