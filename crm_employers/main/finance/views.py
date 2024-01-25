@@ -5,65 +5,154 @@ from rest_framework import permissions,status
 from .serializers import CreateIncomeSerializer,DeleteIncomeSerializer,UpdateIncomeSerializer,GetIncomeSerializer,CreateOutcomeSerializer,DeleteOutcomeSerializer,UpdateOutcomeSerializer,GetOutcomeSerializer
 from user.models import User
 from employer.models import Employer
-
+from user.permissions import FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission
 
 # Create your views here.
 
+
+
+#!need to add an doption to pass email and then search for this worker first
 #* Income section
 class CreateIncome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission,)
+
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = CreateIncomeSerializer(data=cleaned_data)
+        print(cleaned_data)
+        if serializer.is_valid(raise_exception=True):
+            created_data = serializer.create(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+        
+        message = {"error":"invalid fields"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
 
 
 class DeleteIncome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
+
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = DeleteIncomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.delete(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 class UpdateIncome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = UpdateIncomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.update(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 class GetIncome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
     def get(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = GetIncomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.get(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 #*outcome section
 class CreateOutcome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
+
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = CreateOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.create(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 class DeleteOutcome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = DeleteOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.delete(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 class UpdateOutcome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
     def post(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = UpdateOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.update(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 class GetOutcome(APIView):
-    pass
+    permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
     def get(self,request):
-        pass
+        cleaned_data = request.data
+        serializer = GetOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.get(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+
+
 
 

@@ -4,25 +4,64 @@ from rest_framework.authtoken.models import Token as t
 
 u.objects.create_user(email="ben@ben.com",username="ben",password="Aa1122!!")
 u.objects.create_user(email="hr@hr.com",username="hr",password="Aa1122!!")
+u.objects.create_user(email="fin@fin.com",username="fin",password="Aa1122!!")
+
 ben = u.objects.get(username="ben")
 hr = u.objects.get(username="hr")
+va = u.objects.get(username="va")
+fin = u.objects.get(username="fin")
 
+g.objects.all().create(name="admin_permission")
+g.objects.all().create(name="IT_permission")
+g.objects.all().create(name="medium_permission")
 
 g.objects.all().create(name="finance_full_permission")
 g.objects.all().create(name="finance_view_permission")
 g.objects.all().create(name="finance_update_permission")
-g.objects.all().create(name="medium_permission")
-g.objects.all().create(name="IT_permission")
-g.objects.all().create(name="admin_permission")
 
 
-finance_view_permission = g.objects.get(name="finance_view_permission")
+admin_permission = g.objects.get(name="admin_permission")
+it_permission = g.objects.get(name="IT_permission")
 medium_permission = g.objects.get(name="medium_permission")
 
-ben.groups.add(finance_view_permission)
+finance_full_per = g.objects.get(name="finance_full_permission")
+finance_view_per = g.objects.get(name="finance_view_permission")
+finance_update_per = g.objects.get(name="finance_update_permission")
+
+va.groups.add(admin_permission)
+va.groups.add(it_permission)
+va.groups.add(medium_permission)
+va.groups.add(finance_full_per)
+va.groups.add(finance_view_per)
+va.groups.add(finance_update_per)
+
+
+
+ben.groups.add(finance_view_per)
+ben.groups.add(finance_update_per)
 
 hr.groups.add(medium_permission)
 
+fin.groups.add(finance_full_per)
+fin.groups.add(finance_view_per)
+fin.groups.add(finance_update_per)
+
+
 ben_token = t.objects.filter(user=ben)
 hr_token = t.objects.filter(user=hr)
+fin_token = t.objects.filter(user=fin)
+va_token = t.objects.filter(user=va)
 
+
+
+#adding some costumer
+from finance.models import Costumer as c
+
+c.objects.create(
+    name="micro ltd",
+    email="office@micro.com",
+    phone_number = "0223325671",
+    address = "po ve sham evoshehu 667776",
+    notes = "important costumer",
+    costumer_id = 123456789
+)
