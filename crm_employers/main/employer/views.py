@@ -11,10 +11,9 @@ from employer.models import Employer
 
 
 #* employer section
-
 class CreateEmployer(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
-	
+
 
 	def post(self, request):
 		# cleaned_data = custom_validation(request.data)

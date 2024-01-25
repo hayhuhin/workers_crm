@@ -15,4 +15,8 @@ urlpatterns = [
     path('employer/profile/get',profile_views.GetProfile.as_view()),
     path('employer/profile/update',profile_views.UpdateProfile.as_view()),
     path('department/create',department_views.CreateDepartment.as_view()),
+    path('department/delete',department_views.DeleteDepartment.as_view()),
+    path('department/update',department_views.UpdateDepartment.as_view()),
+    path('department/get',department_views.GetDepartment.as_view()),
+
 ]

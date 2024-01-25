@@ -8,6 +8,9 @@ class SystemAdminPermission(BasePermission):
     permission:
     general database permission for system admin
     """
+    
+
+
     def has_permission(self, request, view):
         #checking if the user specific is inside the permission
         #later it will be gathered from the sqlite database
