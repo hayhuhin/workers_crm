@@ -1,13 +1,13 @@
 from django.db import models
 from user.models import User
 
-class Costumer(models.Model):
+class Customer(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    costumer_id = models.IntegerField()
+    customer_id = models.IntegerField()
 
 
 
@@ -17,10 +17,10 @@ class Income(models.Model):
     date_received = models.DateField()
     description = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')])
-    customer = models.ForeignKey(Costumer, on_delete=models.CASCADE, related_name='income_entries',default=None)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='income_entries',default=None)
 
     def __str__(self):
-        return f"{self.month} -- {self.amount}"
+        return f"{self.payment_method} -- {self.amount}"
 
 
 

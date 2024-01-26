@@ -16,6 +16,18 @@ from user.permissions import FinanceFullPermission,FinanceUpdatePermission,Finan
 class CreateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission,)
 
+    def get(self,request):
+        message = {"success":"for creating the income this is how the json should look like","json_example":{
+                "user_email":"the user email that submits the income",
+                "amount":"float number of the amount",
+                "date_received":"YYYY-MM-DD format",
+                "description":"text field of 300 digits allowed",
+                "payment_method":"credit_card or cash allowed",
+                "costumer_id":"existing customer ID"}
+                }
+        
+        return Response(message,status=status.HTTP_200_OK)
+
 
     def post(self,request):
         cleaned_data = request.data
@@ -38,6 +50,18 @@ class DeleteIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
 
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = DeleteIncomeSerializer(data=cleaned_data)
+        
+        if serializer.is_valid():
+            get_data = serializer.get_info(cleaned_data=cleaned_data)
+
+            return Response(get_data[1],status=status.HTTP_200_OK)
+
+        return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
+
+
     def post(self,request):
         cleaned_data = request.data
         serializer = DeleteIncomeSerializer(data=cleaned_data)
@@ -54,6 +78,19 @@ class DeleteIncome(APIView):
 
 class UpdateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
+
+
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = UpdateIncomeSerializer(data=cleaned_data)
+        
+        if serializer.is_valid():
+            get_data = serializer.get_info(cleaned_data=cleaned_data)
+
+            return Response(get_data[1],status=status.HTTP_200_OK)
+
+        return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
+
 
     def post(self,request):
         cleaned_data = request.data
