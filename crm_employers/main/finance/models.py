@@ -17,7 +17,11 @@ class Income(models.Model):
     date_received = models.DateField()
     description = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')])
+    # receipt = models.FileField(upload_to='receipts/', blank=True, null=True) # later it will be used 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='income_entries',default=None)
+    # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used
+
+
 
     def __str__(self):
         return f"{self.payment_method} -- {self.amount}"
@@ -28,8 +32,17 @@ class Income(models.Model):
 
 
 class Outcome(models.Model):
-    month = models.DateField()
-    amount = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_time = models.DateTimeField()
+    category = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    payment_method = models.CharField(max_length=50 , choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')])
+    # receipt = models.FileField(upload_to='receipts/', blank=True, null=True) # later it will be used 
+    vendor = models.CharField(max_length=100)
+    project_or_department = models.CharField(max_length=100)
+    # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used
+
 
     def __str__(self):
         return f"{self.month} -- {self.amount}"
