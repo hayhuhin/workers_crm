@@ -113,12 +113,15 @@ class GetIncome(APIView):
         cleaned_data = request.data
         serializer = GetIncomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.get(cleaned_data=cleaned_data)
+            created_data = serializer.get_info(cleaned_data=cleaned_data)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+        
+        message = {"error":"the fields are invalid"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -183,7 +186,7 @@ class GetOutcome(APIView):
         cleaned_data = request.data
         serializer = GetOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.get(cleaned_data=cleaned_data)
+            created_data = serializer.get_info(cleaned_data=cleaned_data)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
