@@ -446,7 +446,47 @@ class GetIncomeSerializer(serializers.Serializer):
 #* outcome serializers
 
 class CreateOutcomeSerializer(serializers.Serializer):
-    pass
+    user_email = serializers.EmailField()
+    date_time = serializers.DateField()
+    category = serializers.CharField(max_length=50)
+    amount = serializers.DecimalField(max_digits=10,decimal_places=2)
+    description = serializers.CharField(max_length=300)
+    payment_method = serializers.CharField(max_length=30)
+    vendor = serializers.CharField(max_length=100,default=None)
+    project_or_department = serializers.CharField(max_length=100,default=None)
+
+
+
+
+
+    def create(self,cleaned_data):
+        #checking if the user exists
+        user_exists = User.objects.filter(email=cleaned_data["user_email"]).exists()
+        if user_exists:
+            user_obj = User.objects.get(email=cleaned_data["user_email"])
+
+
+            outcome_obj = Outcome.objects.create(
+                user = user_obj,
+                date_time = cleaned_data["date_time"],
+                category = cleaned_data["category"],
+                amount = cleaned_data["amount"],
+                description = cleaned_data["description"],
+                payment_method = cleaned_data["payment_method"],
+                vendor = cleaned_data["vendor"],
+                project_or_department = cleaned_data["project_or_department"]
+                )
+            
+            #saving the created object
+            outcome_obj.save()
+
+            message = {"success":f"created outcome by {user_obj.username}. amount : {outcome_obj.amount} . with payment method : {outcome_obj.payment_method} in {outcome_obj.date_received}"}
+            return True,message
+        
+
+        message = {"error":"user not exists"}
+        return False,message
+
 
 
 class DeleteOutcomeSerializer(serializers.Serializer):

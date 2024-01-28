@@ -39,8 +39,8 @@ class Outcome(models.Model):
     description = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50 , choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')])
     # receipt = models.FileField(upload_to='receipts/', blank=True, null=True) # later it will be used 
-    vendor = models.CharField(max_length=100)
-    project_or_department = models.CharField(max_length=100)
+    vendor = models.CharField(max_length=100,blank=True,null=True)
+    project_or_department = models.CharField(max_length=100,blank=True,null=True)
     # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used
 
 
