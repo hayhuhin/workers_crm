@@ -142,6 +142,8 @@ class CreateOutcome(APIView):
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
 
+        return Response({"error":"invalid fields"},status=status.HTTP_404_NOT_FOUND)
+
 
 
 

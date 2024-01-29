@@ -29,10 +29,15 @@ finance_view_per = g.objects.get(name="finance_view_permission")
 finance_update_per = g.objects.get(name="finance_update_permission")
 
 va.groups.add(admin_permission)
+
 va.groups.add(it_permission)
+
 va.groups.add(medium_permission)
+
 va.groups.add(finance_full_per)
+
 va.groups.add(finance_view_per)
+
 va.groups.add(finance_update_per)
 
 
@@ -55,7 +60,7 @@ va_token = t.objects.filter(user=va)
 
 
 #adding some costumer
-from finance.models import Costumer as c
+from finance.models import Customer as c
 
 c.objects.create(
     name="micro ltd",
@@ -63,5 +68,6 @@ c.objects.create(
     phone_number = "0223325671",
     address = "po ve sham evoshehu 667776",
     notes = "important costumer",
-    costumer_id = 123456789
+    customer_id = 123456789
 )
+

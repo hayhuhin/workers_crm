@@ -451,7 +451,7 @@ class CreateOutcomeSerializer(serializers.Serializer):
     category = serializers.CharField(max_length=50)
     amount = serializers.DecimalField(max_digits=10,decimal_places=2)
     description = serializers.CharField(max_length=300)
-    payment_method = serializers.CharField(max_length=30)
+    payment_method = serializers.CharField(max_length=50)
     vendor = serializers.CharField(max_length=100,default=None)
     project_or_department = serializers.CharField(max_length=100,default=None)
 
@@ -479,13 +479,12 @@ class CreateOutcomeSerializer(serializers.Serializer):
             
             #saving the created object
             outcome_obj.save()
-
-            message = {"success":f"created outcome by {user_obj.username}. amount : {outcome_obj.amount} . with payment method : {outcome_obj.payment_method} in {outcome_obj.date_received}"}
+            message = {"success":f"created outcome by {user_obj.username}. amount : {outcome_obj.amount} . with payment method : {outcome_obj.payment_method} in {outcome_obj.date_time}"}
             return True,message
         
-
         message = {"error":"user not exists"}
         return False,message
+        
 
 
 
