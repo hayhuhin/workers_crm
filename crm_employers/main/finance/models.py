@@ -45,7 +45,7 @@ class Outcome(models.Model):
 
 
     def __str__(self):
-        return f"{self.month} -- {self.amount}"
+        return f"{self.date_time} -- {self.amount}"
 
 
 

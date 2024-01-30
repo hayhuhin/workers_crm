@@ -489,7 +489,84 @@ class CreateOutcomeSerializer(serializers.Serializer):
 
 
 class DeleteOutcomeSerializer(serializers.Serializer):
-    pass
+    date_time = serializers.DateField(default=None)
+    outcome_id = serializers.IntegerField(default=None)
+
+    def get_info(self,cleaned_data):
+        allowed_fields = ["date_time","outcome_id"]
+        query = Q()
+
+        #checkinf that the dict is not empty
+        if not cleaned_data.items():
+            message = {"error":"you have to provide at least one of the fields","json example":{
+                "date_time":"2024-11-11",
+                "outcome_id":123
+                }}
+            return False,message
+
+        for key,value in cleaned_data.items():
+            if key not in allowed_fields:
+                message = {"error":"invalid key or value"}
+                return False,message
+
+            
+            else:
+                if key == "outcome_id":
+                    query &= Q(id=value)
+                if key == "date_time":
+                    query &= Q(date_time=value)
+        
+        #checking that the outcome exists
+        obj_exists = Outcome.objects.filter(query).exists()
+        if obj_exists:
+            outcome_obj = Outcome.objects.filter(query).all()
+            message = {"success":{"query result is:":outcome_obj.values()}}
+            return True,message
+        
+        message = {"error":"nothing have found in the database"}
+        return False,message
+
+
+    def delete(self,cleaned_data):
+        allowed_fields = ["date_time","outcome_id"]
+        query = Q()
+
+
+        #check if the dict is empty
+        if not cleaned_data.items():
+            message = {"error":"you have to provide both fields","json example":{
+                "date_time":"2024-11-11",
+                "outcome_id":123
+                }}
+            return False,message
+
+        #checking that both fields are provided
+        if "outcome_id" not in cleaned_data.keys():
+            message = {"error":"you must provide outcome_id field with id to delete"}
+            return False,message
+        
+        for key,value in cleaned_data.items():
+            if key not in allowed_fields:
+                message = {"error":"invalid key or value"}
+                return False,message
+
+            
+            else:
+                if key == "outcome_id":
+                    query &= Q(id=value)
+                if key == "date_time":
+                    query &= Q(date_time=value)
+        
+        #checking that the outcome exists
+        obj_exists = Outcome.objects.filter(query).exists()
+        if obj_exists:
+            outcome_obj = Outcome.objects.get(query)
+            outcome_obj.delete()
+            message = {"success":"deleted successfuly "}
+            return True,message
+        
+        message = {"error":"nothing have found in the database"}
+        return False,message
 
 
 class UpdateOutcomeSerializer(serializers.Serializer):

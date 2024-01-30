@@ -130,6 +130,20 @@ class GetIncome(APIView):
 class CreateOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
+    def get(self,request):
+        message = {"success":{"post example":{
+            "user_email":"ben@ben.com",
+            "date_time":"2023-11-11",
+            "category":"one,two,three",
+            "amount":123123123,
+            "description":"some description about the outcome",
+            "payment_method":"credit_card,bank_transfer,cash",
+            "vendor":"max stock",
+            "project_or_department":"department"
+        }}}
+
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
 
     def post(self,request):
         cleaned_data = request.data
@@ -149,6 +163,17 @@ class CreateOutcome(APIView):
 
 class DeleteOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
+
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = DeleteOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            get_information = serializer.get_info(cleaned_data=cleaned_data)
+            return Response(get_information[1],status=status.HTTP_200_OK)
+        
+        message = {"error":"invalid get request"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+    
 
     def post(self,request):
         cleaned_data = request.data
