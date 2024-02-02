@@ -17,16 +17,16 @@ class CreateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission,)
 
     def get(self,request):
-        message = {"success":"for creating the income this is how the json should look like","json_example":{
-                "user_email":"the user email that submits the income",
-                "amount":"float number of the amount",
-                "date_received":"YYYY-MM-DD format",
-                "description":"text field of 300 digits allowed",
-                "payment_method":"credit_card or cash allowed",
-                "costumer_id":"existing customer ID"}
-                }
+        cleaned_data = request.data
+        serializer = CreateIncomeSerializer(data=cleaned_data)
         
-        return Response(message,status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            get_data = serializer.get_info(cleaned_data=cleaned_data)
+
+            return Response(get_data[1],status=status.HTTP_200_OK)
+
+        return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
+        
 
 
     def post(self,request):
@@ -75,7 +75,6 @@ class DeleteIncome(APIView):
 
 
 
-
 class UpdateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
 
@@ -105,7 +104,6 @@ class UpdateIncome(APIView):
 
 
 
-
 class GetIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
@@ -125,24 +123,22 @@ class GetIncome(APIView):
 
 
 
-
 #*outcome section
 class CreateOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
-    def get(self,request):
-        message = {"success":{"post example":{
-            "user_email":"ben@ben.com",
-            "date_time":"2023-11-11",
-            "category":"one,two,three",
-            "amount":123123123,
-            "description":"some description about the outcome",
-            "payment_method":"credit_card,bank_transfer,cash",
-            "vendor":"max stock",
-            "project_or_department":"department"
-        }}}
 
-        return Response(message,status=status.HTTP_404_NOT_FOUND)
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = CreateOutcomeSerializer(data=cleaned_data)
+        
+        if serializer.is_valid():
+            get_data = serializer.get_info(cleaned_data=cleaned_data)
+
+            return Response(get_data[1],status=status.HTTP_200_OK)
+
+        return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
+        
 
 
     def post(self,request):
@@ -192,6 +188,21 @@ class DeleteOutcome(APIView):
 class UpdateOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = UpdateOutcomeSerializer(data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.get_info(cleaned_data=cleaned_data)
+            
+            if all(created_data):
+                return Response(created_data[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+        
+        message = {"error":"invalid fields"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
+
     def post(self,request):
         cleaned_data = request.data
         serializer = UpdateOutcomeSerializer(data=cleaned_data)
@@ -202,7 +213,6 @@ class UpdateOutcome(APIView):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
-
 
 
 

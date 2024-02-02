@@ -64,6 +64,39 @@ class GeneralIncomeSerializer(serializers.Serializer):
         return True,cleaned_data
 
 
+class GeneralOutcomeSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(default=None)
+    date_time = serializers.DateField(default=None)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2,default=None)
+    description = serializers.CharField(max_length=300,default=None)
+    payment_method = serializers.ChoiceField(choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')],default=None)
+    vendor = serializers.CharField(default=None)
+    project_or_department = serializers.CharField(default=None)
+
+    def fk_check(self,cleaned_data):
+        """
+        main reason for this method is if the required fields to change are user or customer
+        that represented in the database as a foreign key 
+
+        Returns:
+            dict of the fields 
+            if user or customer are required to change then it will get their object and pass it in as a value.
+        """
+
+        if "user_email" in cleaned_data["update_data"].keys():
+            user_obj_exists = User.objects.filter(email=cleaned_data["update_data"]["user_email"]).exists()
+            if user_obj_exists:
+                cleaned_data["update_data"]["user"] = User.objects.get(email=cleaned_data["update_data"]["user_email"])
+                cleaned_data["update_data"].pop("user_email")
+
+            else:
+                message = {"error":"this user is not exists"}
+                return False,message
+
+        return True,cleaned_data
+
+
+
 
 #* income CRUD serializers
 
@@ -74,6 +107,18 @@ class CreateIncomeSerializer(serializers.Serializer):
     description = serializers.CharField(max_length=300)
     payment_method = serializers.CharField(max_length=30)
     customer_id = serializers.IntegerField()
+
+    def get_info(self,cleaned_data):
+        message = {"success":"for creating the income this is how the json should look like","json_example":{
+                "user_email":"the user email that submits the income",
+                "amount":"float number of the amount",
+                "date_received":"YYYY-MM-DD format",
+                "description":"text field of 300 digits allowed",
+                "payment_method":"credit_card or cash allowed",
+                "costumer_id":"existing customer ID"}
+                }
+        
+        return True,message
 
 
     def create(self,cleaned_data):
@@ -127,7 +172,10 @@ class DeleteIncomeSerializer(serializers.Serializer):
             if keys not in allowed_fields:
                 message = {"error":"invalid fields passed"}
                 return False,message
-            
+        
+        if not cleaned_data.items():
+            message = {"error":"the user must pass one of the fields (date_received or income_id)"}
+            return False,message
         
 
         if "income_id" in cleaned_data.keys():
@@ -237,8 +285,23 @@ class UpdateIncomeSerializer(serializers.Serializer):
             if keys not in allowed_fields:
                 message = {"error":"invalid fields passed"}
                 return False,message
-            
-
+        
+        if not cleaned_data.items():
+            message = {
+                    "error":{
+                        "example for the acceptebale json":{
+                            "date_received":"YYYY-MM-DD",
+                            "income_id":"id of the income",
+                            "update_data":{
+                                "user_email":"user email",
+                                "amount":"amount",
+                                "description":"description",
+                                "payment_method":"payment_method",
+                                "customer_id":"customer id",
+                                "date_received":"YYYY-MM-DD"
+                            }}}}
+            return False,message
+       
 
         if "income_id" in cleaned_data.keys():
             required_id = cleaned_data["income_id"]
@@ -330,9 +393,9 @@ class UpdateIncomeSerializer(serializers.Serializer):
             #* result of the method might be True,cleaned_data(dict) so its meaning that the user or email are found
             if all(cleaned_data):
                 #first checking if the income exists
-                income_exists = Income.objects.filter(id=required_id).exists()
-                if income_exists:
-                    update_obj = Income.objects.get(id=required_id)
+                outcome_exists = Outcome.objects.filter(id=required_id).exists()
+                if outcome_exists:
+                    update_obj = Outcome.objects.get(id=required_id)
 
                     #here im getting a copy of the information for representation
                     for keys,values in cleaned_data[1]["update_data"].items():
@@ -342,11 +405,13 @@ class UpdateIncomeSerializer(serializers.Serializer):
                     update_obj.save()
                     updated_obj_information = {
                             "user_email":update_obj.user.email,
+                            "date_time":update_obj.date_received,
+                            "categoru":update_obj.category,
                             "amount":update_obj.amount,
-                            "date_recieved":update_obj.date_received,
                             "description":update_obj.description,
                             "payment_method":update_obj.payment_method,
-                            "custumer_id":update_obj.customer.customer_id,
+                            "vendor":update_obj.vendor,
+                            "project_or_department":update_obj.project_or_department
                             }
                                 
                     message = {"success":{"updated information":updated_obj_information}}
@@ -384,6 +449,10 @@ class GetIncomeSerializer(serializers.Serializer):
                 message = {"error":"invalid fields passed"}
                 return False,message
 
+        if not cleaned_data.items():
+            message = {"error":"must pass one of the fields : (date_received,user_email,customer_id)"}
+
+            return False,message
 
         #this will have the query fields that are not None
         query = Q()
@@ -442,27 +511,70 @@ class GetIncomeSerializer(serializers.Serializer):
 
 
 
-
 #* outcome serializers
-
+    
 class CreateOutcomeSerializer(serializers.Serializer):
-    user_email = serializers.EmailField()
-    date_time = serializers.DateField()
-    category = serializers.CharField(max_length=50)
-    amount = serializers.DecimalField(max_digits=10,decimal_places=2)
-    description = serializers.CharField(max_length=300)
-    payment_method = serializers.CharField(max_length=50)
+    user_email = serializers.EmailField(default = None)
+    date_time = serializers.DateField(default = None)
+    category = serializers.CharField(max_length=50,default = None)
+    amount = serializers.DecimalField(max_digits=10,decimal_places=2,default = None)
+    description = serializers.CharField(max_length=300,default = None)
+    payment_method = serializers.CharField(max_length=50,default = None)
     vendor = serializers.CharField(max_length=100,default=None)
     project_or_department = serializers.CharField(max_length=100,default=None)
 
 
+    def get_info(self,cleaned_data):
+        message = {"success":{"post example":{
+            "user_email":"ben@ben.com",
+            "date_time":"2023-11-11",
+            "category":"one,two,three",
+            "amount":123123123,
+            "description":"some description about the outcome",
+            "payment_method":"credit_card,bank_transfer,cash",
+            "vendor":"max stock",
+            "project_or_department":"department"
+        }}}
 
+        return True,message
 
 
     def create(self,cleaned_data):
         #checking if the user exists
+        required_fields = ["user_email","date_time","category","amount","description","payment_method","vendor","project_or_department"]
+
+        if not cleaned_data.items():
+            message = {"error":"you must pass these fields","example":{
+                "user_email": "ben@ben.com",
+                "date_time" : "2024-11-11",
+                "category" : "spendings" ,
+                "amount":110011,
+                "description": "just some description about the things here",
+                "payment_method" :"bank_transfer",
+                "vendor" : "max stock",
+                "project_or_department" : "department"
+            }}
+            return False,message
+
+        for fields in required_fields:
+            if fields not in cleaned_data.keys():
+                message = {"error":"you must provide all the fields","example_fields":{
+                "user_email": "ben@ben.com",
+                "date_time" : "2024-11-11",
+                "category" : "spendings" ,
+                "amount":110011,
+                "description": "just some description about the things here",
+                "payment_method" :"bank_transfer",
+                "vendor" : "max stock",
+                "project_or_department" : "department"
+            }}
+                
+            return False,message
+
+
         user_exists = User.objects.filter(email=cleaned_data["user_email"]).exists()
         if user_exists:
+
             user_obj = User.objects.get(email=cleaned_data["user_email"])
 
 
@@ -485,8 +597,6 @@ class CreateOutcomeSerializer(serializers.Serializer):
         message = {"error":"user not exists"}
         return False,message
         
-
-
 
 class DeleteOutcomeSerializer(serializers.Serializer):
     date_time = serializers.DateField(default=None)
@@ -570,7 +680,161 @@ class DeleteOutcomeSerializer(serializers.Serializer):
 
 
 class UpdateOutcomeSerializer(serializers.Serializer):
-    pass
+    date_time = serializers.DateField(default=None)
+    outcome_id = serializers.IntegerField(default=None)
+    update_data = serializers.DictField(default=None)
+
+
+
+    def get_info(self,cleaned_data):
+        allowed_fields = ["date_time","outcome_id"]
+
+        #checking that the user didnt pass both fields
+        if len(cleaned_data.keys()) >= 2:
+            message = {"error":"cant pass two fields and must choose one"}
+            return False,message
+            
+
+        #checking that the fields are in the allowed list
+        for keys in cleaned_data.keys():
+            if keys not in allowed_fields:
+                message = {"error":"invalid fields passed"}
+                return False,message
+            
+
+        if not cleaned_data.items():
+            message = {"error":"must provide at least one of these fields: (date_time or outcome_id) this will represent its current data"}
+            return False,message
+            
+
+
+        if "outcome_id" in cleaned_data.keys():
+            required_id = cleaned_data["outcome_id"]
+            outcome_exists = Outcome.objects.filter(id=required_id).exists()
+            if outcome_exists:
+                outcome_obj = Outcome.objects.get(id=required_id)
+                outcome_dict = {}
+
+                outcome_dict[str(outcome_obj.id)] = {
+                    "user":outcome_obj.user.email,
+                    "date_time":outcome_obj.date_time,
+                    "category":outcome_obj.category,
+                    "amount":outcome_obj.amount,
+                    "description":outcome_obj.description,
+                    "payment_method":outcome_obj.payment_method,
+                    "vendor":outcome_obj.vendor,
+                    "project_or_department":outcome_obj.project_or_department
+                    }
+                
+                message = {"success":{"outcome":outcome_dict}}
+                return True,message
+            
+            return False,{"error":"outcome not exists with this id"}
+
+
+        if "date_time" in cleaned_data.keys():
+                
+            #required date from cleaned_data
+            required_date = cleaned_data["date_time"]
+            #first checking if the outcome exists
+            outcome_exists = Outcome.objects.filter(date_time=required_date).exists()
+            if outcome_exists:
+                outcome_dict = {}
+                outcome_list = Outcome.objects.filter(date_time=required_date)
+                for outcome in outcome_list:
+
+                    outcome_dict[str(outcome.id)] = {
+                    "user":outcome_obj.user.email,
+                    "date_time":outcome_obj.date_time,
+                    "category":outcome_obj.category,
+                    "amount":outcome_obj.amount,
+                    "description":outcome_obj.description,
+                    "payment_method":outcome_obj.payment_method,
+                    "vendor":outcome_obj.vendor,
+                    "project_or_department":outcome_obj.project_or_department
+                        }
+                message = {"success":{"outcome":outcome_dict}}
+                return True,message
+            
+            return False,{"error":"outcome not exists on that date"}
+
+
+
+    def update(self,cleaned_data):
+        allowed_update_fields = ["user_email","category","amount","description","payment_method","vendor","date_time","project_or_department"]
+        allowed_fields = ["outcome_id","update_data","date_received"]
+
+
+        
+        #checking that the user input is not less or more then required fields
+        for key,value in self.__getattribute__("data").items():
+            
+            #* checking that the fields are in the allowed list or not empty
+            if key not in allowed_fields:
+                message = {"error":"invalid key passed or empty json"}
+                return False,message
+            
+            #* checking that all three fields passed
+            if value == None:
+                message = {"error":"invalid fields passed"}
+                return False,message
+
+            
+            #* checking that the keys inside the update_field are allowed to be updated
+            if key == "update_data":
+                for key,_ in value.items():
+                    if key not in allowed_update_fields:
+                        message = {"error":"invalid fields in update fields"}
+                        return False,message
+
+
+
+        #* this part is passing the update_data dict into another serializer to serialization
+        validation_serializer = GeneralOutcomeSerializer(data=cleaned_data["update_data"])
+
+        if validation_serializer.is_valid():
+
+            #* this is adding user object or customer objects into the cleaned_data if the user want to change the
+            #* user foreignkey extractipon
+            cleaned_data = validation_serializer.fk_check(cleaned_data=cleaned_data)
+
+            #* result of the method might be True,cleaned_data(dict) so its meaning that the user or email are found
+            if all(cleaned_data):
+                required_id = cleaned_data["required_id"]
+                #first checking if the income exists
+                income_exists = Income.objects.filter(id=required_id).exists()
+                if income_exists:
+                    update_obj = Income.objects.get(id=required_id)
+
+                    #here im getting a copy of the information for representation
+                    for keys,values in cleaned_data[1]["update_data"].items():
+                        
+                        setattr(update_obj,keys,values)
+                    
+                    update_obj.save()
+                    updated_obj_information = {
+                            "user_email":update_obj.user.email,
+                            "amount":update_obj.amount,
+                            "date_recieved":update_obj.date_received,
+                            "description":update_obj.description,
+                            "payment_method":update_obj.payment_method,
+                            "custumer_id":update_obj.customer.customer_id,
+                            }
+                                
+                    message = {"success":{"updated information":updated_obj_information}}
+                    return True,message
+
+                
+                message = {"error":"income not exists"}
+                return False,
+
+            #if user or customer are not found 
+            message = {"error":cleaned_data[1]}
+            return False,message
+
+        
+        message = {"error":"in update_data one of the values are invalid"}
+        return False,message
 
 
 class GetOutcomeSerializer(serializers.Serializer):

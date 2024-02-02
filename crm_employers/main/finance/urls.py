@@ -8,5 +8,8 @@ urlpatterns = [
     path("income/get",income_views.GetIncome.as_view()),
     path("outcome/create",income_views.CreateOutcome.as_view()),
     path("outcome/delete",income_views.DeleteOutcome.as_view()),
+    path("outcome/update",income_views.UpdateOutcome.as_view()),
+
+
 
 ]
