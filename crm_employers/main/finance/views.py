@@ -32,7 +32,6 @@ class CreateIncome(APIView):
     def post(self,request):
         cleaned_data = request.data
         serializer = CreateIncomeSerializer(data=cleaned_data)
-        print(cleaned_data)
         if serializer.is_valid(raise_exception=True):
             created_data = serializer.create(cleaned_data=cleaned_data)
             
