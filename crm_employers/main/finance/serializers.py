@@ -619,10 +619,9 @@ class CreateOutcomeSerializer(serializers.Serializer):
                 "description": "just some description about the things here",
                 "payment_method" :"bank_transfer",
                 "vendor" : "max stock",
-                "project_or_department" : "department"
-            }}
+                "project_or_department" : "department"}}
                 
-            return False,message
+                return False,message
 
 
         user_exists = User.objects.filter(email=cleaned_data["user_email"]).exists()
@@ -691,14 +690,13 @@ class DeleteOutcomeSerializer(serializers.Serializer):
 
 
     def delete(self,cleaned_data):
-        allowed_fields = ["date_time","outcome_id"]
+        allowed_fields = ["outcome_id"]
         query = Q()
 
 
         #check if the dict is empty
         if not cleaned_data.items():
-            message = {"error":"you have to provide both fields","json example":{
-                "date_time":"2024-11-11",
+            message = {"error":"you have to provide one of the fields","json example":{
                 "outcome_id":123
                 }}
             return False,message
@@ -776,7 +774,8 @@ class UpdateOutcomeSerializer(serializers.Serializer):
                     "description":outcome_obj.description,
                     "payment_method":outcome_obj.payment_method,
                     "vendor":outcome_obj.vendor,
-                    "project_or_department":outcome_obj.project_or_department
+                    "project_or_department":outcome_obj.project_or_department,
+                    "id":outcome_obj.id
                     }
                 
                 message = {"success":{"outcome":outcome_dict}}
@@ -797,14 +796,14 @@ class UpdateOutcomeSerializer(serializers.Serializer):
                 for outcome in outcome_list:
 
                     outcome_dict[str(outcome.id)] = {
-                    "user":outcome_obj.user.email,
-                    "date_time":outcome_obj.date_time,
-                    "category":outcome_obj.category,
-                    "amount":outcome_obj.amount,
-                    "description":outcome_obj.description,
-                    "payment_method":outcome_obj.payment_method,
-                    "vendor":outcome_obj.vendor,
-                    "project_or_department":outcome_obj.project_or_department
+                    "user":outcome.user.username,
+                    "date_time":outcome.date_time,
+                    "category":outcome.category,
+                    "amount":outcome.amount,
+                    "description":outcome.description,
+                    "payment_method":outcome.payment_method,
+                    "vendor":outcome.vendor,
+                    "project_or_department":outcome.project_or_department
                         }
                 message = {"success":{"outcome":outcome_dict}}
                 return True,message
@@ -814,30 +813,79 @@ class UpdateOutcomeSerializer(serializers.Serializer):
 
 
     def update(self,cleaned_data):
-        allowed_update_fields = ["user_email","category","amount","description","payment_method","vendor","date_time","project_or_department"]
+        allowed_update_fields = ["user_email","date_time","category","amount","description","payment_method","vendor","project_or_department"]
         allowed_fields = ["outcome_id","update_data","date_received"]
+        required_fields = ["outcome_id","update_data"]
 
 
+        #* checkinf if the json is empty
+        if not cleaned_data.items():
+            message = {"error":"you must pass these fields","json_example":{
+                "outcome_id":1,
+                "update_data":{
+                    "user_email":"test@test.com",
+                    "date_time":"2023-11-11",
+                    "category":"sales",
+                    "amount":1234567,
+                    "description":"test description",
+                    "payment_method":"credit_card",
+                    "vendor":"max stock",
+                    "project_or_department":"max stock",
+                    "id":112233
+                            }
+                }}
+            return False,message
         
-        #checking that the user input is not less or more then required fields
-        for key,value in self.__getattribute__("data").items():
-            
-            #* checking that the fields are in the allowed list or not empty
-            if key not in allowed_fields:
-                message = {"error":"invalid key passed or empty json"}
-                return False,message
-            
-            #* checking that all three fields passed
-            if value == None:
-                message = {"error":"invalid fields passed"}
-                return False,message
 
-            
-            #* checking that the keys inside the update_field are allowed to be updated
+
+
+        #* checking that the user passed currectly all required fields
+        for key,value in self.__getattribute__("data").items():
+
+
+            #* the user cant pass date_received into the post request
+            if key == "date_received":
+                if value != None:
+                    message = {"error":"you cant pass this field","json_example":{
+                        "outcome_id":1,
+                        "update_data":{
+                            "user_email":"test@test.com",
+                            "date_time":"2023-11-11",
+                            "category":"sales",
+                            "amount":1234567,
+                            "description":"test description",
+                            "payment_method":"credit_card",
+                            "vendor":"max stock",
+                            "project_or_department":"max stock",
+                            "id":112233
+                            }}}
+                    
+                    return False,message
+
+            #* checking that the user didnt pass empty update fields
             if key == "update_data":
-                for key,_ in value.items():
-                    if key not in allowed_update_fields:
-                        message = {"error":"invalid fields in update fields"}
+                if not value:
+                    message = {"error":"cant pass empty update_data json","json example":{
+                    "outcome_id":1,
+                    "update_data":{
+                        "user_email":"test@test.com",
+                        "date_time":"2023-11-11",
+                        "category":"sales",
+                        "amount":1234567,
+                        "description":"test description",
+                        "payment_method":"credit_card",
+                        "vendor":"max stock",
+                        "project_or_department":"max stock",
+                        "id":112233
+                            }}}
+                    return False,message
+
+
+
+                #* loop over the nested dict keys and checking if its in the allowed fields
+                for item in value.keys():
+                    if item not in allowed_update_fields:
+                        message = {"error":"invalid fields in update_data fields"}
                         return False,message
 
 
