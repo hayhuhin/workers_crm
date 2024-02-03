@@ -9,7 +9,7 @@ from django.db.models import Q,F
 
 
 
-allowed_update_fields = ["user","amount","description","payment_method","customer","date_recieved"]
+# allowed_update_fields = ["user","amount","description","payment_method","customer","date_recieved"]
 
 
 #*general serailizers 
