@@ -9,6 +9,8 @@ urlpatterns = [
     path("outcome/create",income_views.CreateOutcome.as_view()),
     path("outcome/delete",income_views.DeleteOutcome.as_view()),
     path("outcome/update",income_views.UpdateOutcome.as_view()),
+    path("outcome/get",income_views.GetOutcome.as_view()),
+
 
 
 

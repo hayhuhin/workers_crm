@@ -814,7 +814,7 @@ class UpdateOutcomeSerializer(serializers.Serializer):
 
     def update(self,cleaned_data):
         allowed_update_fields = ["user_email","date_time","category","amount","description","payment_method","vendor","project_or_department"]
-        allowed_fields = ["outcome_id","update_data","date_received"]
+        allowed_fields = ["outcome_id","update_data","date_time"]
         required_fields = ["outcome_id","update_data"]
 
 
@@ -844,7 +844,7 @@ class UpdateOutcomeSerializer(serializers.Serializer):
 
 
             #* the user cant pass date_received into the post request
-            if key == "date_received":
+            if key == "date_time":
                 if value != None:
                     message = {"error":"you cant pass this field","json_example":{
                         "outcome_id":1,
@@ -897,18 +897,18 @@ class UpdateOutcomeSerializer(serializers.Serializer):
 
             #* this is adding user object or customer objects into the cleaned_data if the user want to change the
             #* user foreignkey extractipon
-            cleaned_data = validation_serializer.fk_check(cleaned_data=cleaned_data)
+            update_data = validation_serializer.fk_check(cleaned_data=cleaned_data)
 
             #* result of the method might be True,cleaned_data(dict) so its meaning that the user or email are found
             if all(cleaned_data):
-                required_id = cleaned_data["required_id"]
+                required_id = cleaned_data["outcome_id"]
                 #first checking if the income exists
-                income_exists = Income.objects.filter(id=required_id).exists()
-                if income_exists:
-                    update_obj = Income.objects.get(id=required_id)
+                outcome_exists = Outcome.objects.filter(id=required_id).exists()
+                if outcome_exists:
+                    update_obj = Outcome.objects.get(id=required_id)
 
                     #here im getting a copy of the information for representation
-                    for keys,values in cleaned_data[1]["update_data"].items():
+                    for keys,values in update_data[1]["update_data"].items():
                         
                         setattr(update_obj,keys,values)
                     
@@ -916,18 +916,19 @@ class UpdateOutcomeSerializer(serializers.Serializer):
                     updated_obj_information = {
                             "user_email":update_obj.user.email,
                             "amount":update_obj.amount,
-                            "date_recieved":update_obj.date_received,
+                            "date_time":update_obj.date_time,
                             "description":update_obj.description,
                             "payment_method":update_obj.payment_method,
-                            "custumer_id":update_obj.customer.customer_id,
+                            "vendor": update_obj.vendor,
+                            "project_or_department": update_obj.project_or_department
                             }
                                 
                     message = {"success":{"updated information":updated_obj_information}}
                     return True,message
 
                 
-                message = {"error":"income not exists"}
-                return False,
+                message = {"error":"outcome not exists"}
+                return False,message
 
             #if user or customer are not found 
             message = {"error":cleaned_data[1]}
@@ -939,5 +940,77 @@ class UpdateOutcomeSerializer(serializers.Serializer):
 
 
 class GetOutcomeSerializer(serializers.Serializer):
-    pass
+    user_email = serializers.EmailField(default=None)
+    date_time = serializers.DateField(default=None)
 
+
+    def get_info(self,cleaned_data):
+        """
+        getting info by one of the fields 
+        """
+        allowed_fields = ["date_time","user_email"]
+
+
+        #checking that the fields are in the allowed list
+        for keys in cleaned_data.keys():
+            if keys not in allowed_fields:
+                message = {"error":"invalid fields passed"}
+                return False,message
+
+        if not cleaned_data.items():
+            message = {"error":"must pass one of the fields : (date_time,user_email)","json_example":{
+                "user_email":"test@test.com",
+                "date_time":"2011-11-11"
+            }}
+
+            return False,message
+
+        #this will have the query fields that are not None
+        query = Q()
+
+        #checking that the user input is not less or more then required fields
+        for key,value in self.__getattribute__("data").items():
+            
+            #* checking that the fields are in the allowed list
+            if key not in allowed_fields:
+                message = {"error":"invalid key passed"}
+                return False,message
+            
+            #* passing the key,values that are not None into our passed_fields dict
+            if value != None:
+                if key == "user_email":
+                    #checking that the user exists first
+                    user_obj_exists = User.objects.filter(email=value).exists()
+                    if user_obj_exists:
+                        user_obj = User.objects.get(email=value)
+                        query &= Q(user=user_obj)
+                    else:
+                        message = {"error":"this user is not exists"}
+                        return False,message
+
+                if key == "date_time":
+                    date_time_exists = Outcome.objects.filter(date_time=value).exists()
+                    if date_time_exists:
+                        query &= Q(date_time=value)
+
+                    else:
+                        message = {"error":"data not exists on that date"}
+                        return False,message
+
+
+
+
+        #* this is the query with the provided fields
+        search_query_exists = Outcome.objects.filter(query).all().annotate(
+            user_email=F("user__email")).values("user_email","date_time","category","amount","description","payment_method","vendor").exists()
+        
+        if search_query_exists:
+
+            search_query = Outcome.objects.filter(query).all().annotate(
+            user_email=F("user__email")).values("id","user_email","date_time","category","amount","description","payment_method","vendor")
+        
+            message = {"data":search_query}
+            return True,message
+
+        message={"error":"data not found by provided fields"}
+        return False,message

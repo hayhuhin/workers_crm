@@ -11,7 +11,6 @@ from user.permissions import FinanceFullPermission,FinanceUpdatePermission,Finan
 
 
 
-#!need to add an doption to pass email and then search for this worker first
 #* Income section
 class CreateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission,)
