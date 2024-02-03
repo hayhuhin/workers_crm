@@ -43,7 +43,6 @@ class CreateIncome(APIView):
         return Response(message,status=status.HTTP_404_NOT_FOUND)
 
 
-
 class DeleteIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
@@ -72,7 +71,6 @@ class DeleteIncome(APIView):
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
 
 
-
 class UpdateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
 
@@ -99,7 +97,6 @@ class UpdateIncome(APIView):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
-
 
 
 class GetIncome(APIView):
@@ -153,8 +150,6 @@ class CreateOutcome(APIView):
         return Response({"error":"invalid fields"},status=status.HTTP_404_NOT_FOUND)
 
 
-
-
 class DeleteOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
@@ -179,8 +174,6 @@ class DeleteOutcome(APIView):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
-
-
 
 
 class UpdateOutcome(APIView):
@@ -213,7 +206,6 @@ class UpdateOutcome(APIView):
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
 
 
-
 class GetOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
@@ -227,7 +219,4 @@ class GetOutcome(APIView):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
-
-
-
 
