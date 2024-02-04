@@ -24,7 +24,7 @@ class CreateEmployer(APIView):
 		
 		if serializer.is_valid(raise_exception=True):
 			created_data = serializer.create(cleaned_data)
-			if created_data[0]: 
+			if all(created_data): 
 				return Response(created_data[1],status=status.HTTP_201_CREATED)
 			
 			return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)

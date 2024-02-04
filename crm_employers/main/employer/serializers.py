@@ -5,7 +5,7 @@ from .models import Employer
 from user.models import User
 
 #* each class with the name employer in it is a high previlage serializers that done by the admin,hr,managers employers
-
+#! must re create this whole seralizers
 
 class EmployerSerializer(serializers.ModelSerializer):
     """
@@ -31,26 +31,54 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
         creating the employer object if the email is already exists in the User model.
         the User model can be modified only by IT or System Admin
         """
-        data = {}
-        user_instance = User.objects.get(email=cleaned_data["email"])
+        required_fields = ["first_name","last_name","email","phone"]
 
+        for fields in required_fields:
+            if fields not in cleaned_data.keys():
+                message = {"error":"invalid fields passed","required_fields":required_fields}
+                return False,message
+            
+        if not cleaned_data.items():
+            message = {"error":"passed empty json","json_example":{
+                "first_name":"john",
+                "last_name":"doe",
+                "email":"existing user email address",
+                "phone":"the phone number"
+            }}
+            return False,message
+        
+
+        #*checking if the employer is already exists
+        employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
+        if employer_exists:
+            message = {"this employer is already exists and cant be created again"}
+            return False,message
+        
+        data = {}
+
+        user_exist = User.objects.filter(email=cleaned_data["email"]).exists()
+        if user_exist:
+            user_instance = User.objects.get(email=cleaned_data["email"])
+            cleaned_data["user"] = user_instance
+
+        else:
+            message = {"error":"user not exists with the provided email"}
+            return False,message
         #TODO add the department,lead,task foreign key later
 
-        try:
-            employer_obj = Employer.objects.create(
-                user=user_instance,
-                first_name=cleaned_data["first_name"],
-                last_name=cleaned_data["last_name"],
-                email=cleaned_data["email"],
-                phone=cleaned_data["phone"],)
-            employer_obj.save()
-            data["first_name"] = cleaned_data["first_name"]
-            data["last_name"] = cleaned_data["last_name"]
-            return True,data
-        
-        except:
-            error_message = {"error":"this user is already exists as employer"}
-            return False,error_message
+
+        employer_obj = Employer()
+        for key,value in cleaned_data.items():
+            setattr(employer_obj,key,value)
+
+        employer_obj.save()
+        employer_id = employer_obj.id
+        employer_data = Employer.objects.filter(id=employer_id).values("first_name","last_name","email","phone","created_at")
+
+        return True,employer_data
+    
+
+
 
 
 class GetEmployerSerializer(serializers.Serializer):

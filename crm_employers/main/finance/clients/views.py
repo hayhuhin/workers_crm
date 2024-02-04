@@ -133,21 +133,3 @@ class GetClientView(APIView):
         message = {"error":"invalid fields passed"}
         return Response(message,status=status.HTTP_404_NOT_FOUND)
 
-
-    # def post(self,request):
-    #     cleaned_data = request.data
-    #     serializer = GetClientSerializer(data = cleaned_data)
-    #     if serializer.is_valid(raise_exception = True):
-    #         delete_data = serializer.(cleaned_data=cleaned_data)
-
-    #         if all(delete_data):
-    #             return Response(delete_data[1],status=status.HTTP_200_OK)
-    #         return Response(delete_data[1],status=status.HTTP_404_NOT_FOUND)
-
-    #     message = {"error":"invalid fields passed"}
-    #     return Response(message,status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
