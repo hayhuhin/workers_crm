@@ -112,7 +112,7 @@ class CreateLeadSerializer(serializers.Serializer):
                 message = {"error":"you must add all required fields","required_fields":required_fields}
                 return False,message
             
-        #* checkinf if the user passed empty json
+        #* checking if the user passed empty json
         if not cleaned_data.items():
             message = {"error":"you passed empty json","example_json":{
             "first_name":"john",

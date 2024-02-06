@@ -1,17 +1,55 @@
 from rest_framework import serializers
 from employer.models import Department
+from django.db.models import Q,F
 
+class GeneralDepartmentSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50,default=None)
+    rank = serializers.IntegerField(default=None)
+    salary = serializers.IntegerField(default=None)
 
-class CreateDepartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = "__all__"
+    def check_unique(self,cleaned_data):
+        """
+        later this method will handle the FK fields 
+        that will be needed to update
+        """
+        return True,cleaned_data
+
+class CreateDepartmentSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50,default=None)
+    rank = serializers.IntegerField(default=None)
+    salary = serializers.IntegerField(default=None)
+
+    def get_info(self,cleaned_data):
+        message = {"success":{"example json":{
+            "name":"name of the department (engineer ...)",
+            "rank":"rank of the department",
+            "salary":"integer of the salary of the mployer"
+        }}}
+
+        return True,message
+
 
     def create(self,cleaned_data):
-        required_department = cleaned_data["name"]
+        required_fields = ["name","rank","salary"]
 
-        #check if the department exists
-        department_exists = Department.objects.filter(name=required_department).exists()
+        #* check if passed empty json
+        if not cleaned_data.keys():
+            message = {"error":"passed empty json","json_example":{
+                "name":"department name",
+                "rank":"department rank",
+                "salary":"department salary"
+            }}
+            return False,message
+        
+        #* check if passed invalid fields
+        for key in cleaned_data.keys():
+            if key not in required_fields:
+                message = {"error":"passed invalid fields","allowed_fields":required_fields}
+                return False,message
+            
+
+        #* check if the department exists
+        department_exists = Department.objects.filter(name=cleaned_data["name"]).exists()
         if department_exists:
             message = {"error":"this department is already exists"}
             return False,message
@@ -21,30 +59,92 @@ class CreateDepartmentSerializer(serializers.ModelSerializer):
             salary=cleaned_data["salary"]
         )
         obj_instance.save()
+        message = {"success":f"department {obj_instance.name} created with the salary of {obj_instance.salary}"}
+        return True,message
 
-        return True,{"success":f"department {obj_instance.name} created with the salary of {obj_instance.salary}"}
+
+class DeleteDepartmentSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50,default=None)
+    department_id = serializers.IntegerField(default=None)
+    all_departments = serializers.BooleanField(default=False)
+
+    def get_info(self,cleaned_data):
+        required_fields = ["name","department_id","all_departments"]
+        for fields in cleaned_data.keys():
+            if fields not in required_fields:
+                message = {"error":"passed invalid fields","required_fields":required_fields}
+                return False,message
+            
+        #* checking if the user passed empty json
+        if not cleaned_data.items():
+            message = {"error":"you passed empty json","example_json":{
+            "name":"engineer",
+            "department_id":"2",
+            "all_departments":"boolean field"
+            }}
+            return False,message
 
 
-class DeleteDepartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = ["name"]
+        #* checking if passed all_department first
+        if "all_departments" in cleaned_data.keys():
+            departments = Department.objects.all().values("id","name")
+            message = {"success":"all_departments field passed successfully","all_departments":departments}
+            return True,message
+        
+        #* this section is trying to query the database with the provided fields
+        query = Q()
 
+        for key,value in self.__getattribute__("data").items():
+            if key == "name" and value != None:
+                #*checking if something found with this name
+                name_exists = Department.objects.filter(name=value).exists()
+                if name_exists:
+                    query &= Q(name=value)
+
+                else:
+                    message = {"error":"department with this name not found"}
+                    return False,message
+            if key == "department_id" and value != None:
+                #* checking if department exists with the provided id
+                department_exists = Department.objects.filter(id=value).exists()
+                if department_exists:
+                    query &= Q(id=value)
+                else:
+                    message = {"error":"department not found with this id"}
+                    return False,message
+            
+        department_exists = Department.objects.filter(query).exists()
+        if department_exists:
+            department_data = Department.objects.filter(query).values("name","id")
+            message = {"success":"found department with the provided data","department_json":department_data}
+            return True,message
+        message = {"error","department not exists with the provided fields"}
+        return False,message
+    
 
     def delete(self,cleaned_data):
-        required_department = cleaned_data["name"]
+        required_fields = ["department_id"]
+
+        for fields in cleaned_data.keys():
+            if fields not in required_fields:
+                message = {"error":"passed invalid fields","required_fields":required_fields}
+                return False,message
+            
+        #* checking if the user passed empty json
+        if not cleaned_data.items():
+            message = {"error":"you passed empty json","example_json":{
+            "department_id":"2",
+            }}
+            return False,message
+
 
         #check if the department exists
-        department_exists = Department.objects.filter(name=required_department).exists()
+        department_exists = Department.objects.filter(id=cleaned_data["department_id"]).exists()
         if department_exists:
-            #getting object instance of the department
-            department = Department.objects.get(name=cleaned_data["name"])
-            #getting the department name for the message
-            department_name = str(department)
-            #deleting it
-            department.delete()
-            
-            message = {"success":f"{department_name} is deleted, employers that were in this department set to Null"}
+            department_obj = Department.objects.get(id=cleaned_data["department_id"])
+            department_obj.delete()
+
+            message = {"success":f"required department is deleted, employers that were in this department set to Null"}
             return True,message
         
 
@@ -54,93 +154,197 @@ class DeleteDepartmentSerializer(serializers.ModelSerializer):
 
 
 class UpdateDepartmentSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=20)
-    required_field = serializers.DictField()
+    name = serializers.CharField(max_length=20,default = None)
+    department_id = serializers.IntegerField(default=None)
+    update_data = serializers.DictField(default = None)
+
+    def get_info(self,cleaned_data):
+        allowed_fields = ["name","department_id"]
+
+        #* returning example json if the user passed empty json
+        if not cleaned_data.keys():
+            message = {"error":"you must pass at least one of the fields","example_json":{
+                "name":"engineer",
+                "department_id":"12"
+            }}
+            return False,message
+        
+        #*checking for allowed fields
+        for key in cleaned_data.keys():
+            if key not in allowed_fields:
+                message = {"error":f"passed invalid field -{key}-"}
+                return False,message
+
+        #this will have my query that will be passed later
+        query = Q()
+
+        #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
+        for key,value in self.__getattribute__("data").items():
+            if key == "name" and value != None:
+                name_exists = Department.objects.filter(name=value).exists()
+                if name_exists: 
+                    query &= Q(name=value)
+                else:
+                    message = {"error":"name not exist. try another field or check if you miss typed"}
+                    return False,message
+                
+            if key == "department_id" and value != None:
+                department_exists = Department.objects.filter(id=value).exists()
+                if department_exists:
+                    query &= Q(id=value)
+                else:
+                    message = {"error":"department with this id not exist. try another field or check if you miss typed"}
+                    return False,message
+
+
+        query_data = Department.objects.filter(query).values("id","name")
+        message = {"success":query_data}
+        return True,message
+
 
     def update(self,cleaned_data):
-        restricted_fields = ["id","rank","started_at"]
-        allowed_fields = ["name","salary"]
+        required_fields = ["department_id","update_data"]
+        allowed_update_fields = ["name","rank","salary"]
 
-        required_department = cleaned_data["name"]
+        #* returning example json if the user passed empty json
+        if not cleaned_data.keys():
+            message = {"error":"you must pass all this fields","example_json":{
+                "department_id":"id of the department as integer",
+                "update_data":{
+                    "name":"engineer",
+                    "rank":"123",
+                    "salary":"2000"
+                    }}}
+            
+            return False,message
+        
+        #*checking that the user passed all fields
+        for field in required_fields:
+            if field not in cleaned_data.keys():
+                message = {"error":"you must pass all fields","json_example":{
+                "department_id":"id of the department as integer",
+                "update_data":{
+                    "name":"engineer",
+                    "rank":"123",
+                    "salary":"2000"
+                    },
+                    "and you passed":cleaned_data.items()
+                    }}
+            
+                return False,message
 
-        #check if the department exists
-        department_exists = Department.objects.filter(name=required_department).exists()
-        if department_exists:
-            #getting object instance of the department
-            department = Department.objects.get(name=cleaned_data["name"])
-            #iterating over the requiored fields
-            for key,values in cleaned_data["required_field"].items():
-                #check if the key in the restricted list
-                if key in restricted_fields:
-                    message = {"error":"cant change this fields"}
-                    return False,message
-                #validate that the key is only in the allowed field
-                if key in allowed_fields:
-                    setattr(department,key,values)
-                
-                else:
-                    message = {"error":"cant assign this fields"}
-                    return False,message
-                
-            #if all valid saving the changes  
-            department.save()
-            message = {"success":f"{department.name} is changed."}
-            return True,message
+        #* checking that the user didnt pass additional fields and only the allowed in the update data
+        for field in cleaned_data["update_data"].keys():
+            if field not in allowed_update_fields:
+                message = {"error":"passed invalid fields into the update_data json","json example of update_data":{
+                    "name":"engineer",
+                    "rank":"123",
+                    "salary":"2000"
+                    }}
+                return False,message
+
+
+        # #*checking if the department exists with the id provided
+        department_exists = Department.objects.filter(id = cleaned_data["department_id"]).exists()
+        if not department_exists:
+            message = {"error":"this department is not exist with this id"}
+            return False,message
+
+
+
+        #* checking that the user didnt pass empty update data dict
+        if not cleaned_data["update_data"]:
+            message = {"error":"you cant pass empty udpate_data ","json_example for updata_data":{
+                    "name":"engineer",
+                    "rank":"123",
+                    "salary":"2000"
+                    }}
+            return False,message
         
 
-        message = {"error":"this department doesnt exists"}
+
+        #*serializing update_data fields in another serializer
+        update_data_serializer = GeneralDepartmentSerializer(data=cleaned_data["update_data"])
+        if update_data_serializer.is_valid(raise_exception=True):
+
+            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
+            if all(check_unique_fields):
+                update_obj = Department.objects.get(id=cleaned_data["department_id"])
+                update_data = check_unique_fields[1]
+                
+                for key,value in update_data.items():
+                    setattr(update_obj,key,value)
+
+                update_obj.save()
+                message = {"success":"updated the required fields","updated_data":{
+                    "name":update_obj.name,
+                    "rank":update_obj.rank,
+                    "salary":update_obj.salary
+                }}
+                return True,message
+            
+            return False,check_unique_fields[1]
+
+        message = {"error":"invalid update_data fields"}
         return False,message
 
 
 
 class GetDepartmentSerializer(serializers.Serializer):
-    choices = ["specific","all"]
+    name = serializers.CharField(max_length=50,default=None)
+    department_id = serializers.IntegerField(default=None)
+    all_departments = serializers.BooleanField(default=False)
 
-    view = serializers.ChoiceField(choices=choices)
-    name = serializers.CharField(max_length=20,default="no name")
 
     def get(self,cleaned_data):
-        
-
-        if cleaned_data["view"] == "specific":
-            
-            #this is checking if the user didnt add the name key to the request
-            try :
-                required_name = cleaned_data["name"]
-
-            except:
-                message = {"error":"you must add key of name and the required value to get the specific department"}
+        required_fields = ["name","department_id","all_departments"]
+        for fields in cleaned_data.keys():
+            if fields not in required_fields:
+                message = {"error":"passed invalid fields","required_fields":required_fields}
                 return False,message
             
-            #checking if the department exists
-            required_department = Department.objects.filter(name=required_name).exists()
-            if required_department:
-                department_data = Department.objects.get(name=required_name)
-
-                message = {"success":{
-                    "name":department_data.name,
-                    "rank":department_data.rank,
-                    "salary":department_data.salary }}
-                
-                return True,message
-            
-            message = {"error":"this department doesnt exists"}
+        #* checking if the user passed empty json
+        if not cleaned_data.items():
+            message = {"error":"you passed empty json","example_json":{
+            "name":"engineer",
+            "department_id":"2",
+            "all_departments":"boolean field"
+            }}
             return False,message
-        
 
-        if cleaned_data["view"] == "all":
-            
-            departments_dict = {}
-            departments = Department.objects.all()
-            for job in departments:
-                departments_dict[job.name]={
-                    "name":job.name,
-                    "rank":job.rank,
-                    "salary":job.salary}
-            
-            message = {"success":{"departments":departments_dict}}
+
+        #* checking if passed all_department first
+        if "all_departments" in cleaned_data.keys():
+            departments = Department.objects.all().values("id","name")
+            message = {"success":"all_departments field passed successfully","all_departments":departments}
             return True,message
-
-        message = {"error":"invalid field provided"}
-        return False,message
         
+        #* this section is trying to query the database with the provided fields
+        query = Q()
+
+        for key,value in self.__getattribute__("data").items():
+            if key == "name" and value != None:
+                #*checking if something found with this name
+                name_exists = Department.objects.filter(name=value).exists()
+                if name_exists:
+                    query &= Q(name=value)
+
+                else:
+                    message = {"error":"department with this name not found"}
+                    return False,message
+            if key == "department_id" and value != None:
+                #* checking if department exists with the provided id
+                department_exists = Department.objects.filter(id=value).exists()
+                if department_exists:
+                    query &= Q(id=value)
+                else:
+                    message = {"error":"department not found with this id"}
+                    return False,message
+            
+        department_exists = Department.objects.filter(query).exists()
+        if department_exists:
+            department_data = Department.objects.filter(query).values("name","id")
+            message = {"success":"found department with the provided data","department_json":department_data}
+            return True,message
+        message = {"error","department not exists with the provided fields"}
+        return False,message

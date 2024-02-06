@@ -13,6 +13,21 @@ from .serializers import CreateDepartmentSerializer,DeleteDepartmentSerializer,U
 class CreateDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = CreateDepartmentSerializer(data = cleaned_data)
+        if serializer.is_valid(raise_exception = True):
+            get_info = serializer.get_info(cleaned_data=cleaned_data)
+
+            if all(get_info):
+                return Response(get_info[1],status=status.HTTP_200_OK)
+            return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
+
+        message = {"error":"invalid fields passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
+
+
     def post(self,request):
         cleaned_data = request.data
 
@@ -30,6 +45,20 @@ class CreateDepartment(APIView):
 
 class DeleteDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = DeleteDepartmentSerializer(data = cleaned_data)
+        if serializer.is_valid(raise_exception = True):
+            get_info = serializer.get_info(cleaned_data=cleaned_data)
+
+            if all(get_info):
+                return Response(get_info[1],status=status.HTTP_200_OK)
+            return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
+
+        message = {"error":"invalid fields passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
 
     def post(self,request):
         cleaned_data = request.data
@@ -49,6 +78,22 @@ class DeleteDepartment(APIView):
 class UpdateDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
+    def get(self,request):
+        cleaned_data = request.data
+        serializer = UpdateDepartmentSerializer(data = cleaned_data)
+        if serializer.is_valid(raise_exception = True):
+            get_info = serializer.get_info(cleaned_data=cleaned_data)
+
+            if all(get_info):
+                return Response(get_info[1],status=status.HTTP_200_OK)
+            return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
+
+        message = {"error":"invalid fields passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
+
+
+
     def post(self,request):
         cleaned_data = request.data
         print(cleaned_data)
@@ -66,6 +111,7 @@ class UpdateDepartment(APIView):
 
 class GetDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,MediumPermission)
+
 
     def get(self,request):
         cleaned_data = request.data
