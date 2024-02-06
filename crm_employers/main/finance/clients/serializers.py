@@ -15,6 +15,29 @@ from django.db.models import Q,F
     # customer_id = models.IntegerField()
 
 
+
+
+# class UpdateSerializer(object):
+#     main_fields = serializers.DictField()
+#     nested_fields = serializers.DictField()
+
+
+#     def get_info(self,required_main_fields,required_nested_fields,cleaned_data):
+#         #* check the main fields first
+#         for field in cleaned_data:
+#             if field not in required_main_fields:
+#                 message = {"error":"invalid field passed"}
+#                 return False,message
+            
+#         #* checking the nested dicts
+#         for 
+
+
+
+
+
+
+
 class GeneralClientSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
@@ -107,6 +130,7 @@ class CreateClientSerializer(serializers.Serializer):
                 else:
                     message = {"error":"customer_id not exist. try another field or check if you miss typed"}
                     return False,message
+        
         
         query_data = Customer.objects.filter(query).values("name","email","phone_number","address","notes","customer_id")
         message = {"success":query_data}

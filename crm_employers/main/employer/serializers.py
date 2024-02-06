@@ -21,6 +21,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
     """
     creating the Employer
     """
+
     class Meta:
         model = Employer
         fields = ["first_name","last_name","email","phone"]
@@ -31,6 +32,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
         creating the employer object if the email is already exists in the User model.
         the User model can be modified only by IT or System Admin
         """
+
         required_fields = ["first_name","last_name","email","phone"]
 
         for fields in required_fields:

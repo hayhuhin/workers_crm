@@ -28,9 +28,9 @@ urlpatterns = [
     #TODO uncomment it after creating the methods
     # #leads employer permission routes
     path('employer/lead/create',lead_views.CreateLead.as_view()),
-    # path('lead/delete',lead_views.DeleteLead.as_view()),
-    # path('lead/update',lead_views.UpdateLead.as_view()),
-    # path('lead/get',lead_views.GetLead.as_view()),
+    path('employer/lead/delete',lead_views.DeleteLead.as_view()),
+    path('employer/lead/update',lead_views.UpdateLead.as_view()),
+    path('employer/lead/get',lead_views.GetLead.as_view()),
 
 
 ]
