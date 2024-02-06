@@ -15,27 +15,16 @@ class GetProfile(APIView):
 
 
 	def get(self, request):
-		# cleaned_data = custom_validation(request.data)
-		#! later it will have custom method to handle the input data
 		
 		cleaned_data = request.data
 		serializer = GetProfileSerializer(data=cleaned_data)
 
 		if serializer.is_valid(raise_exception=True):
 			response_data = serializer.get_profile(cleaned_data=cleaned_data)
-			
 			#*this section is checking that the there is no unauthorized access
-
-			if response_data[0]:
-
-				response_user_email = response_data[1]["email"]
-				found_employer = Employer.objects.get(email=response_user_email).user_id
-
-				if found_employer == request.user.user_id:
-					return Response(response_data[1],status=status.HTTP_202_ACCEPTED)
+			if all(response_data):
+				return Response(response_data[1],status=status.HTTP_200_OK)
 				
-				return Response({"error":"cant access this users data"},status=status.HTTP_401_UNAUTHORIZED)
-			
 			return Response(response_data[1],status=status.HTTP_404_NOT_FOUND)
 			
 		return Response({"error":"invalid inputs"},status=status.HTTP_404_NOT_FOUND)
@@ -44,22 +33,34 @@ class GetProfile(APIView):
 class UpdateProfile(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 
+	def get(self,request):
+		cleaned_data = request.data
+		cleaned_data["email"] = request.user.email
+		serialized_data = UpdateProfileSerializer(data=cleaned_data)
+
+		if serialized_data.is_valid():
+			updated_data = serialized_data.get_info(cleaned_data=cleaned_data)
+			if all(updated_data):
+
+				return Response(updated_data[1],status=status.HTTP_200_OK)
+				#here im checking that the update method is available only for themself
+
+			return Response(updated_data[1],status=status.HTTP_404_NOT_FOUND)
+		
+		return Response({"error":"invalid input data"},status=status.HTTP_404_NOT_FOUND)
+
+
+
 	def post(self,request):
 		cleaned_data = request.data
+		cleaned_data["email"] = request.user.email
 		serialized_data = UpdateProfileSerializer(data=cleaned_data)
 
 		if serialized_data.is_valid():
 			updated_data = serialized_data.update_profile(cleaned_data=cleaned_data)
 
-			if updated_data[0]:
-				requested_email_data = updated_data[1]["email"]
-				found_employer = Employer.objects.get(email=requested_email_data)
-
-				#here im checking that the update method is available only for themself
-				if found_employer.user_id == request.user.user_id:
-					return Response(updated_data[1],status=status.HTTP_201_CREATED)
-				
-				return Response({"error":"cant update this users data"},status=status.HTTP_401_UNAUTHORIZED)
+			if all(updated_data):
+				return Response(updated_data[1],status=status.HTTP_201_CREATED)
 
 			return Response(updated_data[1],status=status.HTTP_404_NOT_FOUND)
 		

@@ -25,7 +25,7 @@ urlpatterns = [
     path('employer/profile/update',profile_views.UpdateProfile.as_view()),
 
 
-    #TODO uncomment it after creating the methods
+
     # #leads employer permission routes
     path('employer/lead/create',lead_views.CreateLead.as_view()),
     path('employer/lead/delete',lead_views.DeleteLead.as_view()),
