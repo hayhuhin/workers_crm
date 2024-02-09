@@ -18,6 +18,7 @@ class Employer(models.Model):
     job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
     lead = models.ForeignKey("Lead",blank=True,null=True,on_delete=models.SET_NULL)
     task = models.ManyToManyField("Task",default=None)
+    graph_db = models.CharField(max_length=50,choices=[("test","Test"),("prod","Prod")],default="test")
     #! need to uncomment it after fixing the dashboard application
     # graph_permission = models.ManyToManyField(GraphPermission,default=None)
     # insights_permission = models.ManyToManyField(GraphInsights,default=None)

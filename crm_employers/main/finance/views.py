@@ -3,8 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from .serializers import CreateIncomeSerializer,DeleteIncomeSerializer,UpdateIncomeSerializer,GetIncomeSerializer,CreateOutcomeSerializer,DeleteOutcomeSerializer,UpdateOutcomeSerializer,GetOutcomeSerializer
-# from user.models import User
-# from employer.models import Employer
 from user.permissions import FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission
 
 # Create your views here.

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'user',
     'employer',
     'finance',
+    'dashboard',
     
 ]
 
@@ -165,6 +166,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 
+MONGODB_URI = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
 
 
 # Default primary key field type

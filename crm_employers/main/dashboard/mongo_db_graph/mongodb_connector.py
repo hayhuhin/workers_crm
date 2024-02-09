@@ -72,7 +72,7 @@ class MongoDBConstructor:
                 if records exists - > returns dict with the data
                 if no records -> returns empty dict
 
-            add_record(new_record:list,position:ont=0,ignore_max:bool=False):
+            add_record(new_record:list,position:int=0,ignore_max:bool=False):
                 method that adds the record adds the record to the end of the list
                 this makes it o(1) and updating the database accordingly with the internal functions
                 
