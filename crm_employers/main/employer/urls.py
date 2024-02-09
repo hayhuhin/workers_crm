@@ -4,7 +4,9 @@ from rest_framework.authtoken import views
 from . import views as employer_views
 from .profile import views as profile_views
 from .department import views as department_views
+from .department.department_task import views as department_task_views
 from .leads import views as lead_views
+from .task import views as task_views
 
 
 urlpatterns = [
@@ -32,5 +34,15 @@ urlpatterns = [
     path('employer/lead/update',lead_views.UpdateLead.as_view()),
     path('employer/lead/get',lead_views.GetLead.as_view()),
 
+    # employer task routes
+    path('employer/task/create',task_views.CreateTask.as_view()),
+    path('employer/task/delete',task_views.DeleteTask.as_view()),
+    path('employer/task/update',task_views.UpdateTask.as_view()),
+    path('employer/task/get',task_views.GetTask.as_view()),
 
+    # department task routes
+    path('department/task/create',department_task_views.CreateTask.as_view()),
+    path('department/task/delete',department_task_views.DeleteTask.as_view()),
+    path('department/task/update',department_task_views.UpdateTask.as_view()),
+    path('department/task/get',department_task_views.GetTask.as_view()),
 ]

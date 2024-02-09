@@ -11,18 +11,18 @@ class GeneralProfileSerializer(serializers.Serializer):
     phone = serializers.CharField(default = None)
 
 
-class EmployerSerializer(serializers.ModelSerializer):
-    """
-    main model serializer class of the Employer model.
-    this needed to represent the values as json
-    """
-    class Meta:
-        model = Employer
-        fields = ["first_name","last_name","email","phone"]
+# class EmployerSerializer(serializers.ModelSerializer):
+#     """
+#     main model serializer class of the Employer model.
+#     this needed to represent the values as json
+#     """
+#     class Meta:
+#         model = Employer
+#         fields = ["first_name","last_name","email","phone"]
 
 
 class GetProfileSerializer(serializers.Serializer):
-    email = serializers.EmailField(default="no email provided")
+    email = serializers.EmailField(default=None)
 
 
     def get_profile(self,cleaned_data):
