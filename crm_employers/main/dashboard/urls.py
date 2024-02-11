@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
 
     # main dashboard operations
-    path('record/create',main_views.CreateRecord.as_view(),name='add_record'),
+    path('record/create',main_views.CreateRecord.as_view(),name='create_record'),
     path('record/update',main_views.UpdateRecord.as_view(),name='update_record'),
     path('record/delete',main_views.DeleteRecord.as_view(),name='delete_position'),
     path('record/get',main_views.GetRecord.as_view(),name='get_record'),

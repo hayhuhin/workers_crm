@@ -260,79 +260,77 @@ class MongoDBConstructor:
             deletes the required record and returns None
         """
 
-        #first checking if the user exists
-        if self.user_exists():
-            
-            if delete_all:
-                #deletes the whole user data from the database
-                    self.collection.delete_one(self.user)
+        #* checking if the user exists
+        if not self.user_exists():
+            message = {"error":"user not exists"}
+            return False,message
+        
+        #* checkinf if delete_all is True
+        if delete_all:
+            #deletes the whole user data from the database
+                self.collection.delete_one(self.user)
                     # print(f"the {self.user} deleted from the database")
 
-
-            #if delete_all is False
-            if not delete_all:
-                
-                #calling graph_records will return records dict if exists or empty list of not exists
-                records = self.graph_records()
-                
-                if not records:
-                    raise ValueError("the user exists but dont have records")
-                
-                if records:
-                    #this checking if the required_record exists inside the  records and if not then it will return an error
-                    if str(required_record) not in records:
-                        raise ValueError(f"this record  not exists")
-
-                    else:
-                        #delete the requested record
-                        delete_query = {
-                            "$unset":{
-                                f"graph_records.records.{str(required_record)}":1,
-                                },
-                            }
-                        self.collection.update_one(self.user,delete_query)
-                        #deleting the ordered list 
-                        list_data = self.find_graph_ordered_list()
-                        target = int(required_record)-1
-                        list_data.pop(target)
-
-
-                        #getting the newest records(after deleting the required record)
-                        new_records = self.graph_records()
-
-                        
-                        #iterating over the requested index += 1
-                        for index in range(len(list_data)-target):
-                            #updates the list_data from [1,2,4] to [1,2,3]
-                            list_data[target] = list_data[target]-1
-                            
-
-
-                            #creating vars of new key and the old data {"3(new key)":"old data"}
-                            prev_index = list_data[target]+1
-                            prev_data = new_records[str(prev_index)]
-
-                            self.collection.update_one(self.user,{"$set":
-                                                                    {f"graph_records.records.{str(list_data[target])}":prev_data},
-                                                                    })
-                            #this removing the multiplied record
-                            # self.remove_record(required_record=prev_index)
-                            self.collection.update_one(self.user,{"$unset":{
-                                                                        f"graph_records.records.{prev_index}":1}})
-                            
-                            
-                            target += 1
-
-                        #updating the list data 
-                        self.update_ordered_list(list_data)
-                        
-                
-                #if there are not records exists it will raise a ValueError
-                else:
-                    raise ValueError("this record not exists")
         
-        else:
-            raise ValueError("the user not exists")
+        #* checking if user have records
+        records_data = self.graph_records()
+        if not records_data:
+            message = {"error":"user dont have records"}
+            return False,message
+
+        
+
+        #* checking if the required record is exists in the data itself
+        if str(required_record) not in records_data:
+            message = {"error":"the required position not exists"}
+            return False,message
+
+
+        #delete the requested record
+        delete_query = {
+            "$unset":{
+                f"graph_records.records.{str(required_record)}":1,
+                },
+            }
+        self.collection.update_one(self.user,delete_query)
+        #deleting the ordered list 
+        list_data = self.find_graph_ordered_list()
+        target = int(required_record)-1
+        list_data.pop(target)
+
+
+        #getting the newest records(after deleting the required record)
+        new_records = self.graph_records()
+
+        
+        #iterating over the requested index += 1
+        for index in range(len(list_data)-target):
+            #updates the list_data from [1,2,4] to [1,2,3]
+            list_data[target] = list_data[target]-1
+            
+
+
+            #creating vars of new key and the old data {"3(new key)":"old data"}
+            prev_index = list_data[target]+1
+            prev_data = new_records[str(prev_index)]
+
+            self.collection.update_one(self.user,{"$set":
+                                                    {f"graph_records.records.{str(list_data[target])}":prev_data},
+                                                    })
+            #this removing the multiplied record
+            # self.remove_record(required_record=prev_index)
+            self.collection.update_one(self.user,{"$unset":{
+                                                        f"graph_records.records.{prev_index}":1}})
+            
+            
+            target += 1
+
+        #updating the list data 
+        self.update_ordered_list(list_data)
+
+        message = {"success":"the required position is deleted successfully"}
+        return True,message
+        
 
 
     def graph_positions(self) -> list:
@@ -531,6 +529,29 @@ class MongoDBConstructor:
             return None    
             
 
+    def get_record_by_position(self,position:int):
+        """
+        method that returns the graph data of the passed position 
+
+        data returned as a Dict
+        """
+        
+        # result = collection.find_one({"name": "fin", "graph_records.records.1": {"$exists": True}})
+
+        projection = {f"graph_records.records.{int(position)}":{"$exists": True}}
+
+        data_found = self.find_data(data={**self.user,**projection})
+
+
+        if not data_found:
+            message = {"error":"position not exists"}
+            return False,message
+        
+        data_found.pop("_id")
+        message = {"success":"found required data",f"{position}":data_found["graph_records"]["records"][str(position)]}
+        return True,message
+
+
     def compare_record(self,position_1:str,position_2:str) -> None:
         """
         this method checking that the compare record is having the same amount of months and returns 3 lists
@@ -615,7 +636,7 @@ class MongoDBConstructor:
             print statment with the find result
         """
         find_result = self.collection.find_one(data)
-        find_result.pop("_id")
+        # find_result.pop("_id")
         return find_result
 
 

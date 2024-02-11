@@ -5,5 +5,17 @@ each request it runs the request.user and request.auth if no class authenticates
 django.contrib.auth.models.AnonymousUser and request.auth to None
 
 When an unauthenticated request is denied permission there are two different error codes that may be appropriate.
-HTTP 401 Unauthorized
-HTTP 403 Permission Denied
+HTTP 403 Unauthorized
+HTTP 401 Permission Denied
+
+
+
+-------------------
+1.graph calculator - does the real calculation of the income and outconme in sql database
+must initialized first with model objects first
+have methods like : sum_by_range,sum_single_month,get_data_by_year
+
+2.mongodb constructor - creating formatted records in mongodb 
+passing the result of the calculation to the mongodb constructor with the appropriate methods like:
+create_record,delete_record,update_record
+

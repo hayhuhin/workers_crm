@@ -28,57 +28,63 @@ class CreateRecord(APIView):
 
     def post(self,request):
         cleaned_data = request.data
-        user = {"email":request.user.email}
+        user = {"email":request.user.email,"username":request.user.username}
 
         serializer = CreateRecordSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
+
+            created_record = serializer.create(cleaned_data=cleaned_data,user=user)
+            if all(created_record):
+                return Response(created_record[1],status=status.HTTP_201_CREATED)
             
-            #the graph calculator class
-            graph_calculator = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
+            return Response(created_record[1],status=status.HTTP_404_NOT_FOUND)
+        
 
-            #the graph mongodb CRUD operations class
-            #the db,collection,max_amount will be accessed from the user database
-            mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
-    
-
-            #serializing the data
-            graph_calculated_data = graph_calculator.sum_by_range(db=serializer.data["db"],start_date=serializer.data["start"],end_date=serializer.data["end"])
-
-            created_record = serializer.create(graph_data=graph_calculated_data)
-            if created_record:
-                mongodb_handler.add_record(created_record)
-                return Response(created_record,status=status.HTTP_201_CREATED)
-            
-            return Response({"error":"cant create record"},status=status.HTTP_404_NOT_FOUND)
-
-        return Response(data=[{"error":"invalid input. the input have to look like in the example below:"},{
+        message = {"error":"invalid input. the input have to look like in the example below:"},{
                     "graph_title":"graph_title",
                     "graph_description":"graph_description",
                     "graph_type":"graph_type",
                     "db":"db",
                     "start":"%Y-%m-%d",
                     "end":"%Y-%m-%d",
-                    }],status=status.HTTP_400_BAD_REQUEST)
+                    }
+        return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteRecord(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
 
-    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-    def post(self,request):
-        #if the user posted any data
-        if request.data:
-            serializer = DeleteRecordSerializer(data=request.data)
-            print(request.data)
-            if serializer.is_valid(raise_exception=True):
-                    #the db,collection,max_amount will be accessed from the user database
-                    mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
-                    mongodb_handler.remove_record(required_record=serializer.data["position"])
-                    return Response({"status":"the record is deleted"},status=status.HTTP_200_OK)
-                    
-            return Response({{"error":"the data is not in a valid format"},{"position":"str(number)"}},status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request):
+        cleaned_data = request.data
+        user = {"email":request.user.email,"username":request.user.username}
+        serializer = DeleteRecordSerializer(data=cleaned_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer_response = serializer.get_info(cleaned_data=cleaned_data,user=user)
+            if all(serializer_response):
+                return Response(serializer_response[1],status=status.HTTP_200_OK)
+            return Response(serializer_response[1],status=status.HTTP_404_NOT_FOUND)
+        message = {"error":"invalid data passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
 
-        return Response({"error":"no data provided"})
+    def post(self,request):
+        cleaned_data = request.data
+        user = {"email":request.user.email,"username":request.user.username}
+
+        serializer = DeleteRecordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+
+            created_record = serializer.delete(cleaned_data=cleaned_data,user=user)
+            if all(created_record):
+                return Response(created_record[1],status=status.HTTP_201_CREATED)
+            
+            return Response(created_record[1],status=status.HTTP_404_NOT_FOUND)
+        
+
+        message = {"error":"invalid input. the input have to look like in the example below:"},{
+                    "position":"100",
+
+                    }
+        return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateRecord(APIView):
@@ -91,6 +97,7 @@ class UpdateRecord(APIView):
             serializer = UpdateRecordSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 
+                # serializer.create()
                 #the graph calculator class
                 graph_calculator = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
 

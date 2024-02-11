@@ -108,8 +108,9 @@ class GraphCalculator:
         db = db.lower()
 
         if db == "income":
-            full_amount_summary = self.db[0].objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
+            full_amount_summary = float(self.db[0].objects.filter(date_received__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"])
             month_year_repr= (first_day_datetime_object.strftime("%B")[0:3] +" "+ (first_day_datetime_object.strftime("%Y"))[2:])
+
 
             if full_amount_summary: 
                 return month_year_repr,full_amount_summary
@@ -118,7 +119,7 @@ class GraphCalculator:
                 raise Exception("the record doesnt exists in the database")
             
         if db == "outcome":
-            full_amount_summary = self.db[1].objects.filter(month__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
+            full_amount_summary = self.db[1].objects.filter(date_received__range=(first_day,last_day)).all().values_list().aggregate(self.db_func[0]('amount'))["amount__sum"]
             month_year_repr= (first_day_datetime_object.strftime("%B")[0:3] +" "+ (first_day_datetime_object.strftime("%Y"))[2:])
 
             if full_amount_summary: 
@@ -146,11 +147,12 @@ class GraphCalculator:
         """
 
         #the data can be stored not ordered by the dates in the sql so the query below orders it by months
-        months_query_set = self.db[0].objects.filter(month__range=(start_date,end_date)).all().order_by("month").values_list()
+        months_query_set = self.db[0].objects.filter(date_received__range=(start_date,end_date)).all().order_by("date_received").values_list()
 
         #checking if the input of the start and end date was valid if not raises exeption
         if not months_query_set:
-            raise Exception("invalid records input or the record not exists")
+            message = {"error":"didnt found any data on this dates"}
+            return False,message
 
         #checking if the sql query is valid 
         if months_query_set:
@@ -159,10 +161,10 @@ class GraphCalculator:
             #this needed if there are more than one record in the same day-month-year in the sql 
             unique_year_month_list = []
             for month in months_query_set:
-                if ((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01") in unique_year_month_list:
+                if (datetime.datetime.strftime(month[3] ,"%Y-%m"))+"-01" in unique_year_month_list:
                     continue
                 else:
-                    unique_year_month_list.append((datetime.datetime.strftime(month[1],"%Y-%m"))+"-01")
+                    unique_year_month_list.append((datetime.datetime.strftime(month[3],"%Y-%m"))+"-01")
             
 
             #string repr of the months and years
