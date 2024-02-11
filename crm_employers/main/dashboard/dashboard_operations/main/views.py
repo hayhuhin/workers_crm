@@ -1,4 +1,4 @@
-from .serializers import CreateRecordSerializer,UpdateRecordSerializer,DeleteRecordSerializer,CompareRecordSerializer,GetInsightsSerializer,UpdateInsightsSerializer,AddInsightsSerializer,DeleteInsightsSerializer
+from .serializers import CreateRecordSerializer,UpdateRecordSerializer,DeleteRecordSerializer,GetRecordSerializer
 from user.permissions import FinanceUpdatePermission,FinanceViewPermission
 from finance.models import Income,Outcome
 from django.db.models import Sum
@@ -124,60 +124,18 @@ class UpdateRecord(APIView):
         return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class GetRecord(APIView):
-
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
-    #this handles the connection to the mongodb database
-    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
-
 
     def get(self,request):
-
-        graph_data = []
-
-        mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=str(request.user.username),max_records=7)
-        #this checking if the user already have basic record in the mongodb graph
-        if not mongodb_handler.user_exists():
-            mongodb_handler.create_basic_record()
-        
-        #method returns dict with records or empty dict if records not exist
-        graph_records_dict = mongodb_handler.graph_records()
-
-        #users first basic data
-        user_basic_data = mongodb_handler.find_data({"name":request.user.username})
-
-
-        #checking if the user have records
-        if graph_records_dict:
-            #itarates over the records keys
-            for record in graph_records_dict:
-                
-                #for comparison methods i should parse "sql_database_compared" even if empty
-                #checking if there are any sql_comparison records in the db
-                if "sql_database_compared" in graph_records_dict[record]:
-                    sql_comparison = graph_records_dict[record]["sql_database_compared"]
-                else:
-                    sql_comparison = []
-
-                #this is how the structure if the "dict_values" argument have to look like
-                dict_values = {"x":graph_records_dict[record]["x"],
-                            "y":graph_records_dict[record]["y"],
-                            "y_2":graph_records_dict[record]["y_2"],
-                            "graph_description":graph_records_dict[record]["graph_description"],
-                            "DB_1":graph_records_dict[record]["sql_database"],
-                            "DB_2":sql_comparison}
-
-                #this method creating graph html with the data extracted from the mongodb 
-
-                #appending the graph_html to the graph_chart list and the list will be parsed into the html template
-                graph_data.append({"graph_data":graph_records_dict[record],"graph_position":record})
-
-
-            # serializer = GraphViewSerializer(graph_data[])
-
-            return Response(graph_data,status=status.HTTP_200_OK)
-            
-        return Response({"error":"user dont have records"},status=status.HTTP_204_NO_CONTENT)
-
+        cleaned_data = request.data
+        user = {"email":request.user.email,"username":request.user.username}
+        serializer = DeleteRecordSerializer(data=cleaned_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer_response = serializer.get_info(cleaned_data=cleaned_data,user=user)
+            if all(serializer_response):
+                return Response(serializer_response[1],status=status.HTTP_200_OK)
+            return Response(serializer_response[1],status=status.HTTP_404_NOT_FOUND)
+        message = {"error":"invalid data passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
 

@@ -13,7 +13,7 @@ gmtime_dict = time.localtime(time.mktime(current_time_utc) + 2 * 3600)
 time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dict[3]}:{gmtime_dict[4]}")
 
 
-#* general serializers
+#* general record serializers
 class GeneralRecordSerializer(serializers.Serializer):
     sql_database = serializers.ChoiceField(choices=[("income","Income"),("outcome","Outcome")],default=None)
     graph_title = serializers.CharField(max_length=100,default=None)
@@ -66,20 +66,7 @@ class GeneralRecordSerializer(serializers.Serializer):
         return True,cleaned_data
 
 
-
-    #* later it will be usefull for our graph repr 
-class GraphViewSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    name = serializers.CharField(max_length=50)
-    db = serializers.CharField(max_length=50)
-    collection = serializers.CharField(max_length=50)
-    graph_permited = serializers.BooleanField(default=False)
-    graph_db_type= serializers.CharField(max_length=50)
-    graph_records = serializers.DictField(default={})
-    ordered_list = serializers.ListField(default=[])
-
-
-
+#* record CRUD operations serializers
 class CreateRecordSerializer(serializers.Serializer):
     database_name = serializers.ChoiceField(choices=[("income","Income"),("outcome","Outcome")],default=None)
     graph_title = serializers.CharField(max_length=100,default=None)
@@ -429,38 +416,57 @@ class UpdateRecordSerializer(serializers.Serializer):
         # return updated_record
     
 
+class GetRecordSerializer(serializers.Serializer):
+    position = serializers.IntegerField(default=None)
+    all_records = serializers.BooleanField(default=False)
 
-class CompareRecordSerializer(serializers.Serializer):
-    src_position = serializers.CharField(max_length=5)
-    dst_position = serializers.CharField(max_length=5)
+    def get_info(self,cleaned_data,user):
+        #* checking if passed empty json
+        allowed_fields = ["position","all_records"]
+        if not cleaned_data.items():
+            message = {
+                "error":"passed empty json",
+                "json_example":{
+                    "position":"postition of the graph",
+                    "all_records":"true or false"
+                    }}
+            return False,message
 
-
-class GetInsightsSerializer(serializers.Serializer):
-    income_year = serializers.ListField()
-    outcome_year = serializers.ListField()
-    income_amount = serializers.ListField()
-    outcome_amount = serializers.ListField()
-
-
-class UpdateInsightsSerializer(serializers.Serializer):
-    income_year = serializers.ListField()
-    outcome_year = serializers.ListField()
-    income_amount = serializers.ListField()
-    outcome_amount = serializers.ListField()
-
-    def to_json(self):
-        pass
-
-
-class AddInsightsSerializer(serializers.Serializer):
-    db_options = [
-        ("income","Income"),
-        ("outcome","Outcome")]
-    
-    db = serializers.ChoiceField(choices=db_options)
-    year = serializers.ListField()
-    # amount = serializers.ListField()
+        #* checking that the user passed valid fields
+        for item in cleaned_data.keys():
+            if item not in allowed_fields:
+                message = {"error":"passed invalid fields"}
 
 
-class DeleteInsightsSerializer(serializers.Serializer):
-    insights_id = serializers.CharField(max_length=12)
+        #* checking if the user is exists as employer
+        user_exists_as_employer = Employer.objects.filter(email=user["email"]).exists()
+        if user_exists_as_employer:
+            employer_obj = Employer.objects.get(email=user["email"])
+        else:
+            message = {"error":"user not exists as employer"}
+
+
+        for key,value in self.__getattribute__("data").items():
+            if key == "all_records" and value is True:
+                mongodb_handler = MongoDBConstructor(uri=settings.MONGODB_URI,db="test",collection=employer_obj.graph_db,user=user["username"],max_records=7)
+                records_data = mongodb_handler.graph_records()
+                if records_data:
+                    message = {"success":"found_records","all_records":records_data}
+                    return True,message
+                else:
+                    message = {"error","no records exists"}
+                    return False,message
+                
+            if key == "all_records" and value != True:
+                message = {"error":"passed invalid values"}
+                return False,message
+
+            if key == "position" and value != None:
+                mongodb_handler = MongoDBConstructor(uri=settings.MONGODB_URI,db="test",collection=employer_obj.graph_db,user=user["username"],max_records=7)
+                found_data = mongodb_handler.get_record_by_position(int(cleaned_data["position"]))
+                if all(found_data):
+                    return True,found_data
+
+                else:
+                    return False,found_data
+
