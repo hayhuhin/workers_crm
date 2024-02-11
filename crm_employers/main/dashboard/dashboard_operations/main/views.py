@@ -90,44 +90,39 @@ class DeleteRecord(APIView):
 class UpdateRecord(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
 
-    uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+
+    def get(self,request):
+        cleaned_data = request.data
+        user = {"email":request.user.email,"username":request.user.username}
+        serializer = DeleteRecordSerializer(data=cleaned_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer_response = serializer.get_info(cleaned_data=cleaned_data,user=user)
+            if all(serializer_response):
+                return Response(serializer_response[1],status=status.HTTP_200_OK)
+            return Response(serializer_response[1],status=status.HTTP_404_NOT_FOUND)
+        message = {"error":"invalid data passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
+
     def post(self,request):
-        #if the user posted any data
-        if request.data:
-            serializer = UpdateRecordSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                
-                # serializer.create()
-                #the graph calculator class
-                graph_calculator = GraphCalculator(user=request.user.username,last_save="",db=[Income,Outcome],db_func=[Sum])
+        cleaned_data = request.data
+        user = {"email":request.user.email,"username":request.user.username}
 
-                #the graph mongodb CRUD operations class
-                #the db,collection,max_amount will be accessed from the user database
-                mongodb_handler = MongoDBConstructor(uri=self.uri,db="test",collection="test",user=request.user.username,max_records=7)
+        serializer = UpdateRecordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
 
-                #serializing the data
-                graph_calculated_data = graph_calculator.sum_by_range(db=serializer.data["db"],start_date=serializer.data["start"],end_date=serializer.data["end"])
-
-                updated_record = serializer.update_record(graph_data=graph_calculated_data)
-                if updated_record:
-                    mongodb_handler.edit_record(record_position=serializer.data["graph_position"],edit_data=updated_record)
-                    updated_record["graph_position"] = serializer.data["graph_position"]
-                    return Response(updated_record,status=status.HTTP_201_CREATED)
-                
-                return Response({"error":"cant update record"},status=status.HTTP_404_NOT_FOUND)
+            created_record = serializer.update(cleaned_data=cleaned_data,user=user)
+            if all(created_record):
+                return Response(created_record[1],status=status.HTTP_201_CREATED)
             
-            return Response(request.data,status=status.HTTP_400_BAD_REQUEST)
+            return Response(created_record[1],status=status.HTTP_404_NOT_FOUND)
         
-        return Response(data=[{"error":"invalid input. the input have to look like in the example below:"},
-                {
-                    "graph_title":"graph_title",
-                    "graph_description":"graph_description",
-                    "graph_type":"graph_type",
-                    "db":"db",
-                    "start":"%Y-%m-%d",
-                    "end":"%Y-%m-%d",
-                    "graph_position":"graph_position"
-                }],status=status.HTTP_400_BAD_REQUEST)
+
+        message = {"error":"invalid input. the input have to look like in the example below:"},{
+                    "position":"100",
+
+                    }
+        return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class GetRecord(APIView):
