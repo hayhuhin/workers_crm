@@ -1,4 +1,10 @@
 from rest_framework import serializers
+from dashboard.func_tools.graph_calculations import GraphCalculator
+from dashboard.mongo_db_graph.mongodb_connector import MongoDBConstructor
+from finance.models import Income,Outcome
+from django.db.models import Sum
+from employer.models import Employer
+from django.conf import settings 
 import time
 
 gmtime_dict = time.gmtime()
@@ -7,103 +13,91 @@ time_now = str(f"{gmtime_dict[0]}-{gmtime_dict[1]}-{gmtime_dict[2]}. {gmtime_dic
 
 
 
-    #* later it will be usefull for our graph repr 
-class GraphViewSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    name = serializers.CharField(max_length=50)
-    db = serializers.CharField(max_length=50)
-    collection = serializers.CharField(max_length=50)
-    graph_permited = serializers.BooleanField(default=False)
-    graph_db_type= serializers.CharField(max_length=50)
-    graph_records = serializers.DictField(default={})
-    ordered_list = serializers.ListField(default=[])
-
-
-class AddRecordSerializer(serializers.Serializer):
-    graph_title = serializers.CharField(max_length=100)
-    graph_description = serializers.CharField(max_length=100)
-    graph_type = serializers.CharField(max_length=100)
-    db = serializers.CharField(max_length=100)
-    start = serializers.CharField(max_length=100)
-    end = serializers.CharField(max_length=100)
-
-
-    def serialize(self,graph_data):
-        new_record = {
-                    "graph_title":self.validated_data.get("graph_title"),
-                    "graph_description":self.validated_data.get("graph_description"),
-                    "graph_type":self.validated_data.get("graph_type"),
-                    "created_at" : time_now,
-                    "x":graph_data[1],
-                    "y":graph_data[0],
-                    "y_2":[],
-                    'sql_database':self.validated_data.get("db"),
-                    "start_date":self.validated_data.get("start"),
-                    "end_date":self.validated_data.get("end"),
-                    }
-        return new_record
-    
-
-class UpdateRecordSerializer(serializers.Serializer):
-    graph_title = serializers.CharField(max_length=100)
-    graph_description = serializers.CharField(max_length=100)
-    graph_type = serializers.CharField(max_length=100)
-    db = serializers.CharField(max_length=100)
-    start = serializers.CharField(max_length=100)
-    end = serializers.CharField(max_length=100)
-    graph_position = serializers.CharField(max_length=5)
-
-    def update_record(self,graph_data):
-        updated_record = {
-                    "graph_title":self.validated_data.get("graph_title"),
-                    "graph_description":self.validated_data.get("graph_description"),
-                    "graph_type":self.validated_data.get("graph_type"),
-                    "created_at" : time_now,
-                    "x":graph_data[1],
-                    "y":graph_data[0],
-                    "y_2":[],
-                    'sql_database':self.validated_data.get("db"),
-                    "start_date":self.validated_data.get("start"),
-                    "end_date":self.validated_data.get("end"),
-                    }
-        return updated_record
-    
-
-class DeleteRecordSerializer(serializers.Serializer):
-    position = serializers.CharField(max_length=5)
-
-
 class CompareRecordSerializer(serializers.Serializer):
-    src_position = serializers.CharField(max_length=5)
-    dst_position = serializers.CharField(max_length=5)
+    src_position = serializers.CharField(max_length=5,default=None)
+    dst_position = serializers.CharField(max_length=5,default=None)
 
 
-class GetInsightsSerializer(serializers.Serializer):
-    income_year = serializers.ListField()
-    outcome_year = serializers.ListField()
-    income_amount = serializers.ListField()
-    outcome_amount = serializers.ListField()
+    def get_info(self,cleaned_data,user):
+
+        message = {
+            "error":"you need to pass data as post request",
+            "json_example_of_post_request":{
+                "src_position":"source position of the required graph that you want to compare with",
+                "dst_position":"destination position of the required graph that you want to be compared with"
+                }}
+        return False,message
+
+    def compare(self,cleaned_data,user):
+        required_fields = ["src_position","dst_position"]
+        #* checking that the user passed valid fields
+        for item in required_fields:
+            if item not in cleaned_data.keys():
+                message = {"error":"must pass all required fields","required_fields":required_fields}
+                return False,message
+
+        #* checking if the user is exists as employer
+        user_exists_as_employer = Employer.objects.filter(email=user["email"]).exists()
+        if user_exists_as_employer:
+            employer_obj = Employer.objects.get(email=user["email"])
+        else:
+            message = {"error":"user not exists as employer"}
 
 
-class UpdateInsightsSerializer(serializers.Serializer):
-    income_year = serializers.ListField()
-    outcome_year = serializers.ListField()
-    income_amount = serializers.ListField()
-    outcome_amount = serializers.ListField()
+        #* main classed that handle the calc and the mongodb CRUD operations
+        mongodb_handler = MongoDBConstructor(uri=settings.MONGODB_URI,db="test",collection=employer_obj.graph_db,user=user["username"],max_records=7)
+        compared_data = mongodb_handler.compare_record(position_1=cleaned_data["src_position"],position_2=cleaned_data["dst_position"])
 
-    def to_json(self):
-        pass
+        if not all(compared_data):
+            message = {"error":compared_data[1]}
+            return False,message
 
-
-class AddInsightsSerializer(serializers.Serializer):
-    db_options = [
-        ("income","Income"),
-        ("outcome","Outcome")]
-    
-    db = serializers.ChoiceField(choices=db_options)
-    year = serializers.ListField()
-    # amount = serializers.ListField()
+        else:
+            message = {"success":compared_data[1]}
+            return True,message
 
 
-class DeleteInsightsSerializer(serializers.Serializer):
-    insights_id = serializers.CharField(max_length=12)
+
+class SwitchRecordSerializer(serializers.Serializer):
+    src_position = serializers.CharField(max_length=5,default=None)
+    dst_position = serializers.CharField(max_length=5,default=None)
+
+    def get_info(self,cleaned_data,user):
+
+        message = {
+            "error":"you need to pass data as post request",
+            "json_example_of_post_request":{
+                "src_position":"source position of the required graph that you want to compare with",
+                "dst_position":"destination position of the required graph that you want to be compared with"
+                }}
+        return False,message
+
+    def switch(self,cleaned_data,user):
+        required_fields = ["src_position","dst_position"]
+        #* checking that the user passed valid fields
+        for item in required_fields:
+            if item not in cleaned_data.keys():
+                message = {"error":"must pass all required fields","required_fields":required_fields}
+                return False,message
+
+        #* checking if the user is exists as employer
+        user_exists_as_employer = Employer.objects.filter(email=user["email"]).exists()
+        if user_exists_as_employer:
+            employer_obj = Employer.objects.get(email=user["email"])
+        else:
+            message = {"error":"user not exists as employer"}
+
+
+        #* main classed that handle the calc and the mongodb CRUD operations
+        mongodb_handler = MongoDBConstructor(uri=settings.MONGODB_URI,db="test",collection=employer_obj.graph_db,user=user["username"],max_records=7)
+        switched_data = mongodb_handler.switch_records(src_position=cleaned_data["src_position"],dst_position=cleaned_data["dst_position"])
+
+        if not all(switched_data):
+            message = switched_data[1]
+            return False,message
+
+        else:
+            message = switched_data[1]
+            return True,message
+
+

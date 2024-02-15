@@ -442,7 +442,7 @@ class MongoDBConstructor:
 
         if len(records) >= self.max_records and ignore_max == False:
             max_record_exceded_message = f"you exceded the maximum records in the user. your maximum is: {self.max_records}"
-            print(max_record_exceded_message)
+
             raise ValueError(max_record_exceded_message)
         
 
@@ -498,35 +498,49 @@ class MongoDBConstructor:
             None.
         """
 
+        #* checking if positions exist
+        src_position_exists = self.get_record_by_position(src_position)
+        if not all(src_position_exists):
+            message = {"error":"invalid position passed"}
+            return False,message
+        
+        dst_position_exists = self.get_record_by_position(dst_position)
+        if not all(dst_position_exists):
+            message = {"error":"invalid position passed"}
+            return False,message
+
+
+
         #getting the user records
         records = self.graph_records()
-        positions = self.graph_positions()
+        # positions = self.graph_positions()
         #checking if the src record exists
 
-        if str(src_position) not in positions:
-            raise ValueError("src_position is invalid")
+        # if str(src_position) not in positions:
+        #     raise ValueError("src_position is invalid")
 
-        if str(dst_position) not in positions:
-            raise ValueError("dst_position is invalid")
+        # if str(dst_position) not in positions:
+        #     raise ValueError("dst_position is invalid")
 
-        else:
+    # else:
 
-            src_data = records[str(src_position)]
-            dst_data = records[str(dst_position)]
+        src_data = records[str(src_position)]
+        dst_data = records[str(dst_position)]
 
-            # changing the src to dst
-            src_to_dst = {
-            "$set": {
-                f"graph_records.records.{dst_position}":src_data
-            }}
-            self.collection.update_one(self.user,src_to_dst)
-            
-            dst_to_src = {
-            "$set": {
-                f"graph_records.records.{src_position}":dst_data
-            }}
-            self.collection.update_one(self.user,dst_to_src)
-            return None    
+        # changing the src to dst
+        src_to_dst = {
+        "$set": {
+            f"graph_records.records.{dst_position}":src_data
+        }}
+        self.collection.update_one(self.user,src_to_dst)
+        
+        dst_to_src = {
+        "$set": {
+            f"graph_records.records.{src_position}":dst_data
+        }}
+        self.collection.update_one(self.user,dst_to_src)
+        message = {"success":"switched the positions successfully"}
+        return True,message
             
 
     def get_record_by_position(self,position:int):
@@ -534,9 +548,12 @@ class MongoDBConstructor:
         method that returns the graph data of the passed position 
 
         data returned as a Dict
+        Returns boolean,dict
         """
-        
-        # result = collection.find_one({"name": "fin", "graph_records.records.1": {"$exists": True}})
+        #* checking if the position is passed as integer
+        if not isinstance(position,int):
+            message = {"error":"passed invalid type"}
+            return False,message
 
         projection = {f"graph_records.records.{int(position)}":{"$exists": True}}
 
@@ -561,15 +578,28 @@ class MongoDBConstructor:
         """
         #transforms it to strings
         #! ill add another method that will check the types of the inserted data before passing the args 
+
+        #* checking if positions are exist
+        pos_1_exists = self.get_record_by_position(position_1)
+        if not all(pos_1_exists):
+            message = {"error":"invalid position passed"}
+            return False,message
+        
+        pos_2_exists = self.get_record_by_position(position_2)
+        if not all(pos_2_exists):
+            message = {"error":"invalid position passed"}
+            return False,message
+
         #! into the class/method
         position_1 = str(position_1)
         position_2 = str(position_2)
 
-
         records = self.graph_records()
         #if the user dont have recods to compare
         if not records:
-            raise ValueError("user dont have records")
+            message = {"error":"user dont have any record to compare with"}
+            return False,message
+        
         #if the user have available records and more than 1
         if len(records) > 1 :
             first_compare_record = records[position_1]
@@ -599,12 +629,17 @@ class MongoDBConstructor:
             if int(position_1) > int(position_2):
                 self.remove_record(required_record=position_1)
                 self.remove_record(required_record=int(position_2))
+                message = {"success":"compared the record successfully"}
+                return True,message
             else:
                 self.remove_record(required_record=int(position_2))
                 self.remove_record(required_record=int(position_1))
-          
+                message = {"success":"compared the record successfully"}
+                return True,message
+
         else:
-            raise ValueError("cant compare when have only one record")
+            message = {"error":"cant compare when have only one record"}
+            return True,message
 
 
     def edit_record(self,record_position:str,edit_data:dict) -> None:
@@ -718,6 +753,11 @@ class MongoDBConstructor:
             user(str) : the user that we will querie in the mongodb
             insights_data(dict) : this data will be saved in the db each time the method called 
         """
+
+        #* checking if the user exist
+        user_exists = self.user_exists()
+        if not user_exists:
+            self.create_basic_record()
 
         # insight_format = {str(randint(1,10000000)):insights_data}
         current_insight_amount = self.collection.find_one(self.user,{"insights":1})
