@@ -212,22 +212,21 @@ class GraphCalculator:
             lower_db = str(databases_obj.__name__)
 
             # dbs_name_lower = dbs_name_lower.lower()
-            
+
             # print(dbs.__name__,choosen_db)
             if lower_db.lower() == db_name:
                 # print(year_range)
                 for year in year_range:
                     start = f"{year}-01-01"
                     end = f"{year}-12-31"
-                    print(type(start),type(end))
                     full_sum_test = databases_obj.objects.filter(date_received__range=("2024-01-01","2024-12-31")).aggregate(self.db_func[0]('amount'))['amount__sum']
-                    print(full_sum_test)
+                    # print(full_sum_test)
                     full_sum = databases_obj.objects.filter(date_received__range=(start,end)).aggregate(self.db_func[0]("amount"))['amount__sum']
-                    yearly_sum_dict[year] = full_sum
 
-        # print(yearly_sum_dict)
-
-
-                
-
+                    #* checking that there is any result an if true it converts it to float and not Decimal object
+                    if full_sum:
+                        yearly_sum_dict[year] = float(full_sum)
+                    else:
+                        yearly_sum_dict[year] = full_sum
+                        
         return yearly_sum_dict,db_name

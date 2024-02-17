@@ -80,7 +80,7 @@ class CreateRecordSerializer(serializers.Serializer):
         allowed_fields = ["database_name","graph_title","graph_description","graph_type","start_date","end_date"]
         uri = settings.MONGODB_URI
 
-        #* checkinf if passed empty json
+        #* checking if passed empty json
         if not cleaned_data.items():
             message = {
                 "error":"passed empty json",
