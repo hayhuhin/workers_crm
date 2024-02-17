@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 
 
 
+#* insight operations
 
 class CreateInsight(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
@@ -52,7 +53,6 @@ class CreateInsight(APIView):
                     }
         return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
 
- 
 
 class UpdateInsight(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission)
@@ -130,7 +130,6 @@ class DeleteInsight(APIView):
                     "end":"%Y-%m-%d",
                     }
         return Response(data=message,status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class GetInsight(APIView):
