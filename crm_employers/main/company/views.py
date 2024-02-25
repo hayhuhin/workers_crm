@@ -83,10 +83,11 @@ class UpdateCompany(APIView):
 
     def get(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = UpdateCompanySerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
-            get_info = serializer.get_info(cleaned_data=cleaned_data)
-
+            get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
             return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
@@ -99,10 +100,12 @@ class UpdateCompany(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         print(cleaned_data)
         serializer = UpdateCompanySerializer(data=cleaned_data)
         if serializer.is_valid():
-            updated_department = serializer.update(cleaned_data=cleaned_data)
+            updated_department = serializer.update(cleaned_data=cleaned_data,user=user)
 
             if all(updated_department):
                 return Response(updated_department[1],status=status.HTTP_201_CREATED)
@@ -113,19 +116,20 @@ class UpdateCompany(APIView):
 
 
 class GetCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,MediumPermission)
+    permission_classes = (permissions.IsAuthenticated,ITAdminPermission)
 
 
     def get(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
 
-        serializer = GetCompanySerializer(data=cleaned_data)
-        if serializer.is_valid():
-            created_department = serializer.get(cleaned_data=cleaned_data)
+        serializer = DeleteCompanySerializer(data = cleaned_data)
+        if serializer.is_valid(raise_exception = True):
+            get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
-            if all(created_department):
-                return Response(created_department[1],status=status.HTTP_201_CREATED)
-            
-            return Response(created_department[1],status=status.HTTP_404_NOT_FOUND)
-        
-        return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+            if all(get_info):
+                return Response(get_info[1],status=status.HTTP_200_OK)
+            return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
+
+        message = {"error":"invalid fields passed"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
