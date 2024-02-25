@@ -10,6 +10,14 @@ from django.db.models import Q,F
 #! must re create this whole seralizers
 #* general serializers
 
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["email","username","password"]
+
+
+
 class EmployerSerializer(serializers.ModelSerializer):
     """
     main model serializer class of the Employer model.

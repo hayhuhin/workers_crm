@@ -1,12 +1,24 @@
 from django.db import models
 #! need to uncomment it after fixing the dashboard application
 # from dashboard.models import GraphPermission,GraphInsights
-from user.models import User
+from user.models import User,Company
 from finance.models import Customer
 
 
-#* employer and department section models 
 
+# class Company(models.Model):
+#     name = models.CharField(max_length=100)
+#     description = models.TextField(blank=True)
+#     address = models.CharField(max_length=255)
+#     admin_email = models.EmailField(max_length=50,unique=True)
+#     departments = models.ManyToManyField("Department", related_name='companies')
+
+#     def __str__(self):
+#         return self.name
+
+
+
+#* employer and department section models 
 class Employer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50,blank=False)
@@ -15,13 +27,13 @@ class Employer(models.Model):
     phone = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now=True)
     profile_pic = models.ImageField(default='profile_pics/profile_picture.jpeg',upload_to='profile_pics')
-    job_position = models.ForeignKey("Department",blank=True,null=True,on_delete=models.SET_NULL)
+    job_position = models.ForeignKey("Department",on_delete=models.CASCADE)
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
     lead = models.ForeignKey("Lead",blank=True,null=True,on_delete=models.SET_NULL)
     task = models.ManyToManyField("Task",default=None)
     graph_db = models.CharField(max_length=50,choices=[("test","Test"),("prod","Prod")],default="test")
     #! need to uncomment it after fixing the dashboard application
-    # graph_permission = models.ManyToManyField(GraphPermission,default=None)
-    # insights_permission = models.ManyToManyField(GraphInsights,default=None)
+
 
 
     def __str__(self):
@@ -34,6 +46,7 @@ class Department(models.Model):
     started_at = models.DateTimeField(auto_now=True)
     salary = models.IntegerField()
     task = models.ManyToManyField("DepartmentTask",blank=True)
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
 
     def __str__(self):

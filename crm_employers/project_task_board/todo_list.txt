@@ -108,3 +108,22 @@ ADD:export CSV and Import CSV - in the import must be a option to watch without 
     1.export CSV - DONE
     2.import CSV - DONE
 
+
+
+
+
+
+
+
+
+#### new section for the improvement
+
+
+
+1.user creating account fot the application and hes admin 
+2.now he must create company 
+3.after he created company it will automatically create hr,finance departments
+
+<<< working on that 
+4.from here he can create users that are by default will be added to this specific company 
+

@@ -5,15 +5,55 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
-from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer,AssignFinanceFullPermissionSerializer,AssignFinanceUpdatePermissionSerializer,AssignFinanceViewPermissionSerializer,DisallowFinanceFullPermissionSerializer,DisallowFinanceUpdatePermissionSerializer,DisallowFinanceViewPermissionSerializer
+from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer,AssignFinanceFullPermissionSerializer,AssignFinanceUpdatePermissionSerializer,AssignFinanceViewPermissionSerializer,DisallowFinanceFullPermissionSerializer,DisallowFinanceUpdatePermissionSerializer,DisallowFinanceViewPermissionSerializer,CreateUserSerializer
 from rest_framework.authtoken.models import Token
 from .permissions import SystemAdminPermission,ITAdminPermission,MediumPermission
 from .models import User
 
 
 
+
+#!! each user that created have to add him to the relevant company
+#!! normal users cant just create company of their own and can only accessing their company
+#!! 
+
+class CreateUser(APIView):
+	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
+
+	def get(self,request):
+		cleaned_data = request.data
+		serializer = CreateUserSerializer(data=cleaned_data)
+		if serializer.is_valid(raise_exception=True):
+			get_data = serializer.get_info(cleaned_data=cleaned_data)
+			if all(get_data):
+				message = {"success":get_data[1]}
+				return Response(message,status=status.HTTP_202_ACCEPTED)
+		
+			message = {"error":get_data[1]}
+			return Response(message,status=status.HTTP_404_NOT_FOUND)
+		
+		message = {'error',"passed invalid fields"}
+		return Response(message,status=status.HTTP_404_NOT_FOUND)
+
+	def post(self,request):
+		cleaned_data = request.data
+		company = request.user.company
+		serializer = CreateUserSerializer(data=cleaned_data)
+		if serializer.is_valid(raise_exception=True):
+			get_data = serializer.create(cleaned_data=cleaned_data,company=company)
+			if all(get_data):
+				message = {"success":get_data[1]}
+				return Response(message,status=status.HTTP_202_ACCEPTED)
+		
+			message = {"error":get_data[1]}
+			return Response(message,status=status.HTTP_404_NOT_FOUND)
+		
+		message = {'error',"passed invalid fields"}
+		return Response(message,status=status.HTTP_404_NOT_FOUND)
+			
+
 #*user section
-class UserRegister(APIView):
+class AdminUserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 
 

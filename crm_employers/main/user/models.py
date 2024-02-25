@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
-
+from company.models import Company
 
 
 class UserManager(BaseUserManager):
@@ -55,6 +55,8 @@ class User(AbstractBaseUser,PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     is_superuser = models.BooleanField(default=False)
+    company = models.ForeignKey(Company,blank=True,null=True,on_delete=models.CASCADE,unique=True)
+
 
     objects = UserManager()
 

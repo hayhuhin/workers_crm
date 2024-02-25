@@ -4,9 +4,33 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
 
 
-
-#* user serializer section
 UserModel = get_user_model()
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ["username","email","password"]
+
+
+    def create(self,cleaned_data,company):
+        company_obj = company
+        data = {}
+        user_obj = UserModel.objects.create_user(email=cleaned_data["email"],username=cleaned_data["username"],password=cleaned_data["password"])
+        user_obj.company = company_obj
+        user_obj.save()
+        token = Token.objects.get(user=user_obj).key
+        data["username"] = user_obj.username
+        data["email"] = user_obj.email
+        data["token"] = token
+        data["company"] = company_obj.name
+
+        return True,data
+
+
+
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
