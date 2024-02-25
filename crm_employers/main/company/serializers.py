@@ -2,6 +2,7 @@ from rest_framework import serializers
 from employer.models import Department
 from django.db.models import Q,F
 from .models import Company
+from user.models import User
 
 
 class GeneralCompanySerializer(serializers.Serializer):
@@ -30,22 +31,6 @@ class CreateCompanySerializer(serializers.ModelSerializer):
     def create(self,cleaned_data,user):
         admin_email = user["email"]
 
-        # #* check if passed empty json
-        # if not cleaned_data.keys():
-        #     message = {"error":"passed empty json","json_example":{
-        #         "name":"department name",
-        #         "rank":"department rank",
-        #         "salary":"department salary"
-        #     }}
-        #     return False,message
-        
-        # #* check if passed invalid fields
-        # for key in cleaned_data.keys():
-        #     if key not in required_fields:
-        #         message = {"error":"passed invalid fields","allowed_fields":required_fields}
-        #         return False,message
-            
-
         #* check if the company exists
         company_exists = Company.objects.filter(name=cleaned_data["name"]).exists()
         if company_exists:
@@ -59,14 +44,20 @@ class CreateCompanySerializer(serializers.ModelSerializer):
             message = {"error":"this user is already created a company"}
             return False,message
 
-        obj_instance = Company.objects.create(
+        company_obj = Company.objects.create(
             name=cleaned_data["name"],
             description=cleaned_data["description"],
             address=cleaned_data["address"],
             admin_email=admin_email
         )
-        obj_instance.save()
-        message = {"success":f"company {obj_instance.name} created. admin email is {admin_email}"}
+        company_obj.save()
+        #* as we creating the company we must add this user to the company in the user model
+        
+        user_obj = User.objects.get(email=admin_email)
+        user_obj.company = company_obj
+        user_obj.save()
+
+        message = {"success":f"company {company_obj.name} created. admin email is {admin_email}"}
         return True,message
 
 

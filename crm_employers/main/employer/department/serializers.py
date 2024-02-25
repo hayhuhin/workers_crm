@@ -1,6 +1,9 @@
 from rest_framework import serializers
+
 from employer.models import Department
 from django.db.models import Q,F
+from user.models import User,Company
+from employer.models import Employer
 
 class GeneralDepartmentSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50,default=None)
@@ -19,7 +22,9 @@ class CreateDepartmentSerializer(serializers.Serializer):
     rank = serializers.IntegerField(default=None)
     salary = serializers.IntegerField(default=None)
 
-    def get_info(self,cleaned_data):
+    def get_info(self,cleaned_data,user):
+        admin_email = user["email"]
+
         message = {"success":{"example json":{
             "name":"name of the department (engineer ...)",
             "rank":"rank of the department",
@@ -29,8 +34,9 @@ class CreateDepartmentSerializer(serializers.Serializer):
         return True,message
 
 
-    def create(self,cleaned_data):
+    def create(self,cleaned_data,user):
         required_fields = ["name","rank","salary"]
+        admin_email = user["email"]
 
         #* check if passed empty json
         if not cleaned_data.keys():
@@ -41,6 +47,15 @@ class CreateDepartmentSerializer(serializers.Serializer):
             }}
             return False,message
         
+        #* check if the user already have company
+        company_exists = Company.objects.filter(admin_email=admin_email).exists()
+        if not company_exists:
+            message = {"error":"you cant create department without creating the company first"}
+            return False,message
+        else:
+            company_obj = Company.objects.get(admin_email=admin_email)
+
+
         #* check if passed invalid fields
         for key in cleaned_data.keys():
             if key not in required_fields:
@@ -56,7 +71,8 @@ class CreateDepartmentSerializer(serializers.Serializer):
         
         obj_instance = Department.objects.create(
             name=cleaned_data["name"],
-            salary=cleaned_data["salary"]
+            salary=cleaned_data["salary"],
+            company=company_obj
         )
         obj_instance.save()
         message = {"success":f"department {obj_instance.name} created with the salary of {obj_instance.salary}"}
@@ -68,7 +84,8 @@ class DeleteDepartmentSerializer(serializers.Serializer):
     department_id = serializers.IntegerField(default=None)
     all_departments = serializers.BooleanField(default=False)
 
-    def get_info(self,cleaned_data):
+    def get_info(self,cleaned_data,user):
+        user_email = user["email"]
         required_fields = ["name","department_id","all_departments"]
         for fields in cleaned_data.keys():
             if fields not in required_fields:
@@ -296,7 +313,8 @@ class GetDepartmentSerializer(serializers.Serializer):
     all_departments = serializers.BooleanField(default=False)
 
 
-    def get(self,cleaned_data):
+    def get_info(self,cleaned_data,user):
+        user_email = user["email"]
         required_fields = ["name","department_id","all_departments"]
         for fields in cleaned_data.keys():
             if fields not in required_fields:
@@ -315,7 +333,8 @@ class GetDepartmentSerializer(serializers.Serializer):
 
         #* checking if passed all_department first
         if "all_departments" in cleaned_data.keys():
-            departments = Department.objects.all().values("id","name")
+            company_obj = Company.objects.employer_set.all()
+            departments = Department.objects.get(company=company)
             message = {"success":"all_departments field passed successfully","all_departments":departments}
             return True,message
         

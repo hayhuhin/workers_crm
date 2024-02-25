@@ -13,9 +13,8 @@ from .models import User
 
 
 
-#!! each user that created have to add him to the relevant company
-#!! normal users cant just create company of their own and can only accessing their company
-#!! 
+#!! maybe i will switch the creation of the user inside the  employer togheter as a user 
+
 
 class CreateUser(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
@@ -35,12 +34,13 @@ class CreateUser(APIView):
 		message = {'error',"passed invalid fields"}
 		return Response(message,status=status.HTTP_404_NOT_FOUND)
 
+
 	def post(self,request):
 		cleaned_data = request.data
-		company = request.user.company
+		user = {"email":request.user.email}
 		serializer = CreateUserSerializer(data=cleaned_data)
 		if serializer.is_valid(raise_exception=True):
-			get_data = serializer.create(cleaned_data=cleaned_data,company=company)
+			get_data = serializer.create(cleaned_data=cleaned_data,user=user)
 			if all(get_data):
 				message = {"success":get_data[1]}
 				return Response(message,status=status.HTTP_202_ACCEPTED)

@@ -55,7 +55,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     is_superuser = models.BooleanField(default=False)
-    company = models.ForeignKey(Company,blank=True,null=True,on_delete=models.CASCADE,unique=True)
+    company = models.ForeignKey(Company,blank=True,on_delete=models.CASCADE,null=True)
 
 
     objects = UserManager()

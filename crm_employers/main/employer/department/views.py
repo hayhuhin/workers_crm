@@ -15,9 +15,10 @@ class CreateDepartment(APIView):
 
     def get(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
         serializer = CreateDepartmentSerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
-            get_info = serializer.get_info(cleaned_data=cleaned_data)
+            get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
@@ -30,10 +31,11 @@ class CreateDepartment(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
 
         serializer = CreateDepartmentSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_department = serializer.create(cleaned_data=cleaned_data)
+            created_department = serializer.create(cleaned_data=cleaned_data,user=user)
 
             if all(created_department):
                 return Response(created_department[1],status=status.HTTP_201_CREATED)
@@ -115,10 +117,10 @@ class GetDepartment(APIView):
 
     def get(self,request):
         cleaned_data = request.data
-
+        user = {"email":request.user.email}
         serializer = GetDepartmentSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_department = serializer.get(cleaned_data=cleaned_data)
+            created_department = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(created_department):
                 return Response(created_department[1],status=status.HTTP_201_CREATED)

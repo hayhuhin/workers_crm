@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model,authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
-
+from company.models import Company
+from user.models import User 
 
 UserModel = get_user_model()
 
@@ -13,12 +14,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ["username","email","password"]
 
 
-    def create(self,cleaned_data,company):
-        company_obj = company
+    def create(self,cleaned_data,user):
+        admin_email = user["email"]
+        company_obj = Company.objects.get(admin_email=admin_email)
+
         data = {}
         user_obj = UserModel.objects.create_user(email=cleaned_data["email"],username=cleaned_data["username"],password=cleaned_data["password"])
-        user_obj.company = company_obj
         user_obj.save()
+
+        test = User.objects.get(email=cleaned_data["email"])
+        test.company = company_obj
+        test.save()
+
         token = Token.objects.get(user=user_obj).key
         data["username"] = user_obj.username
         data["email"] = user_obj.email
