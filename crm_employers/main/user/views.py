@@ -22,17 +22,9 @@ class CreateUser(APIView):
 	def get(self,request):
 		cleaned_data = request.data
 		serializer = CreateUserSerializer(data=cleaned_data)
-		if serializer.is_valid(raise_exception=True):
-			get_data = serializer.get_info(cleaned_data=cleaned_data)
-			if all(get_data):
-				message = {"success":get_data[1]}
-				return Response(message,status=status.HTTP_202_ACCEPTED)
-		
-			message = {"error":get_data[1]}
-			return Response(message,status=status.HTTP_404_NOT_FOUND)
-		
-		message = {'error',"passed invalid fields"}
-		return Response(message,status=status.HTTP_404_NOT_FOUND)
+		get_data = serializer.get_info(cleaned_data=cleaned_data)
+		message = {"success":get_data[1]}
+		return Response(message,status=status.HTTP_202_ACCEPTED)
 
 
 	def post(self,request):

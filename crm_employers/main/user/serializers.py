@@ -14,8 +14,24 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ["username","email","password"]
 
 
+    def get_info(self,cleaned_data):
+        message = {"success":"you have to fill this json as a post method","example_json":{
+            "username":"the wanted username for the user",
+            "email":"email of the user",
+            "password":"password of the user"
+        }}
+        return True,message 
+
+
     def create(self,cleaned_data,user):
         admin_email = user["email"]
+
+        #* first im checking if the admin is already has a company
+        admin_has_company = User.objects.get(email=admin_email)
+        if not admin_has_company.company:
+            message = {"error":"the admin didnt create company"}
+            return False,message
+
         company_obj = Company.objects.get(admin_email=admin_email)
 
         data = {}

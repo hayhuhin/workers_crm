@@ -64,7 +64,8 @@ class CreateDepartmentSerializer(serializers.Serializer):
             
 
         #* check if the department exists
-        department_exists = Department.objects.filter(name=cleaned_data["name"]).exists()
+        department_exists = company_obj.department_set.filter(name=cleaned_data["name"]).exists()
+        # department_exists = Department.objects.filter(name=cleaned_data["name"]).exists()
         if department_exists:
             message = {"error":"this department is already exists"}
             return False,message
@@ -101,10 +102,18 @@ class DeleteDepartmentSerializer(serializers.Serializer):
             }}
             return False,message
 
+        #* getting the company object of the user
+        user_obj = User.objects.get(email=user_email)
+
+        if not user_obj.company:
+            message = {"error":"user doesnt have company"}
+            return False,message
+        
+        company_obj = user_obj.company
 
         #* checking if passed all_department first
         if "all_departments" in cleaned_data.keys():
-            departments = Department.objects.all().values("id","name")
+            departments = company_obj.department_set.all().values("id","name")
             message = {"success":"all_departments field passed successfully","all_departments":departments}
             return True,message
         
@@ -139,7 +148,8 @@ class DeleteDepartmentSerializer(serializers.Serializer):
         return False,message
     
 
-    def delete(self,cleaned_data):
+    def delete(self,cleaned_data,user):
+        user_email = user["email"]
         required_fields = ["department_id"]
 
         for fields in cleaned_data.keys():
@@ -153,10 +163,25 @@ class DeleteDepartmentSerializer(serializers.Serializer):
             "department_id":"2",
             }}
             return False,message
+        
+        #* first im checking if the user exists
+        user_exists = User.objects.filter(email=user_email).exists()
+        if not user_exists:
+            message = {"error":"user not exists"}
+            return False,message
+        else:
+            user_obj = User.objects.get(email=user_email)
+        
+        #* checking that the user have company 
+        if not user_obj.company:
+            message = {"error":"this user doesnt have company"}
+            return False,message
+        
 
 
-        #check if the department exists
-        department_exists = Department.objects.filter(id=cleaned_data["department_id"]).exists()
+        #* checking if department exists 
+        company_obj = user_obj.company
+        department_exists = company_obj.department_set.filter(id=cleaned_data["department_id"]).exists()
         if department_exists:
             department_obj = Department.objects.get(id=cleaned_data["department_id"])
             department_obj.delete()
@@ -175,9 +200,9 @@ class UpdateDepartmentSerializer(serializers.Serializer):
     department_id = serializers.IntegerField(default=None)
     update_data = serializers.DictField(default = None)
 
-    def get_info(self,cleaned_data):
+    def get_info(self,cleaned_data,user):
         allowed_fields = ["name","department_id"]
-
+        user_email = user["email"]
         #* returning example json if the user passed empty json
         if not cleaned_data.keys():
             message = {"error":"you must pass at least one of the fields","example_json":{
@@ -191,14 +216,31 @@ class UpdateDepartmentSerializer(serializers.Serializer):
             if key not in allowed_fields:
                 message = {"error":f"passed invalid field -{key}-"}
                 return False,message
+            
+
+        #* first im checking if the user exists
+        user_exists = User.objects.filter(email=user_email).exists()
+        if not user_exists:
+            message = {"error":"user not exists"}
+            return False,message
+        else:
+            user_obj = User.objects.get(email=user_email)
+        
+
+        #* checking that the user have company 
+        if not user_obj.company:
+            message = {"error":"this user doesnt have company"}
+            return False,message
+        
 
         #this will have my query that will be passed later
         query = Q()
 
         #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
+        company_obj = user_obj.company
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
-                name_exists = Department.objects.filter(name=value).exists()
+                name_exists = company_obj.department_set.filter(name=value).exists()
                 if name_exists: 
                     query &= Q(name=value)
                 else:
@@ -206,7 +248,7 @@ class UpdateDepartmentSerializer(serializers.Serializer):
                     return False,message
                 
             if key == "department_id" and value != None:
-                department_exists = Department.objects.filter(id=value).exists()
+                department_exists = company_obj.department_set.filter(id=value).exists()
                 if department_exists:
                     query &= Q(id=value)
                 else:
@@ -214,12 +256,13 @@ class UpdateDepartmentSerializer(serializers.Serializer):
                     return False,message
 
 
-        query_data = Department.objects.filter(query).values("id","name")
+        query_data = company_obj.department_set.filter(query).values("id","name")
         message = {"success":query_data}
         return True,message
 
 
-    def update(self,cleaned_data):
+    def update(self,cleaned_data,user):
+        user_email = user["email"]
         required_fields = ["department_id","update_data"]
         allowed_update_fields = ["name","rank","salary"]
 
@@ -261,8 +304,24 @@ class UpdateDepartmentSerializer(serializers.Serializer):
                 return False,message
 
 
+        #* first im checking if the user exists
+        user_exists = User.objects.filter(email=user_email).exists()
+        if not user_exists:
+            message = {"error":"user not exists"}
+            return False,message
+        else:
+            user_obj = User.objects.get(email=user_email)
+        
+
+        #* checking that the user have company 
+        if not user_obj.company:
+            message = {"error":"this user doesnt have company"}
+            return False,message
+        
+        
         # #*checking if the department exists with the id provided
-        department_exists = Department.objects.filter(id = cleaned_data["department_id"]).exists()
+        company_obj = user_obj.company
+        department_exists = company_obj.department_set.filter(id = cleaned_data["department_id"]).exists()
         if not department_exists:
             message = {"error":"this department is not exist with this id"}
             return False,message
@@ -286,7 +345,7 @@ class UpdateDepartmentSerializer(serializers.Serializer):
 
             check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
             if all(check_unique_fields):
-                update_obj = Department.objects.get(id=cleaned_data["department_id"])
+                update_obj = company_obj.department_set.get(id=cleaned_data["department_id"])
                 update_data = check_unique_fields[1]
                 
                 for key,value in update_data.items():
@@ -330,12 +389,30 @@ class GetDepartmentSerializer(serializers.Serializer):
             }}
             return False,message
 
+        #* checking if company exists in user model
+        user_exists = User.objects.filter(email=user_email)
+        if not user_exists:
+            message = {"error":"the user not exists"}
+            return False,message
+        else:
+            user_obj = User.objects.get(email=user_email)
+
+        
+        #* checking if user have company field
+        if not user_obj.company:
+            message = {"error":"this user doesnt have company field"}
+            return False,message
+
+        #* getting company object
+        company_id = user_obj.company.id
+        company_obj = Company.objects.get(id=company_id)
+
 
         #* checking if passed all_department first
         if "all_departments" in cleaned_data.keys():
-            company_obj = Company.objects.employer_set.all()
-            departments = Department.objects.get(company=company)
-            message = {"success":"all_departments field passed successfully","all_departments":departments}
+            departments = company_obj.department_set.all()
+            # departments = Department.objects.get(company=company)
+            message = {"success":"all_departments field passed successfully","departments":departments.values("id","name","rank","salary")}
             return True,message
         
         #* this section is trying to query the database with the provided fields
@@ -344,7 +421,7 @@ class GetDepartmentSerializer(serializers.Serializer):
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
                 #*checking if something found with this name
-                name_exists = Department.objects.filter(name=value).exists()
+                name_exists = company_obj.department_set.filter(name=value).exists()
                 if name_exists:
                     query &= Q(name=value)
 
@@ -353,16 +430,16 @@ class GetDepartmentSerializer(serializers.Serializer):
                     return False,message
             if key == "department_id" and value != None:
                 #* checking if department exists with the provided id
-                department_exists = Department.objects.filter(id=value).exists()
+                department_exists = company_obj.department_set.filter(id=value).exists()
                 if department_exists:
                     query &= Q(id=value)
                 else:
                     message = {"error":"department not found with this id"}
                     return False,message
             
-        department_exists = Department.objects.filter(query).exists()
+        department_exists = company_obj.department_set.filter(query).exists()
         if department_exists:
-            department_data = Department.objects.filter(query).values("name","id")
+            department_data = company_obj.department_set.filter(query).values("name","id")
             message = {"success":"found department with the provided data","department_json":department_data}
             return True,message
         message = {"error","department not exists with the provided fields"}

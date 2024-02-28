@@ -50,9 +50,11 @@ class DeleteDepartment(APIView):
 
     def get(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = DeleteDepartmentSerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
-            get_info = serializer.get_info(cleaned_data=cleaned_data)
+            get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
@@ -64,10 +66,11 @@ class DeleteDepartment(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
 
         serializer = DeleteDepartmentSerializer(data=cleaned_data)
         if serializer.is_valid():
-            deleted_department = serializer.delete(cleaned_data=cleaned_data)
+            deleted_department = serializer.delete(cleaned_data=cleaned_data,user=user)
 
             if all(deleted_department):
                 return Response(deleted_department[1],status=status.HTTP_201_CREATED)
@@ -82,9 +85,10 @@ class UpdateDepartment(APIView):
 
     def get(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
         serializer = UpdateDepartmentSerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
-            get_info = serializer.get_info(cleaned_data=cleaned_data)
+            get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
@@ -94,14 +98,12 @@ class UpdateDepartment(APIView):
         return Response(message,status=status.HTTP_404_NOT_FOUND)
 
 
-
-
     def post(self,request):
         cleaned_data = request.data
-        print(cleaned_data)
+        user = {"email":request.user.email}
         serializer = UpdateDepartmentSerializer(data=cleaned_data)
         if serializer.is_valid():
-            updated_department = serializer.update(cleaned_data=cleaned_data)
+            updated_department = serializer.update(cleaned_data=cleaned_data,user=user)
 
             if all(updated_department):
                 return Response(updated_department[1],status=status.HTTP_201_CREATED)

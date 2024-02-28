@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model,authenticate
 from rest_framework.authtoken.models import Token
-from .models import Employer
+from .models import Employer,Department
+from company.models import Company
 from user.models import User
 from django.db.models import Q,F
 
@@ -86,6 +87,12 @@ class GeneralEmployerSerializer(serializers.Serializer):
         if "user" in cleaned_data.keys():
             cleaned_data["email"] = user_obj.email
 
+        # if "email" in cleaned_data.keys():
+        #     employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
+        #     if not employer_exists:
+        #         message = {"error":"the wanted email is not exists as employer"}
+        #         return False,message
+
         # #* removing the unecesery data to make clean cleaned_data
         # unnecesery_data = ["customer_id"]
         # for data in unnecesery_data:
@@ -108,7 +115,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employer
-        fields = ["first_name","last_name","email","phone"]
+        fields = ["first_name","last_name","email","phone","job_position"]
         # fields = ["first_name","last_name","email","phone",""]
 
 
@@ -130,7 +137,8 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
                 "first_name":"john",
                 "last_name":"doe",
                 "email":"existing user email address",
-                "phone":"the phone number"
+                "phone":"the phone number",
+                "job_position":"1"
             }}
             return False,message
         
@@ -141,18 +149,32 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
             message = {"this employer is already exists and cant be created again"}
             return False,message
         
-        data = {}
-
+        #* checking if the user exists is exists then i create var of the object
         user_exist = User.objects.filter(email=cleaned_data["email"]).exists()
         if user_exist:
-            user_instance = User.objects.get(email=cleaned_data["email"])
-            cleaned_data["user"] = user_instance
-
+            user_obj = User.objects.get(email=cleaned_data["email"])
+            #* thes is adding new key value of the user for later usage
+            cleaned_data["user"] = user_obj
         else:
             message = {"error":"user not exists with the provided email"}
             return False,message
         #TODO add the department,lead,task foreign key later
 
+        #* now im checking if the department that passed is exists
+        department_exists = Department.objects.filter(id=cleaned_data["job_position"]).exists()
+        if department_exists:
+            department_object = Department.objects.get(id=cleaned_data["job_position"])
+            cleaned_data["job_position"]=department_object
+        else:
+            message = {"error":f"the department id {cleaned_data['job_position']} is incorrect"}
+            return False,message
+
+        #* checking if the user have company in their model 
+        if not user_obj.company:
+            message = {"error":"cant create employer without have company for this user"}
+            return False,message
+        else:
+            cleaned_data["company"] = user_obj.company
 
         employer_obj = Employer()
         for key,value in cleaned_data.items():
@@ -262,7 +284,7 @@ class DeleteEmployerSerializer(serializers.Serializer):
         #* checking if employer exists the provided email
         employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
         if employer_exists:
-            employer_obj = Employer.objects.get(email=-cleaned_data["email"])
+            employer_obj = Employer.objects.get(email=cleaned_data["email"])
             employer_obj.delete()
             message = {"success":"employer deleted successfully"}
             return True,message
@@ -366,6 +388,11 @@ class UpdateEmployerSerializer(serializers.Serializer):
             message = {"error":"this user is not exist with this email"}
             return False,message
 
+        #* cheking if the user exists as employer 
+        employer_exists = Employer.objects.filter(email=cleaned_data["email"])
+        if not employer_exists :
+            message = {"error":"cant update this user if the user not exists as employer"}
+            return False,message
 
         #* checking that the user didnt pass empty update data dict
         if not cleaned_data["update_data"]:
@@ -401,7 +428,7 @@ class UpdateEmployerSerializer(serializers.Serializer):
                     "email":update_obj.email,
                     "phone":update_obj.phone,
                     "email":update_obj.email,
-                    "job_position":update_obj.job_position
+                    "job_position":update_obj.job_position.name
                 }}
                 return True,message
             
