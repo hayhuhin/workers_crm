@@ -467,7 +467,7 @@ class GetTaskSerializer(serializers.Serializer):
             
             #* checking if the email are axists in the task table
             if item == "department_id" and item_value == True:
-                department_task_exists = Department.objects.exists(id=cleaned_data["department_id"]).exists()
+                department_task_exists = Department.objects.filter(id=cleaned_data["department_id"]).exists()
                 if department_task_exists:
                     task_data = department_obj.task.all().values("id","title")
                     message = {"success":"department tasks found","department_tasks":task_data}
@@ -480,6 +480,7 @@ class GetTaskSerializer(serializers.Serializer):
             if item == "task_id" and item_value != None :
 
                 #* first checking if the task exists
+                user_obj
                 task_exists = DepartmentTask.objects.filter(id=cleaned_data["task_id"]).exists()
                 if task_exists:
                     task_obj = DepartmentTask.objects.get(id=cleaned_data["task_id"])

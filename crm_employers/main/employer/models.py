@@ -1,20 +1,6 @@
 from django.db import models
-#! need to uncomment it after fixing the dashboard application
-# from dashboard.models import GraphPermission,GraphInsights
 from user.models import User,Company
 from finance.models import Customer
-
-
-
-# class Company(models.Model):
-#     name = models.CharField(max_length=100)
-#     description = models.TextField(blank=True)
-#     address = models.CharField(max_length=255)
-#     admin_email = models.EmailField(max_length=50,unique=True)
-#     departments = models.ManyToManyField("Department", related_name='companies')
-
-#     def __str__(self):
-#         return self.name
 
 
 
@@ -27,7 +13,7 @@ class Employer(models.Model):
     phone = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now=True)
     profile_pic = models.ImageField(default='profile_pics/profile_picture.jpeg',upload_to='profile_pics')
-    job_position = models.ForeignKey("Department",on_delete=models.CASCADE)
+    department = models.ForeignKey("Department",on_delete=models.CASCADE)
     company = models.ForeignKey(Company,on_delete=models.CASCADE)
     lead = models.ForeignKey("Lead",blank=True,null=True,on_delete=models.SET_NULL)
     task = models.ManyToManyField("Task",default=None)

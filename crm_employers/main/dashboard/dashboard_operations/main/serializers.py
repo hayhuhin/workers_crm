@@ -170,6 +170,7 @@ class DeleteRecordSerializer(serializers.Serializer):
             employer_obj = Employer.objects.get(email=user["email"])
         else:
             message = {"error":"user not exists as employer"}
+            return False,message
 
 
         for key,value in self.__getattribute__("data").items():
@@ -180,7 +181,7 @@ class DeleteRecordSerializer(serializers.Serializer):
                     message = {"success":"found_records","all_records":records_data}
                     return True,message
                 else:
-                    message = {"error","no records exists"}
+                    message = {"error","no records exist"}
                     return False,message
                 
             if key == "all_records" and value != True:

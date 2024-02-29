@@ -115,7 +115,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employer
-        fields = ["first_name","last_name","email","phone","job_position"]
+        fields = ["first_name","last_name","email","phone","department"]
         # fields = ["first_name","last_name","email","phone",""]
 
 
@@ -125,7 +125,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
         the User model can be modified only by IT or System Admin
         """
 
-        required_fields = ["first_name","last_name","email","phone"]
+        required_fields = ["first_name","last_name","email","phone","department"]
 
         for fields in required_fields:
             if fields not in cleaned_data.keys():
@@ -138,7 +138,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
                 "last_name":"doe",
                 "email":"existing user email address",
                 "phone":"the phone number",
-                "job_position":"1"
+                "department":"1"
             }}
             return False,message
         
@@ -149,7 +149,7 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
             message = {"this employer is already exists and cant be created again"}
             return False,message
         
-        #* checking if the user exists is exists then i create var of the object
+        #* checking if the user exists andif exists then i create var of the object
         user_exist = User.objects.filter(email=cleaned_data["email"]).exists()
         if user_exist:
             user_obj = User.objects.get(email=cleaned_data["email"])
@@ -158,33 +158,39 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
         else:
             message = {"error":"user not exists with the provided email"}
             return False,message
-        #TODO add the department,lead,task foreign key later
 
-        #* now im checking if the department that passed is exists
-        department_exists = Department.objects.filter(id=cleaned_data["job_position"]).exists()
-        if department_exists:
-            department_object = Department.objects.get(id=cleaned_data["job_position"])
-            cleaned_data["job_position"]=department_object
-        else:
-            message = {"error":f"the department id {cleaned_data['job_position']} is incorrect"}
-            return False,message
-
-        #* checking if the user have company in their model 
+        #*checking if the user is already in a company
         if not user_obj.company:
-            message = {"error":"cant create employer without have company for this user"}
+            message = {"error":"this user doesnt have company"}
             return False,message
         else:
-            cleaned_data["company"] = user_obj.company
+            company_obj = user_obj.company
+            cleaned_data["company"] = company_obj
 
+        #* if no department exists returns error message
+        if not company_obj.department_set.filter(id=cleaned_data["department"]).exists():
+            message = {"error":"this department not exists"}
+            return False,message
+        else:
+            department_object = Department.objects.get(id=cleaned_data["department"])
+            # department_object = company_obj.department_set.get(id=cleaned_data["department"])
+            # department_object = Department.objects.get(id=cleaned_data["job_position"])
+            cleaned_data["department"]=department_object
+            # print(type(cleaned_data["department"]))
+
+        #* here im adding all fields of the employer from user data into our employer model and saving it
         employer_obj = Employer()
         for key,value in cleaned_data.items():
             setattr(employer_obj,key,value)
 
         employer_obj.save()
-        employer_id = employer_obj.id
-        employer_data = Employer.objects.filter(id=employer_id).values("first_name","last_name","email","phone","created_at")
-
-        return True,employer_data
+        message = {"success":"employer created successfully","employer_data":{
+            "first_name":employer_obj.first_name,
+            "last_name":employer_obj.last_name,
+            "email":employer_obj.email,
+            "created_at":employer_obj.created_at,
+        }}
+        return True,message
     
 
 class GetEmployerSerializer(serializers.Serializer):

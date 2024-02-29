@@ -88,16 +88,16 @@ ADD:smaller presentation example: 1 row or 2 rows with graphs - DONE
 
 
 <<working on >>
-ADD:visually change the graph presentation to look clean - 
+ADD:visually change the graph presentation to look clean - DONE
 
-FIX:dashboard.views hirarcy of the code - done
+FIX:dashboard.views hirarcy of the code - DONE
 
 #MUST REVIEW IT AGAIN WHEN ACTIVATING WEBSERVER
 https://docs.djangoproject.com/en/4.2/topics/security/#user-uploaded-content-security
 ITS THE FILE HANDLING AND SECURITY
 
 task 5:
-add logic to the home page that will represent the usage of the crm with a description - 
+add logic to the home page that will represent the usage of the crm with a description - not relevant
 
 
 ADD:cache/save the data (to prevent the sql querieng every time the user sending get request/refreshing the page)
@@ -118,12 +118,33 @@ ADD:export CSV and Import CSV - in the import must be a option to watch without 
 
 #### new section for the improvement
 
+1.user creating account for the application and hes admin - DONE
+
+2.from here he can create users that are by default will be added to this specific company - DONE
+
+3.create validation application that will be called in all applications that need the same validation checks
+
+5.create generic error messages with the option to provide additional data in the message
+
+6.find a way to test all the api calles with a penetration testing (no postman)
+
+7.add automation when admin user created it gives him all permissions
+
+8.refactor the assign permission views and serializers
+
+9.add cache on the graph data
+
+10.udjust the company data into the mongodb 
+
+11.start practicing with react + building small projects(IMPORTANT)
+
+12.learn coniners
+
+13.add email authentication and num code sent to email after deleting some data
 
 
-1.user creating account fot the application and hes admin 
-2.now he must create company 
-3.after he created company it will automatically create hr,finance departments
 
-<<< working on that 
-4.from here he can create users that are by default will be added to this specific company 
+
+
+
 

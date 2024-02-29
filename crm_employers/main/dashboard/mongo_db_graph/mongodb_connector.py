@@ -194,7 +194,7 @@ class MongoDBConstructor:
             else:
                 return {}
         else:
-            raise ValueError("the user not exists")
+            return {}
 
 
     def dump_test_records(self) -> None:
