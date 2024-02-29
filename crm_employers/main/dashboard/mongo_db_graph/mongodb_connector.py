@@ -5,40 +5,40 @@ import json
 from random import randint
 
 
-@dataclass
-class RecordContent:
-    graph_title : str
-    graph_description :str
-    graph_type : str
-    created_at: str
-    start_date : str
-    end_date : str 
-    position : int 
-    x : list[str,int] = field(default_factory=list)
-    y : list[int] = field(default_factory=list)
-    y_2 :[str,int] = field(default_factory=list)
+# @dataclass
+# class RecordContent:
+#     graph_title : str
+#     graph_description :str
+#     graph_type : str
+#     created_at: str
+#     start_date : str
+#     end_date : str 
+#     position : int 
+#     x : list[str,int] = field(default_factory=list)
+#     y : list[int] = field(default_factory=list)
+#     y_2 : [str,int] = field(default_factory=list)
 
 
 
-@dataclass
-class GraphRecords:
-    records_id : str = field(default="0")
-    records_content : RecordContent = field(default_factory=dict)
+# @dataclass
+# class GraphRecords:
+#     records_id : str = field(default="0")
+#     records_content : RecordContent = field(default_factory=dict)
 
 
 
-@dataclass
-class UserConfig:
-    name : str
-    db : str
-    collection : str
-    graph_permited : bool
-    graph_db_type : str
-    graph_Records : GraphRecords = field(default_factory=dict)
-    graph_repr : str = field(default="1_row")
+# @dataclass
+# class UserConfig:
+#     name : str
+#     db : str
+#     collection : str
+#     graph_permited : bool
+#     graph_db_type : str
+#     graph_Records : GraphRecords = field(default_factory=dict)
+#     graph_repr : str = field(default="1_row")
 
-    def to_json(self):
-        return json.dumps(self.__dict__,default=lambda x:x.__dict__,indent=4)
+#     def to_json(self):
+#         return json.dumps(self.__dict__,default=lambda x:x.__dict__,indent=4)
 
 
 

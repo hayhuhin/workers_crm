@@ -480,7 +480,7 @@ class GetTaskSerializer(serializers.Serializer):
             if item == "task_id" and item_value != None :
 
                 #* first checking if the task exists
-                user_obj
+                # user_obj
                 task_exists = DepartmentTask.objects.filter(id=cleaned_data["task_id"]).exists()
                 if task_exists:
                     task_obj = DepartmentTask.objects.get(id=cleaned_data["task_id"])
