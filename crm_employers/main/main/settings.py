@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'employer',
     'finance',
     'dashboard',
+    'custom_validation',
     
 ]
 

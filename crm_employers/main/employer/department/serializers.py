@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from custom_validation.validation import CustomValidation
 from employer.models import Department
 from django.db.models import Q,F
 from user.models import User,Company
