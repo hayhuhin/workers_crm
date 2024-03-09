@@ -7,14 +7,15 @@ from .serializers import CreateCompanySerializer,DeleteCompanySerializer,UpdateC
 
 
 
-
 #*need to create department handling of creation and deletion
 
 class CreateCompany(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+
         serializer = CreateCompanySerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
             get_info = serializer.get_info(cleaned_data=cleaned_data)
@@ -48,19 +49,22 @@ class DeleteCompany(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+
         user = {"email":request.user.email}
 
         serializer = DeleteCompanySerializer(data = cleaned_data)
-        if serializer.is_valid(raise_exception = True):
+        if serializer.is_valid(raise_exception = False):
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
             return Response(get_info[1],status=status.HTTP_404_NOT_FOUND)
-
-        message = {"error":"invalid fields passed"}
-        return Response(message,status=status.HTTP_404_NOT_FOUND)
+        
+        else:
+            message = {"error":"invalid fields passed"}
+            return Response(message,status=status.HTTP_404_NOT_FOUND)
 
 
     def post(self,request):
@@ -82,9 +86,14 @@ class UpdateCompany(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
     def get(self,request):
-        cleaned_data = request.data
-        user = {"email":request.user.email}
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
 
+
+
+
+        user = {"email":request.user.email}
+        print(cleaned_data)
         serializer = UpdateCompanySerializer(data = cleaned_data)
         if serializer.is_valid(raise_exception = True):
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)

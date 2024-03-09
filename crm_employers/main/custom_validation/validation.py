@@ -9,7 +9,7 @@ from django.db.models import Q,F
 class OutputMessages:
 
     @staticmethod
-    def error_with_message(self,main_message:str,second_message:dict=None):
+    def error_with_message(main_message:str,second_message:dict=None):
         if not second_message:
             error_message = {"error":main_message,}
             return False,error_message
@@ -18,14 +18,14 @@ class OutputMessages:
             return False,error_message
 
     @staticmethod
-    def user_not_exsts(self,message=None):
+    def user_not_exsts(message=None):
         if not message:
             message = {"error":"user not exists"}
             return False,message
         else:
             return False,message
     @staticmethod
-    def employer_not_exists(self,message=None):
+    def employer_not_exists(message=None):
         if not message:
             message = {"error":"employer not exists"}
             return False,message
@@ -33,7 +33,7 @@ class OutputMessages:
             return False,message
     
     @staticmethod
-    def data_not_found(self,message=None):
+    def data_not_found(message=None):
         if not message:
             message = {"error":"the required data not found"}
             return False,message
@@ -42,7 +42,7 @@ class OutputMessages:
     
     
     @staticmethod
-    def valid_data(self,main_message:str,second_message:dict=None):
+    def valid_data(main_message:str,second_message:dict=None):
         if not second_message:
             success_message = {"success":main_message,}
             return True,success_message
@@ -50,7 +50,7 @@ class OutputMessages:
             success_message = {"success":main_message,**second_message}
             return True,success_message
         
-    def success_and_object(self,main_message,output_object=None):
+    def success_and_object(main_message,output_object=None):
         if not output_object:
             success_message = {"success":main_message,}
             return True,success_message
@@ -61,24 +61,34 @@ class OutputMessages:
 
 #* here i will create my general validation checks that will be used inside the serializers 
 
-class CustomValidation(serializers.Serializer):
+class CustomValidation:
 
-    def basic_validation(self,input_fields,required_fields,allowed_fields,user):
-        #* check if passed empty json        
-        if not input_fields.keys():
-            main="passed empty jason"
-            second = {"fields_required":required_fields}
-            error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
-            return error_output
+    def basic_validation(self,input_fields:dict,user:dict,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False):
+        #* check if passed empty json
+        if not empty_json:
+            if not input_fields.keys():
+                main="passed empty json"
+                second = {"fields_required":required_fields or allowed_fields}
+                error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
+                return error_output
         
         #* check if passed invalid fields
-        for valid_field in required_fields:
-            if valid_field not in input_fields:
-                main = "passed invalid field"
-                second = {"required_fields":required_fields}
-                output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
-                return output_error
+        if required_fields:
+            for valid_field in required_fields:
+                if valid_field not in input_fields:
+                    main = "passed invalid field"
+                    second = {"required_fields":required_fields}
+                    output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
+                    return output_error
         
+        if allowed_fields:
+            for key in input_fields.keys():
+                if key not in allowed_fields:
+                    main = "passed invalid field"
+                    second = {"required_fields":required_fields}
+                    output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
+                    return output_error
+
         #* check if the user exists as user and have a company
         user_email = user["email"]
         user_exists = User.objects.filter(email=user_email).exists()
@@ -86,18 +96,29 @@ class CustomValidation(serializers.Serializer):
             error_output = OutputMessages.user_not_exsts()
             return error_output
         else:
-            user_object = User.objects.get(email=user_email)
+            user_obj = User.objects.get(email=user_email)
 
-        return OutputMessages
+        main = "user exists"
+        return OutputMessages.success_and_object(main_message=main,output_object=user_obj)
     
 
     def passed_valid_fields(self,input_fields,valid_fields):
+        #* check if passed empty json    
+
+        if not input_fields.keys():
+            main="passed empty json"
+            second = {"valid_fields":valid_fields}
+            error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
+            return error_output
+        
         for field in input_fields.keys():
             if field not in valid_fields:
                 main = "passed invalid field"
                 second = {"valid_fields":valid_fields}
                 output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
                 return output_error
+        main = "all fields are valid"
+        return OutputMessages.valid_data(main_message=main)
             
 
     def exists_in_database(self,query_fields:dict,database:object):
