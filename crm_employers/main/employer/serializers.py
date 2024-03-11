@@ -5,6 +5,7 @@ from .models import Employer,Department
 from company.models import Company
 from user.models import User
 from django.db.models import Q,F
+from custom_validation.validation import CustomValidation,OutputMessages
 
 
 #* each class with the name employer in it is a high previlage serializers that done by the admin,hr,managers employers
@@ -33,71 +34,71 @@ class GeneralEmployerSerializer(serializers.Serializer):
     user = serializers.EmailField(default=None)
     first_name = serializers.CharField(max_length=50,default=None)
     last_name = serializers.CharField(max_length=50,default=None)
-    email = serializers.EmailField(default=None)
     phone = serializers.CharField(max_length=50,default=None)
-    job_position = serializers.CharField(default=None)
+    department = serializers.CharField(default=None)
     # lead = serializers.IntegerField(default=None)
     # task = serializers.IntegerField(default=None)
     #! need to uncomment it after fixing the dashboard application
     # graph_permission = models.ManyToManyField(GraphPermission,default=None)
     # insights_permission = models.ManyToManyField(GraphInsights,default=None)
 
-    def check_unique(self,cleaned_data):
+    def check_unique(self,cleaned_data,user_object):
         """
         this method will check if there is already existing data with the same id.
 
         unique fields are customer_id,email
         """
+        #* this class will handle the validation 
+        cv = CustomValidation()
+
 
         for key in cleaned_data.keys():
             #* checking if the employer already exists under the required user 
             if key == "user":
-                required_user_exists = User.objects.filter(email=cleaned_data["user"]).exists()
-                if required_user_exists:
-                    #* this removes the user and will be added user object instead
-                    user_obj = User.objects.get(email=cleaned_data["user"])
+                # check if this user is exists and if he already have employer 
 
-                    #* now check if employer already exists with this user data
-
-                    employer_exists = Employer.objects.filter(user=user_obj).exists()
-                    if employer_exists:
-                        message = {"error":"cant cange this employer to the required user because this user is already exists as employer"}
-                        return False,message
-                    
-                    cleaned_data["user"] = user_obj
-                    # cleaned_data["email"] = user_obj.email
-                    
+                targeted_user = user_object.company.user_set.filter(email=cleaned_data["user"]).exists()
+                if not targeted_user:
+                    main = "this user not exists"
+                    error_message = OutputMessages.error_with_message(main_message=main)
+                    return error_message
                 else:
-                    message = {"error":"this user not exists"}
-                    return False,message
+                    targeted_user = user_object.company.user_set.get(email=cleaned_data["user"])
 
-            #TODO job positions not exists yet
-            if key == "job_position":
-                job_position_exists = Employer.objects.filter(job_position=cleaned_data["job_position"]).exists()
-                if job_position_exists:
+
+
+                #check if this user already have employer
+                targeted_user_is_employer = user_object.company.employer_set.filter(email=targeted_user.email).exists()
+                if targeted_user_is_employer :
+                    main = "cant change this employer to the required user because this user is already exists as employer"
+                    error_message = OutputMessages.error_with_message(main_message=main)
+                    return error_message
+
+                else:
+                    cleaned_data["user"] = targeted_user
+
+
+            if key == "department":
+                department_exists = user_object.company.department_set.filter(name=cleaned_data["department"]).exists()
+                if department_exists:
                     #* this removes the assigned to email and changes it to the assigned to object
-                    job_obj = Employer.objects.get(job_position=cleaned_data["job_position"])
-                    cleaned_data["job_position"] = job_obj
-                   
+                    department_obj = user_object.company.department_set.get(name=cleaned_data["department"])
+                    cleaned_data["department"] = department_obj
                 else:
-                    message = {"error","this job position not exists with the provided details"}
-                    return False,message
+                    main = "this department not exists with the provided details"
+                    error_message = OutputMessages.error_with_message(main_message=main)
+                    return error_message
 
-        #* this happens only if the user object is changed so it will change the email too                
-        if "user" in cleaned_data.keys():
-            cleaned_data["email"] = user_obj.email
 
-        # if "email" in cleaned_data.keys():
-        #     employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
-        #     if not employer_exists:
-        #         message = {"error":"the wanted email is not exists as employer"}
-        #         return False,message
+        #* adding user object into the cleaned_data if the user not going to be modified
+        if "user" not in cleaned_data.keys():
+            cleaned_data["user"] = user_object
+        
+        
+        #* updating automaticly the employer email to the user's email
+        cleaned_data["email"] = cleaned_data["user"].email
+                
 
-        # #* removing the unecesery data to make clean cleaned_data
-        # unnecesery_data = ["customer_id"]
-        # for data in unnecesery_data:
-        #     if data in  cleaned_data.keys():
-        #         cleaned_data.pop(data)
 
 
         #* returning cleaned data with the objects inside that can be used to update the database
@@ -108,75 +109,73 @@ class GeneralEmployerSerializer(serializers.Serializer):
 
 #* employer serializers
 
-class CreateEmployerSerializer(serializers.ModelSerializer):
+class CreateEmployerSerializer(serializers.Serializer):
     """
     creating the Employer
     """
+    first_name = serializers.CharField(default=None,max_length=50)
+    last_name = serializers.CharField(default=None,max_length=50)
+    email = serializers.EmailField(default=None)
+    phone = serializers.CharField(default=None,max_length=50)
+    department = serializers.CharField(default=None,max_length=50)
 
-    class Meta:
-        model = Employer
-        fields = ["first_name","last_name","email","phone","department"]
-        # fields = ["first_name","last_name","email","phone",""]
 
 
-    def create(self,cleaned_data):
+    def create(self,cleaned_data,user):
         """
         creating the employer object if the email is already exists in the User model.
-        the User model can be modified only by IT or System Admin
+        the User model can be modified or created only by IT or System Admin
         """
 
         required_fields = ["first_name","last_name","email","phone","department"]
 
-        for fields in required_fields:
-            if fields not in cleaned_data.keys():
-                message = {"error":"invalid fields passed","required_fields":required_fields}
-                return False,message
-            
-        if not cleaned_data.items():
-            message = {"error":"passed empty json","json_example":{
-                "first_name":"john",
-                "last_name":"doe",
-                "email":"existing user email address",
-                "phone":"the phone number",
-                "department":"1"
-            }}
-            return False,message
-        
+        custom_validation = CustomValidation()
+        basic_validation = custom_validation.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
+
+
 
         #*checking if the employer is already exists
-        employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
-        if employer_exists:
-            message = {"this employer is already exists and cant be created again"}
-            return False,message
+        query_field = {"email":cleaned_data["email"]}
+        employer_exists = custom_validation.exists_in_database(query_fields=query_field,database=Employer)
+        if all(employer_exists):
+            main_message = "this employer is already exists"
+            error_message = OutputMessages.error_with_message(main_message=main_message)
+            return error_message
+
         
-        #* checking if the user exists andif exists then i create var of the object
-        user_exist = User.objects.filter(email=cleaned_data["email"]).exists()
-        if user_exist:
-            user_obj = User.objects.get(email=cleaned_data["email"])
-            #* thes is adding new key value of the user for later usage
-            cleaned_data["user"] = user_obj
+        #* checking if the user  exists with this email
+        query_field = {"email":cleaned_data["email"]}
+        user_exists = custom_validation.exists_in_database(query_fields=query_field,database=User)
+        if not all(user_exists):
+            return user_exists
         else:
-            message = {"error":"user not exists with the provided email"}
-            return False,message
+            user_obj = user_exists[1]["object"]
+
+        #* this is adding new key value of the user for later usage
+        cleaned_data["user"] = user_obj
+        
 
         #*checking if the user is already in a company
         if not user_obj.company:
-            message = {"error":"this user doesnt have company"}
-            return False,message
+            main_message = "this user doesnt have company"
+            error_message = OutputMessages.error_with_message(main_message=main_message)
+            return error_message
         else:
             company_obj = user_obj.company
             cleaned_data["company"] = company_obj
 
         #* if no department exists returns error message
-        if not company_obj.department_set.filter(id=cleaned_data["department"]).exists():
-            message = {"error":"this department not exists"}
-            return False,message
+        if not company_obj.department_set.filter(name=cleaned_data["department"]).exists():
+            main_message = "this department not exists"
+            error_message = OutputMessages.error_with_message(main_message=main_message)
+            return error_message
+        
         else:
-            department_object = Department.objects.get(id=cleaned_data["department"])
-            # department_object = company_obj.department_set.get(id=cleaned_data["department"])
-            # department_object = Department.objects.get(id=cleaned_data["job_position"])
-            cleaned_data["department"]=department_object
-            # print(type(cleaned_data["department"]))
+            department_obj = company_obj.department_set.get(name=cleaned_data["department"])
+            cleaned_data["department"]=department_obj
+
 
         #* here im adding all fields of the employer from user data into our employer model and saving it
         employer_obj = Employer()
@@ -184,13 +183,15 @@ class CreateEmployerSerializer(serializers.ModelSerializer):
             setattr(employer_obj,key,value)
 
         employer_obj.save()
-        message = {"success":"employer created successfully","employer_data":{
+        main_message = "employer created successfully"
+        second_message = {"employer_data":{
             "first_name":employer_obj.first_name,
             "last_name":employer_obj.last_name,
             "email":employer_obj.email,
             "created_at":employer_obj.created_at,
         }}
-        return True,message
+        success_message = OutputMessages.success_with_message(main_message=main_message,second_message=second_message)
+        return success_message
     
 
 class GetEmployerSerializer(serializers.Serializer):
@@ -200,245 +201,229 @@ class GetEmployerSerializer(serializers.Serializer):
     or if all it will return all employers
     """
 
-    choices = [
-    ("specific","Specific"),
-    ("all","All")]
-    request_options = serializers.ChoiceField(choices=choices)
-    email = serializers.EmailField(default="no email provided")
+    all_employers = serializers.BooleanField(default=False)
+    email = serializers.EmailField(default=None)
 
-    def get_employer(self,cleaned_data):
+    def get_info(self,cleaned_data,user):
+        allowed_fields = ["all_employers","email"]
+        custom_validation = CustomValidation()
+        valid_fields = custom_validation.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
+        if not all(valid_fields):
+            return valid_fields
+        
+        #* getting the user's company first
+        query_fields = {"email":user["email"]}
+        user_exists = custom_validation.exists_in_database(query_fields=query_fields,database=User)
+        if not all(user_exists):
+            return user_exists
+        else:
+            creater_user_obj = user_exists[1]["object"]
 
-        #* specific user search
-        if cleaned_data["request_options"] == "specific":
+        #* checking that the user that creating the employer have company 
+        if not creater_user_obj.company:
+            main_message = "first you need to be a part of a company"
+            error_message = OutputMessages.error_with_message(main_message = main_message)
+            return error_message
 
-            #* have to make sure that the user is exists
-            try:
-                specific_employer = Employer.objects.get(email=cleaned_data["email"])
-                serializer = EmployerSerializer(specific_employer)
-                employer_json = {"first_name":serializer.data["first_name"],"email":serializer.data["email"]}
-                return True,employer_json
+        else:
+            company_obj = creater_user_obj.company
+
+        #* first option
+        if "all_employers" in cleaned_data.keys():
+            main_message = "successfully found employers"
+
+            second_message = {"employer_json":company_obj.employer_set.all().values("first_name","email")}
+            success_message = OutputMessages.success_with_message(main_message=main_message,second_message=second_message)
+            return success_message
+        
+        #* second option
+        if "email" in cleaned_data.keys():
+            #* trying to find this employer
+            employer_exists = company_obj.employer_set.filter(email=cleaned_data["email"]).exists()
+            if not employer_exists:
+                main_message = f"employer not exists with the email:{cleaned_data['email']}"
+                error_message = OutputMessages.error_with_message(main_message=main_message)
+                return error_message
+            else:
+                employer_obj = company_obj.employer_set.all().get(email=cleaned_data["email"])
+                employer_json = {
+                    "first_name":employer_obj.first_name,
+                    "email":employer_obj.email,
+                    "phone":employer_obj.phone,
+                    "company":employer_obj.company.name ,
+                    }
+                main_message = "employer found successfully"
+                sc_msg = {"employer_json":employer_json}
+                success_message = OutputMessages.success_with_message(main_message=main_message,second_message=sc_msg)
+                return success_message
             
-            except:
-                data = {"no_data":"employer not exists"}
-                return False,data
-            
-        #* all users search
-        if cleaned_data["request_options"] == "all":
-            all_employers = Employer.objects.all()
-            employer_json = {}
-            for employer in all_employers:
-                serializer = EmployerSerializer(employer)
-                repr_data = {"first_name":serializer.data["first_name"],"email":serializer.data["email"]}
-                employer_json[str(employer)] = repr_data
-            return True,employer_json
-
-
-        error_message = {"error":"the data provided is not specific or all fields"}
-        return False,error_message
 
 
 class DeleteEmployerSerializer(serializers.Serializer):
     email = serializers.EmailField(default=None)
     
 
-    def get_info(self,cleaned_data):
-        allowed_fields = ["email"]
+    def get_info(self,cleaned_data,user):
+        required_fields = ["email"]
 
-
-        #* checking if passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"passed empty json","json_example":{
-                "email":"employer1@work.com"
-            }}
-            return False,message
-        
-        #* checking that the user passed only the allowed fields
-        for item in cleaned_data.keys():
-            if item not in allowed_fields:
-                message = {"error":"passed invalid field","allowed_fields":allowed_fields}
-                return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
+        else:
+            user_obj = basic_validation[1]["object"]        
             
         #* checking if employer exists the provided email
-        employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
-        if employer_exists:
-            employer_data = Employer.objects.filter(email=cleaned_data["email"]).values("first_name","last_name","email","phone")
+        company_obj = user_obj.company
 
-            message = {"success":"employer exists","employer_info":employer_data}
-            return True,message
+        employer_exists = company_obj.employer_set.filter(email=cleaned_data["email"]).exists()
+        if not employer_exists:
+            main = "employer not exists"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        else:
+            employer_dict = company_obj.employer_set.filter(email=cleaned_data["email"]).values("first_name","last_name","email","phone","company__name","department__name")
+            main = "successfully employer found"
+            second = {"employer_json":employer_dict}
+            success_message = OutputMessages.success_with_message(main_message=main,second_message=second)
+            return success_message
 
-        message = {"error":"employer not exists or invalid"}        
-        return False,message
 
 
-    def delete(self,cleaned_data):
-        allowed_fields = ["email"]
+
+    def delete(self,cleaned_data,user):
+        required_fields = ["email"]
 
 
-        #* checking if passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"passed empty json","json_example":{
-                "email":"employer1@work.com"
-            }}
-            return False,message
-        
-        #* checking that the user passed only the allowed fields
-        for item in cleaned_data.keys():
-            if item not in allowed_fields:
-                message = {"error":"passed invalid field","allowed_fields":allowed_fields}
-                return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
+        else:
+            user_obj = basic_validation[1]["object"]        
             
         #* checking if employer exists the provided email
-        employer_exists = Employer.objects.filter(email=cleaned_data["email"]).exists()
-        if employer_exists:
-            employer_obj = Employer.objects.get(email=cleaned_data["email"])
+        company_obj = user_obj.company
+
+        employer_exists = company_obj.employer_set.filter(email=cleaned_data["email"]).exists()
+        if not employer_exists:
+            main = "employer not exists"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        else:
+            employer_obj = company_obj.employer_set.get(email=cleaned_data["email"])
             employer_obj.delete()
-            message = {"success":"employer deleted successfully"}
-            return True,message
+            main = f"successfully deleted employer {cleaned_data['email']}"
+            success_message = OutputMessages.success_with_message(main_message=main)
+            return success_message
 
-        message = {"error":"employer not exists or invalid"}        
-        return False,message
 
     
 class UpdateEmployerSerializer(serializers.Serializer):
     email = serializers.EmailField(default=None)
     update_data = serializers.DictField(default=None)
 
-    def get_info(self,cleaned_data):
-        allowed_fields = ["email"]
+    def get_info(self,cleaned_data,user):
+        required_fields = ["email"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass email field","example_json":{
-                "email":"customer@customer.com",
-            }}
-            return False,message
-        
-        #*checking for allowed fields
-        for key in cleaned_data.keys():
-            if key not in allowed_fields:
-                message = {"error":f"passed invalid field -{key}-"}
-                return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
+        else:
+            user_obj = basic_validation[1]["object"]        
+            
+        #* checking if employer exists the provided email
+        company_obj = user_obj.company
 
-        #this will have my query that will be passed later
-        query = Q()
-
-        #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
-        for key,value in self.__getattribute__("data").items():
-            if key == "email" and value != None:
-                email_exists = Employer.objects.filter(email=value).exists()
-                if email_exists: 
-                    query &= Q(email=value)
-                else:
-                    message = {"error":"email not exist. try another field or check if you miss typed"}
-                    return False,message
-
-        query_data = Employer.objects.filter(query).values("first_name","last_name","email","phone","job_position")
-        message = {"success":query_data}
-        return True,message
+        employer_exists = company_obj.employer_set.filter(email=cleaned_data["email"]).exists()
+        if not employer_exists:
+            main = "employer not exists"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        else:
+            employer_dict = company_obj.employer_set.filter(email=cleaned_data["email"]).values("first_name","last_name","email","phone","company__name","department__name")
+            main = "successfully employer found"
+            second = {"employer_json":employer_dict}
+            success_message = OutputMessages.success_with_message(main_message=main,second_message=second)
+            return success_message
 
 
-    def update(self,cleaned_data):
+
+    def update(self,cleaned_data,user):
         required_fields = ["email","update_data"]
-        allowed_update_fields = ["user","first_name","last_name","email","phone","job_position"]
+        allowed_update_fields = ["user","first_name","last_name","phone","department"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass all this fields","example_json":{
-                "lead_id":"id of the lead as integer",
-                "update_data":{
-                    "user":"user email",
-                    "first_name":"john",
-                    "last_name":"doe",
-                    "email":"john_doe@electric.com",
-                    "phone":"phone number",
-                    "job_position":"engineer department"
-                    }}}
-            
-            return False,message
+
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
+        else:
+            creator_user = basic_validation[1]["object"]
+            company_obj = creator_user.company
+
         
-        #*checking that the user passed all fields
-        for field in required_fields:
-            if field not in cleaned_data.keys():
-                message = {"error":"you must pass all fields","json_example":{
-                "email":"employer email",
-                "update_data":{
+        valid_fields = cv.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
+        if not all(valid_fields):
+            main = "passed invalid field in the update_data"
+            second = {"json_example":{
                     "user":"user email",
                     "first_name":"john",
                     "last_name":"doe",
-                    "email":"john_doe@electric.com",
                     "phone":"phone number",
-                    "job_position":"engineer department"
-                    },
-                    "and you passed":cleaned_data.items()
+                    "department":"engineer department"
                     }}
-            
-                return False,message
-
-        #* checking that the user didnt pass additional fields and only the allowed in the update data
-        for field in cleaned_data["update_data"].keys():
-            if field not in allowed_update_fields:
-                message = {"error":"passed invalid fields into the update_data json","json example of update_data":{
-                    "user":"user email",
-                    "first_name":"john",
-                    "last_name":"doe",
-                    "email":"john_doe@electric.com",
-                    "phone":"phone number",
-                    "job_position":"engineer department"
-                    }}
-                return False,message
-
+            error_message = OutputMessages.error_with_message(main_message=main,second_message=second)
+            return error_message
+        
 
         # #*checking if the user exists with the email provided
-        user_exists = User.objects.filter(email=cleaned_data["email"]).exists()
+        user_exists = company_obj.user_set.filter(email=cleaned_data["email"]).exists()
         if not user_exists:
-            message = {"error":"this user is not exist with this email"}
-            return False,message
+            main = "user not exists"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        else:
+            user_obj = company_obj.user_set.get(email=cleaned_data["email"])
+
+
 
         #* cheking if the user exists as employer 
-        employer_exists = Employer.objects.filter(email=cleaned_data["email"])
-        if not employer_exists :
-            message = {"error":"cant update this user if the user not exists as employer"}
-            return False,message
-
-        #* checking that the user didnt pass empty update data dict
-        if not cleaned_data["update_data"]:
-            message = {"error":"you cant pass empty udpate_data ","json_example for updata_data":{
-                    "user":"user email",
-                    "first_name":"john",
-                    "last_name":"doe",
-                    "email":"john_doe@electric.com",
-                    "phone":"phone number",
-                    "job_position":"engineer department"
-                    }}
-            return False,message
-        
+        if not user_obj.employer:
+            main = "cant update this user if the user not exists as employer"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message        
 
 
         #*serializing update_data fields in another serializer
         update_data_serializer = GeneralEmployerSerializer(data=cleaned_data["update_data"])
-        if update_data_serializer.is_valid(raise_exception=True):
-
-            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
+        if update_data_serializer.is_valid(raise_exception=False):
+            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"],user_object=user_obj)
             if all(check_unique_fields):
-                update_obj = Employer.objects.get(email=cleaned_data["email"])
-
+                employer_obj = user_obj.employer
                 update_data = check_unique_fields[1]
 
                 for key,value in update_data.items():
-                    setattr(update_obj,key,value)
+                    setattr(employer_obj,key,value)
 
-                update_obj.save()
-                message = {"success":"updated the required fields","updated_data":{
-                    "first_name":update_obj.first_name,
-                    "last_name":update_obj.last_name,
-                    "email":update_obj.email,
-                    "phone":update_obj.phone,
-                    "email":update_obj.email,
-                    "job_position":update_obj.job_position.name
+                employer_obj.save()
+                main = "updated the required fields"
+                second = {"employer_json":{
+                    "first_name":employer_obj.first_name,
+                    "last_name":employer_obj.last_name,
+                    "email":employer_obj.email,
+                    "phone":employer_obj.phone,
+                    "email":employer_obj.email,
+                    "department":employer_obj.department.name
                 }}
-                return True,message
+                success_message = OutputMessages.success_with_message(main_message=main,second_message=second)
+                return success_message
             
-            return False,check_unique_fields[1]
+            
+            error_message = OutputMessages.error_with_message(main_message=check_unique_fields[1]["error"])
+            return error_message
 
-        message = {"error":"invalid update_data fields"}
-        return False,message
+        main = "invalid update_data fields"
+        error_message = OutputMessages.error_with_message(main_message=main)
+        return error_message

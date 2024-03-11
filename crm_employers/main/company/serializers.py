@@ -70,7 +70,7 @@ class CreateCompanySerializer(serializers.ModelSerializer):
         user_obj.save()
 
         main = f"company {company_obj.name} created. admin email is {admin_email}"
-        message = OutputMessages.valid_data(main_message=main)
+        message = OutputMessages.success_with_message(main_message=main)
         return message
 
 
@@ -119,7 +119,7 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
                     "address":company_obj.address,
                     "company_owner":company_obj.admin_email
             }}
-        return OutputMessages.valid_data(main_message=main,second_message=second)
+        return OutputMessages.success_with_message(main_message=main,second_message=second)
     
 
 
@@ -195,14 +195,14 @@ class UpdateCompanySerializer(serializers.Serializer):
             return OutputMessages.error_with_message(main_message=main)
 
         company_obj = Company.objects.get(admin_email=user_obj.email,name=cleaned_data["name"])
-        main = "found company with the provided data","company_json",
+        main = "found company with the provided data",
         second = {"company_json":{
             "name":company_obj.name,
             "description":company_obj.description,
             "address":company_obj.address,
             "admin_email":company_obj.admin_email
         }}
-        return OutputMessages.valid_data(main_message=main,second_message=second)
+        return OutputMessages.success_with_message(main_message=main,second_message=second)
         
 
     def update(self,cleaned_data,user):
@@ -211,92 +211,64 @@ class UpdateCompanySerializer(serializers.Serializer):
         required_fields = ["name","update_data"]
         allowed_update_fields = ["name","description","address"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass all this fields","example_json":{
-                "name":"name of the company as charfield",
-                "update_data":{
-                    "name":"engineer",
-                    "description":"123",
-                    "address":"2000"
-                    }}}
-            
-            return False,message
-        
-        #*checking that the user passed all fields
-        for field in required_fields:
-            if field not in cleaned_data.keys():
-                message = {"error":"you must pass all fields","json_example":{
-                "name":"name of the company as charfield",
-                "update_data":{
-                    "name":"engineer",
-                    "description":"123",
-                    "address":"2000"
-                    },
-                    "and you passed":cleaned_data.items()
-                    }}
-            
-                return False,message
+        custom_validation = CustomValidation()
+
+        basic_validation = custom_validation.basic_validation(input_fields=cleaned_data,user=user,required_fields=required_fields)
+
+        if not all(basic_validation):
+            return basic_validation
+
 
         #* checking that the user didnt pass additional fields and only the allowed in the update data
-        for field in cleaned_data["update_data"].keys():
-            if field not in allowed_update_fields:
-                message = {"error":"passed invalid fields into the update_data json","json_example":{
-                    "name":"engineer",
-                    "description":"123",
-                    "address":"sasa at as 1211"
-                    }}
-                return False,message
+        update_data_validation = custom_validation.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
+        if not all(update_data_validation):
+            return update_data_validation
 
-
-        # #*checking if the department exists with the name provided
-        company_exists = Company.objects.filter(name=cleaned_data["name"]).exists()
-        if not company_exists:
-            message = {"error":"this company is not exist with this name"}
-            return False,message
+        # #*checking if the company exists with the name provided
+        query_fields = {"name":cleaned_data["name"]}
+        company_exists = custom_validation.exists_in_database(query_fields=query_fields,database=Company)
+        if not all(company_exists):
+            main = {"error":"this user not a admin or the company not exists"}
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        else:
+            company_obj = company_exists[1]["object"]
 
 
         #* checking if this user is admin_email and its hes company
-        admin_email_exists = Company.objects.filter(admin_email=admin_email,name=cleaned_data["name"]).exists()
-        if not admin_email_exists:
-            message = {"error":"this user not a admin or the company not exists"}
-            return False,message
+        if not company_obj.admin_email == admin_email:
+            main = {"error":"this user not a admin or the company not exists"}
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
 
-
-        #* checking that the user didnt pass empty update data dict
-        if not cleaned_data["update_data"]:
-            message = {"error":"you cant pass empty udpate_data ","json_example":{
-                    "name":"engineer",
-                    "description":"123",
-                    "address":"2000"
-                    }}
-            return False,message
-        
 
 
         #*serializing update_data fields in another serializer
         update_data_serializer = GeneralCompanySerializer(data=cleaned_data["update_data"])
-        if update_data_serializer.is_valid(raise_exception=True):
+        if update_data_serializer.is_valid(raise_exception=False):
 
             check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
             if all(check_unique_fields):
-                update_obj = Company.objects.get(name=cleaned_data["name"],admin_email=admin_email)
                 update_data = check_unique_fields[1]
                 for key,value in update_data.items():
-                    setattr(update_obj,key,value)
+                    setattr(company_obj,key,value)
 
-                update_obj.save()
-                message = {"success":"updated the required fields","updated_data":{
-                    "name":update_obj.name,
-                    "description":update_obj.description,
-                    "address":update_obj.address
+                company_obj.save()
+                message = "updated the required fields"
+                second = {"updated_data":{
+                    "name":company_obj.name,
+                    "description":company_obj.description,
+                    "address":company_obj.address
                 }}
-                return True,message
+                success_message = OutputMessages.success_with_message(main_message=message,second_message=second)
+                return success_message
             
-            return False,check_unique_fields[1]
+            error_message = OutputMessages.error_with_message(main_message=check_unique_fields[1])
+            return error_message
 
-        message = {"error":"invalid update_data fields"}
-        return False,message
+        main = {"error":"invalid update_data fields"}
+        error_message = OutputMessages.error_with_message(main_message=main)
+        return error_message
 
 
 
@@ -307,37 +279,38 @@ class GetCompanySerializer(serializers.ModelSerializer):
 
     def get_info(self,cleaned_data,user):
         admin_email = user["email"]
+        required_fields = ["name"]
 
-        #* this section is trying to query the database with the provided fields
-        query = Q()
+        custom_validation = CustomValidation()
+        basic_validation = custom_validation.basic_validation(input_fields=cleaned_data,user=user,required_fields=required_fields)
+        if not all(basic_validation):
+            return basic_validation
 
-        for key,value in cleaned_data.items():
-            if key == "name" and value != None:
-                #*checking if something found with this name
-                name_exists = Company.objects.filter(name=value).exists()
-                if name_exists:
-                    query &= Q(name=value)
-
-                else:
-                    message = {"error":"company with this name not found"}
-                    return False,message
-            
-
-        #* checking if company exists with the provided admin email
-        admin_email_exists = Company.objects.filter(admin_email=admin_email).exists()
-        if admin_email_exists:
-            query &= Q(admin_email=admin_email)
+        #*checking if the company exists with the name provided
+        query_fields = {"name":cleaned_data["name"]}
+        company_exists = custom_validation.exists_in_database(query_fields=query_fields,database=Company)
+        if not all(company_exists):
+            main = {"error":"this user is not an admin or the company not exists"}
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
         else:
-            message = {"error":"company not found with your email"}
-            return False,message
+            company_obj = company_exists[1]["object"]
 
 
-        company_exists = Company.objects.filter(query).exists()
-        if company_exists:
-            company_data = Company.objects.filter(query).values("name","description","address","admin_email")
-            message = {"success":"found company with the provided data","company_json":company_data}
-            return True,message
-        
-        message = {"error":"company not exists with the provided fields"}
-        return False,message
-    
+        #* checking if this user is admin_email and its hes company
+        if not company_obj.admin_email == admin_email:
+            main = {"error":"this is user not an admin or the company not exists"}
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+
+
+        company_json = {
+            "name":company_obj.name,
+            "description":company_obj.description,
+            "address":company_obj.address,
+            "admin_email":company_obj.admin_email
+        }
+        main = {"success":"found company with the provided data"}
+        success_message = OutputMessages.success_with_message(main_message=main,second_message={"company_json":company_json})
+        return success_message
+            

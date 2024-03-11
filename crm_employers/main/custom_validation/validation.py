@@ -42,9 +42,9 @@ class OutputMessages:
     
     
     @staticmethod
-    def valid_data(main_message:str,second_message:dict=None):
+    def success_with_message(main_message:str,second_message:dict=None):
         if not second_message:
-            success_message = {"success":main_message,}
+            success_message = {"success":main_message}
             return True,success_message
         else:
             success_message = {"success":main_message,**second_message}
@@ -68,7 +68,7 @@ class CustomValidation:
         if not empty_json:
             if not input_fields.keys():
                 main="passed empty json"
-                second = {"fields_required":required_fields or allowed_fields}
+                second = {"required_fields":required_fields or allowed_fields}
                 error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
                 return error_output
         
@@ -118,12 +118,13 @@ class CustomValidation:
                 output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
                 return output_error
         main = "all fields are valid"
-        return OutputMessages.valid_data(main_message=main)
+        return OutputMessages.success_with_message(main_message=main)
             
 
     def exists_in_database(self,query_fields:dict,database:object):
         query = Q(**query_fields)
         query_exists = database.objects.filter(query).exists()
+        
         if not query_exists:
             error_output = OutputMessages.error_with_message(main_message="data not found with the provided fields")
             return error_output

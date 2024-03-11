@@ -88,14 +88,9 @@ class UpdateCompany(APIView):
     def get(self,request):
         query_dict = {**request.GET}
         cleaned_data = {key: value[0] for key, value in query_dict.items()}
-
-
-
-
         user = {"email":request.user.email}
-        print(cleaned_data)
         serializer = UpdateCompanySerializer(data = cleaned_data)
-        if serializer.is_valid(raise_exception = True):
+        if serializer.is_valid(raise_exception = False):
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
             if all(get_info):
                 return Response(get_info[1],status=status.HTTP_200_OK)
@@ -129,11 +124,12 @@ class GetCompany(APIView):
 
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
 
-        serializer = DeleteCompanySerializer(data = cleaned_data)
-        if serializer.is_valid(raise_exception = True):
+        serializer = GetCompanySerializer(data = cleaned_data)
+        if serializer.is_valid():
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
