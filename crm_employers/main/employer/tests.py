@@ -122,7 +122,7 @@ class TestAPIData:
 
 
 # Create your tests here.
-class TestCompanyAPI(TestCase):
+class TestEmployerAPI(TestCase):
     def setUp(self):
         self.APIClassTest = TestAPIData(user_email="test@test.com")
         self.created_user = self.APIClassTest.create_user()
@@ -211,12 +211,13 @@ class TestCompanyAPI(TestCase):
                 fields = test_data["fields"]
                 response = test_data["response"]
                 method = test_data["method"]
+                
                 if method == "get":
                     get_response = self.send_request.get(format=json_format,path=path,data=fields)
-                    # print(User.objects.all().values("email","company__name"))
                     print(get_response.json())
                     message_test = self.assertEqual(list(get_response.json().keys()),response["message"])
                     status_code_test = self.assertEqual(get_response.status_code,response["status"])
+                
                 if method == "post":
                     get_response = self.send_request.post(format=json_format,path=path,data=fields)
                     print(get_response.json())
@@ -516,9 +517,18 @@ class TestCompanyAPI(TestCase):
         response = {"message":["success","employer_json"],"status":201}
         new_user = {"fields":fields,"response":response,"method":method}
 
-        custom_invalid = self.generic_tests(path=path,custom_fields=[valid_fields,new_user])
+        #*updating to existing new department(from test_department to test_company_department)
+        fields = {"email":"ww@ww.com","update_data":{"department":"test_company_department"}}
+        response = {"message":["success","employer_json"],"status":201}
+        new_department = {"fields":fields,"response":response,"method":method}
+
+
+
+        custom_invalid = self.generic_tests(path=path,custom_fields=[valid_fields,new_user,new_department])
         #! tested it internally inside the generic_tests(when changing the user from qq to banan the employer not exists with the email of qq because its changed to banan)
         #* after the change we want to make sure that qq@qq.com not exists
+
+
 
 
     def test_update_data_invalid_fields(self):
@@ -540,12 +550,6 @@ class TestCompanyAPI(TestCase):
         response = {"message":["error"],"status":404}
         already_exists_as_employer = {"fields":fields,"response":response,"method":method}
 
-        #*changing into new user that doesnt exist as employer
-        fields = {"email":"qq@qq.com","update_data":{"user":"banan@banan.com"}}
-        response = {"message":["error"],"status":404}
-        new_user = {"fields":fields,"response":response,"method":method}
-
-
         #*changing user to unexisting user
         fields = {"email":"qq@qq.com","update_data":{"user":"not_existing@not_existing.com"}}
         response = {"message":["error"],"status":404}
@@ -557,11 +561,50 @@ class TestCompanyAPI(TestCase):
         same_user = {"fields":fields,"response":response,"method":method}
 
         #*changing user to user in another company
-        fields = {"email":"qq@aa.com","update_data":{"user":"aa@aa.com"}}
+        fields = {"email":"qq@qq.com","update_data":{"user":"aa@aa.com"}}
         response = {"message":["error"],"status":404}
-        same_user = {"fields":fields,"response":response,"method":method}
+        user_another_company = {"fields":fields,"response":response,"method":method}
+
+        #*updating to unexisting department
+        fields = {"email":"ww@ww.com","update_data":{"department":1}}
+        response = {"message":["error"],"status":404}
+        unexisting_department = {"fields":fields,"response":response,"method":method}
+
+        #*updating to another company department
+        fields = {"email":"ww@ww.com","update_data":{"department":"django_dev_department"}}
+        response = {"message":["error"],"status":404}
+        another_company_department = {"fields":fields,"response":response,"method":method}
+
+        #*updating to a new user and to unexisting department
+        fields = {"email":"ww@ww.com","update_data":{"user":"banan@banan.com","department":"not_existing_department"}}
+        response = {"message":["error"],"status":404}
+        new_user_unexisting_department = {"fields":fields,"response":response,"method":method}
 
 
+        #*invalid phone
+        fields = {"email":"ww@ww.com","update_data":{"phone":True}}
+        response = {"message":["error"],"status":404}
+        invalid_phone = {"fields":fields,"response":response,"method":method}
+
+        #*invalid fieldname
+        fields = {"email":"ww@ww.com","update_data":{"invalid":"invalid"}}
+        response = {"message":["error","json_example"],"status":404}
+        invalid_field_name = {"fields":fields,"response":response,"method":method}
+
+        #*invalid additional field
+        fields = {"email":"ww@ww.com","update_data":{"email":"qq@qq.com"}}
+        response = {"message":["error","json_example"],"status":404}
+        invalid_additional_field = {"fields":fields,"response":response,"method":method}
+
+        #*invalid last_name
+        fields = {"email":"ww@ww.com","update_data":{"last_name":True}}
+        response = {"message":["error",],"status":404}
+        invalid_last_name = {"fields":fields,"response":response,"method":method}
 
 
-        custom_invalid = self.generic_tests(path=path,custom_fields=[invalid_email,empty_update_data,already_exists_as_employer,unexisting_user,same_user,new_user])
+        #* empty json
+        fields = {}
+        response = {"message":["error","required_fields"],"status":404}
+        empty_json = {"fields":fields,"response":response,"method":method}
+
+        custom_invalid = self.generic_tests(path=path,custom_fields=[invalid_email,empty_update_data,already_exists_as_employer,unexisting_user,same_user,user_another_company,unexisting_department,another_company_department,new_user_unexisting_department,invalid_phone,invalid_field_name,invalid_additional_field,empty_json,invalid_last_name])
