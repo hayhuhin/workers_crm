@@ -97,11 +97,11 @@ class DeleteDepartmentSerializer(serializers.Serializer):
         basic_validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
         if not all(basic_validation):
             return basic_validation
+        else:
+            user_obj = basic_validation[1]["object"]
         
         
         #* getting the company object of the user
-        user_obj = User.objects.get(email=user_email)
-
         if not user_obj.company:
             message = {"error":"user doesnt have company"}
             return False,message
