@@ -14,10 +14,12 @@ class CreateDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
+
         serializer = CreateDepartmentSerializer(data = cleaned_data)
-        if serializer.is_valid(raise_exception = True):
+        if serializer.is_valid(raise_exception = False):
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):

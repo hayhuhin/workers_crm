@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from custom_validation.validation import CustomValidation
+from custom_validation.validation import CustomValidation,OutputMessages
 from employer.models import Department
 from django.db.models import Q,F
 from user.models import User,Company
 from employer.models import Employer
+
 
 class GeneralDepartmentSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50,default=None)
@@ -23,85 +24,81 @@ class CreateDepartmentSerializer(serializers.Serializer):
     salary = serializers.IntegerField(default=None)
 
     def get_info(self,cleaned_data,user):
-        admin_email = user["email"]
 
-        message = {"success":{"example json":{
+        main = "to perform this you need to use post request"
+        second = {"example_json":{
             "name":"name of the department (engineer ...)",
             "rank":"rank of the department",
             "salary":"integer of the salary of the mployer"
-        }}}
+        }}
 
-        return True,message
+        success_message = OutputMessages.success_with_message(main_message=main,second_message=second)
+        return success_message
 
 
     def create(self,cleaned_data,user):
         required_fields = ["name","rank","salary"]
-        admin_email = user["email"]
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(basic_validation):
+            return basic_validation
 
-        #* check if passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"passed empty json","json_example":{
-                "name":"department name",
-                "rank":"department rank",
-                "salary":"department salary"
-            }}
-            return False,message
-        
+
         #* check if the user already have company
-        company_exists = Company.objects.filter(admin_email=admin_email).exists()
-        if not company_exists:
-            message = {"error":"you cant create department without creating the company first"}
-            return False,message
+        query_fields = {"email":user["email"]}
+        company_exists = cv.exists_in_database(query_fields=query_fields,database=User)
+        if not all(company_exists):
+            main = "you cant create department without creating the company first"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+        
         else:
-            company_obj = Company.objects.get(admin_email=admin_email)
+            #*company object
+            company_obj = company_exists[1]["object"]
 
-
-        #* check if passed invalid fields
-        for key in cleaned_data.keys():
-            if key not in required_fields:
-                message = {"error":"passed invalid fields","allowed_fields":required_fields}
-                return False,message
-            
 
         #* check if the department exists
         department_exists = company_obj.department_set.filter(name=cleaned_data["name"]).exists()
-        # department_exists = Department.objects.filter(name=cleaned_data["name"]).exists()
         if department_exists:
-            message = {"error":"this department is already exists"}
-            return False,message
-        
-        obj_instance = Department.objects.create(
+            main = "this department is already exists"
+            error_message = OutputMessages.error_with_message(main_message=main)
+            return error_message
+
+        #*creating the new department
+        new_department = Department.objects.create(
             name=cleaned_data["name"],
             salary=cleaned_data["salary"],
+            rank=cleaned_data["rank"],
             company=company_obj
         )
-        obj_instance.save()
-        message = {"success":f"department {obj_instance.name} created with the salary of {obj_instance.salary}"}
-        return True,message
+
+        new_department.save()
+        main = "created successfully"
+        second = {"department_json":{
+            "name":new_department.name,
+            "salary":new_department.salary,
+            "rank":new_department.rank,
+            "company":new_department.company.name
+            }}
+    
+        success_message = OutputMessages.success_with_message(main_message=main,second_message=second)
+        return success_message
+    
 
 
 class DeleteDepartmentSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50,default=None)
-    department_id = serializers.IntegerField(default=None)
     all_departments = serializers.BooleanField(default=False)
 
-    def get_info(self,cleaned_data,user):
-        user_email = user["email"]
-        required_fields = ["name","department_id","all_departments"]
-        for fields in cleaned_data.keys():
-            if fields not in required_fields:
-                message = {"error":"passed invalid fields","required_fields":required_fields}
-                return False,message
-            
-        #* checking if the user passed empty json
-        if not cleaned_data.items():
-            message = {"error":"you passed empty json","example_json":{
-            "name":"engineer",
-            "department_id":"2",
-            "all_departments":"boolean field"
-            }}
-            return False,message
 
+    def get_info(self,cleaned_data,user):
+        allowed_fields = ["name","all_departments"]
+        cv = CustomValidation()
+        basic_validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
+        if not all(basic_validation):
+            return basic_validation
+        
+        
         #* getting the company object of the user
         user_obj = User.objects.get(email=user_email)
 
