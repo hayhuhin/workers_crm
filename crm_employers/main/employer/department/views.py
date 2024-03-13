@@ -36,7 +36,7 @@ class CreateDepartment(APIView):
         user = {"email":request.user.email}
 
         serializer = CreateDepartmentSerializer(data=cleaned_data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=False):
             created_department = serializer.create(cleaned_data=cleaned_data,user=user)
 
             if all(created_department):
@@ -44,7 +44,13 @@ class CreateDepartment(APIView):
             
             return Response(created_department[1],status=status.HTTP_404_NOT_FOUND)
         
-        return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+        else:
+            response = {"error":"invalid input","required_fields":{
+            "name":"name of the department (engineer ...)",
+            "rank":"rank of the department",
+            "salary":"integer of the salary of the mployer"
+        }}
+            return Response(response,status=status.HTTP_404_NOT_FOUND)
 
 
 class DeleteDepartment(APIView):
@@ -80,17 +86,22 @@ class DeleteDepartment(APIView):
             
             return Response(deleted_department[1],status=status.HTTP_404_NOT_FOUND)
         
-        return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+        response = {"error":"invalid input","required_fields":{
+            "name":"name of the department you want to delete"
+        }}
+        return Response(response,status=status.HTTP_404_NOT_FOUND)
 
 
 class UpdateDepartment(APIView):
     permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
+
         serializer = UpdateDepartmentSerializer(data = cleaned_data)
-        if serializer.is_valid(raise_exception = True):
+        if serializer.is_valid(raise_exception = False):
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             if all(get_info):
@@ -112,8 +123,15 @@ class UpdateDepartment(APIView):
                 return Response(updated_department[1],status=status.HTTP_201_CREATED)
             
             return Response(updated_department[1],status=status.HTTP_404_NOT_FOUND)
-        
-        return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+        response = {"error":"invalid input","required_fields":{
+            "name":"name of the department",
+            "update_data":{
+                "name":"update the name",
+                "rank":"update the rank",
+                "salary":"update the salary",
+            }
+        }}
+        return Response(response,status=status.HTTP_404_NOT_FOUND)
 
 
 class GetDepartment(APIView):
@@ -121,8 +139,10 @@ class GetDepartment(APIView):
 
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
+
         serializer = GetDepartmentSerializer(data=cleaned_data)
         if serializer.is_valid():
             created_department = serializer.get_info(cleaned_data=cleaned_data,user=user)
@@ -131,5 +151,8 @@ class GetDepartment(APIView):
                 return Response(created_department[1],status=status.HTTP_201_CREATED)
             
             return Response(created_department[1],status=status.HTTP_404_NOT_FOUND)
-        
-        return Response({"error":"invalid input"},status=status.HTTP_404_NOT_FOUND)
+        response = {"error":"invalid input","required_fields":{
+            "name":"name of the department",
+            "all_departments":"all departments that are created"
+        }}
+        return Response(response,status=status.HTTP_404_NOT_FOUND)

@@ -42,7 +42,7 @@ class CreateCompany(APIView):
             
             return Response(created_department[1],status=status.HTTP_404_NOT_FOUND)
         
-        return Response({"error":"passed invalid fields","valid_fields":serializer.fields.keys()},status=status.HTTP_404_NOT_FOUND)
+        return Response({"error":"passed invalid fields","required_fields":serializer.fields.keys()},status=status.HTTP_404_NOT_FOUND)
 
 
 class DeleteCompany(APIView):

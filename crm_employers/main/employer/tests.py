@@ -361,7 +361,7 @@ class TestEmployerAPI(TestCase):
         #*invalid field name
         get_data = {"invalid":"qq@qq.com"}
         get_response = self.send_request.get(format="json",path="/v1/api/employer/get",data=get_data)
-        message_test = self.assertEqual(list(get_response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(get_response.status_code,404)
 
         #*passing both fields
@@ -448,7 +448,7 @@ class TestEmployerAPI(TestCase):
 
         #* extra fields
         fields = {"id":1,"email":"aa@aa.com"}
-        response = {"message":["error"],"status":404}
+        response = {"message":["error","required_fields"],"status":404}
         method = "post"
         extra_field = {"fields":fields,"response":response,"method":method}
 

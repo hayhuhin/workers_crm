@@ -39,22 +39,23 @@ class CreateDepartmentSerializer(serializers.Serializer):
     def create(self,cleaned_data,user):
         required_fields = ["name","rank","salary"]
         cv = CustomValidation()
-        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
-        if not all(basic_validation):
-            return basic_validation
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
+        else:
+            user_obj = validation[1]["object"]
 
 
         #* check if the user already have company
         query_fields = {"email":user["email"]}
-        company_exists = cv.exists_in_database(query_fields=query_fields,database=User)
-        if not all(company_exists):
+        if not user_obj.company:
             main = "you cant create department without creating the company first"
             error_message = OutputMessages.error_with_message(main_message=main)
             return error_message
         
         else:
             #*company object
-            company_obj = company_exists[1]["object"]
+            company_obj = user_obj.company
 
 
         #* check if the department exists
@@ -98,7 +99,7 @@ class DeleteDepartmentSerializer(serializers.Serializer):
         if not all(basic_validation):
             return basic_validation
         else:
-            user_obj = basic_validation[1]["object"]
+            user_obj = User.objects.get(email=user["email"])
         
         
         #* getting the company object of the user
@@ -117,8 +118,6 @@ class DeleteDepartmentSerializer(serializers.Serializer):
             return success_message
         
         #* this section is trying to query the database with the provided fields
-        query = Q()
-
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
                 #*checking if something found with this name
@@ -137,15 +136,16 @@ class DeleteDepartmentSerializer(serializers.Serializer):
     
 
     def delete(self,cleaned_data,user):
-        required_fields = ["department_name"]
+        required_fields = ["name"]
 
         cv = CustomValidation()
-        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
-        if not basic_validation:
-            return basic_validation
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
 
         else:
-            user_obj = basic_validation[1]["object"]        
+            
+            user_obj = validation[1]["object"]        
 
 
         #* checking that the user have company 
@@ -180,11 +180,11 @@ class UpdateDepartmentSerializer(serializers.Serializer):
     def get_info(self,cleaned_data,user):
         allowed_fields = ["name"]
         cv = CustomValidation()
-        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=allowed_fields,user=user)
-        if not basic_validation:
-            return basic_validation
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=allowed_fields,user=user)
+        if not all(validation):
+            return validation
         else:
-            user_obj = basic_validation[1]["object"]
+            user_obj = validation[1]["object"]
         
 
         #* checking that the user have company 
@@ -216,11 +216,11 @@ class UpdateDepartmentSerializer(serializers.Serializer):
         allowed_update_fields = ["name","rank","salary"]
 
         cv = CustomValidation()
-        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
-        if not basic_validation:
-            return basic_validation
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
         else:
-            user_obj = basic_validation[1]["object"]
+            user_obj = validation[1]["object"]
         
         valid_update_data = cv.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
         if not valid_update_data:
@@ -263,7 +263,7 @@ class UpdateDepartmentSerializer(serializers.Serializer):
 
             department_obj.save()
             main = "updated the required fields"
-            second = {"updated_data":{
+            second = {"department_json":{
                 "name":department_obj.name,
                 "rank":department_obj.rank,
                 "salary":department_obj.salary
@@ -287,11 +287,11 @@ class GetDepartmentSerializer(serializers.Serializer):
         required_fields = ["name","all_departments"]
 
         cv = CustomValidation()
-        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
-        if not basic_validation:
-            return basic_validation
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not validation:
+            return validation
         else:
-            user_obj = basic_validation[1]["object"]
+            user_obj = validation[1]["object"]
             
         
         #* checking if user have company field

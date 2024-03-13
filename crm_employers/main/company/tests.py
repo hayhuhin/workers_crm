@@ -102,28 +102,28 @@ class TestCompanyAPI(TestCase):
         #* passed empty name (POST REQUEST)
         data = {"name":"","description":"no desc","address":"no addr"}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
-        message_test = self.assertEqual(list(response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(response.status_code,404)
         
 
         #* passed empty description
         data = {"name":"test","description":"","address":"no addr"}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
-        message_test = self.assertEqual(list(response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(response.status_code,404)
         
 
         # #* passed empty address
         data = {"name":"test","description":"","address":""}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
-        message_test = self.assertEqual(list(response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(response.status_code,404)
         
 
         # #* passed empty json
         data = {}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
-        message_test = self.assertEqual(list(response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(response.status_code,404)
 
         
@@ -135,6 +135,7 @@ class TestCompanyAPI(TestCase):
         #* passed empty name
         data = {"name":"test","description":"no desc","address":"no addr"}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
+        print(response.json())
         message_test = self.assertEqual(list(response.json().keys()),["success"])
         status_code_test = self.assertEqual(response.status_code,201)
         
@@ -243,7 +244,7 @@ class TestCompanyAPI(TestCase):
         #* invalid key field
         data = {"id":"test_company"}
         get_response = self.send_request.get(format="json",path="/v1/api/company/update",data=data)
-        message_test = self.assertEqual(list(get_response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(get_response.status_code,404)
 
         #* invalid value field
@@ -261,7 +262,7 @@ class TestCompanyAPI(TestCase):
         #* invalid empty json
         data = {}
         get_response = self.send_request.get(format="json",path="/v1/api/company/update",data=data)
-        message_test = self.assertEqual(list(get_response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(get_response.status_code,404)
 
 
@@ -285,13 +286,13 @@ class TestCompanyAPI(TestCase):
         new_data = {"name":"test_company","update_data":{"wrong":"wrong123"}}
         post_response = self.send_request.post(format="json",path="/v1/api/company/update",data=new_data)
         
-        message_test = self.assertEqual(list(post_response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(post_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(post_response.status_code,404)
         
         #*invalid update_data input (empty json)
         new_data = {"name":"test_company","update_data":{}}
         post_response = self.send_request.post(format="json",path="/v1/api/company/update",data=new_data)
-        message_test = self.assertEqual(list(post_response.json().keys()),["error","valid_fields"])
+        message_test = self.assertEqual(list(post_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(post_response.status_code,404)
 
         #*invalid update_data input(not passing update_data field)

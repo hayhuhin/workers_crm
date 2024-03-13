@@ -50,13 +50,10 @@ class OutputMessages:
             success_message = {"success":main_message,**second_message}
             return True,success_message
         
-    def success_and_object(main_message,output_object=None):
-        if not output_object:
-            success_message = {"success":main_message,}
-            return True,success_message
-        else:
-            success_message = {"success":main_message,"object":output_object}
-            return True,success_message
+    def success_and_object(main_message,output_object):
+
+        success_message = {"success":main_message,"object":output_object}
+        return True,success_message
         
 
 #* here i will create my general validation checks that will be used inside the serializers 
@@ -72,15 +69,24 @@ class CustomValidation:
                 error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
                 return error_output
         
-        #* check if passed invalid fields
         if required_fields:
+            #* check that all the required fields are filled in
             for valid_field in required_fields:
                 if valid_field not in input_fields:
                     main = "passed invalid field"
                     second = {"required_fields":required_fields}
                     output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
                     return output_error
+            #* check that all the input keys are same as the required fields
+            for input_field in input_fields.keys():
+                if input_field not in required_fields:
+                    main = "passed invalid field"
+                    second = {"required_fields":required_fields}
+                    output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
+                    return output_error
         
+
+
         if allowed_fields:
             for key in input_fields.keys():
                 if key not in allowed_fields:
@@ -107,14 +113,14 @@ class CustomValidation:
 
         if not input_fields.keys():
             main="passed empty json"
-            second = {"valid_fields":valid_fields}
+            second = {"required_fields":valid_fields}
             error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
             return error_output
         
         for field in input_fields.keys():
             if field not in valid_fields:
                 main = "passed invalid field"
-                second = {"valid_fields":valid_fields}
+                second = {"required_fields":valid_fields}
                 output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
                 return output_error
         main = "all fields are valid"

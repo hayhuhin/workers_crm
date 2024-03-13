@@ -36,8 +36,8 @@ class CreateCompanySerializer(serializers.ModelSerializer):
 
 
         #* check if any company is exists with this exact name
-        required_fields = {"name":cleaned_data["name"]}
-        company_exists = custom_validation.exists_in_database(required_fields,Company)
+        query_fields = {"name":cleaned_data["name"]}
+        company_exists = custom_validation.exists_in_database(query_fields,Company)
         if all(company_exists):
             main = {"this company is already exists with this exact name"}
             message = OutputMessages.error_with_message(main_message=main)
