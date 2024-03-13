@@ -110,9 +110,11 @@ class DeleteDepartmentSerializer(serializers.Serializer):
 
         #* checking if passed all_department first
         if "all_departments" in cleaned_data.keys():
-            departments = company_obj.department_set.all().values("id","name")
-            message = {"success":"all_departments field passed successfully","all_departments":departments}
-            return True,message
+            departments = company_obj.department_set.all().values("name")
+            main = "all_departments field passed successfully"
+            second = {"department_json":departments}
+            success_message = OutputMessages.success_with_message(main,second)
+            return success_message
         
         #* this section is trying to query the database with the provided fields
         query = Q()
@@ -120,324 +122,214 @@ class DeleteDepartmentSerializer(serializers.Serializer):
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
                 #*checking if something found with this name
-                name_exists = Department.objects.filter(name=value).exists()
-                if name_exists:
-                    query &= Q(name=value)
+                name_exists = company_obj.department_set.filter(name=value).exists()
+                if not name_exists:
+                    main = "department with this name not found"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    department_query_dict = company_obj.department_set.filter(name=value).values("name")
+                    main = "found department with the provided data"
+                    second = {"department_json":department_query_dict}
+                    success_message = OutputMessages.success_with_message(main,second)
+                    return success_message
 
-                else:
-                    message = {"error":"department with this name not found"}
-                    return False,message
-            if key == "department_id" and value != None:
-                #* checking if department exists with the provided id
-                department_exists = Department.objects.filter(id=value).exists()
-                if department_exists:
-                    query &= Q(id=value)
-                else:
-                    message = {"error":"department not found with this id"}
-                    return False,message
-            
-        department_exists = Department.objects.filter(query).exists()
-        if department_exists:
-            department_data = Department.objects.filter(query).values("name","id")
-            message = {"success":"found department with the provided data","department_json":department_data}
-            return True,message
-        message = {"error","department not exists with the provided fields"}
-        return False,message
     
 
     def delete(self,cleaned_data,user):
-        user_email = user["email"]
-        required_fields = ["department_id"]
+        required_fields = ["department_name"]
 
-        for fields in cleaned_data.keys():
-            if fields not in required_fields:
-                message = {"error":"passed invalid fields","required_fields":required_fields}
-                return False,message
-            
-        #* checking if the user passed empty json
-        if not cleaned_data.items():
-            message = {"error":"you passed empty json","example_json":{
-            "department_id":"2",
-            }}
-            return False,message
-        
-        #* first im checking if the user exists
-        user_exists = User.objects.filter(email=user_email).exists()
-        if not user_exists:
-            message = {"error":"user not exists"}
-            return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not basic_validation:
+            return basic_validation
+
         else:
-            user_obj = User.objects.get(email=user_email)
-        
+            user_obj = basic_validation[1]["object"]        
+
+
         #* checking that the user have company 
         if not user_obj.company:
-            message = {"error":"this user doesnt have company"}
-            return False,message
+            main = "this user doesnt have company"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         
 
 
         #* checking if department exists 
         company_obj = user_obj.company
-        department_exists = company_obj.department_set.filter(id=cleaned_data["department_id"]).exists()
-        if department_exists:
-            department_obj = Department.objects.get(id=cleaned_data["department_id"])
-            department_obj.delete()
-
-            message = {"success":f"required department is deleted, employers that were in this department set to Null"}
-            return True,message
+        department_exists = company_obj.department_set.filter(name=cleaned_data["name"]).exists()
+        if not department_exists:
+            main = "this department doesnt exists"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         
-
-        message = {"error":"this department doesnt exists"}
-        return False,message
-
+        else:
+            department_obj = company_obj.department_set.get(name=cleaned_data["name"])
+            department_obj.delete()
+            main = {"required department is deleted, employers that were in this department set to Null"}
+            success_message = OutputMessages.success_with_message(main)
+            return success_message
+        
 
 
 class UpdateDepartmentSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=20,default = None)
-    department_id = serializers.IntegerField(default=None)
     update_data = serializers.DictField(default = None)
 
     def get_info(self,cleaned_data,user):
-        allowed_fields = ["name","department_id"]
-        user_email = user["email"]
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass at least one of the fields","example_json":{
-                "name":"engineer",
-                "department_id":"12"
-            }}
-            return False,message
-        
-        #*checking for allowed fields
-        for key in cleaned_data.keys():
-            if key not in allowed_fields:
-                message = {"error":f"passed invalid field -{key}-"}
-                return False,message
-            
-
-        #* first im checking if the user exists
-        user_exists = User.objects.filter(email=user_email).exists()
-        if not user_exists:
-            message = {"error":"user not exists"}
-            return False,message
+        allowed_fields = ["name"]
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=allowed_fields,user=user)
+        if not basic_validation:
+            return basic_validation
         else:
-            user_obj = User.objects.get(email=user_email)
+            user_obj = basic_validation[1]["object"]
         
 
         #* checking that the user have company 
         if not user_obj.company:
-            message = {"error":"this user doesnt have company"}
-            return False,message
+            main = "this user doesnt have company"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         
 
-        #this will have my query that will be passed later
-        query = Q()
 
-        #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
         company_obj = user_obj.company
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
                 name_exists = company_obj.department_set.filter(name=value).exists()
-                if name_exists: 
-                    query &= Q(name=value)
+                if not name_exists: 
+                    main = {"name not exist. try another field or check if you miss typed"}
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
                 else:
-                    message = {"error":"name not exist. try another field or check if you miss typed"}
-                    return False,message
-                
-            if key == "department_id" and value != None:
-                department_exists = company_obj.department_set.filter(id=value).exists()
-                if department_exists:
-                    query &= Q(id=value)
-                else:
-                    message = {"error":"department with this id not exist. try another field or check if you miss typed"}
-                    return False,message
-
-
-        query_data = company_obj.department_set.filter(query).values("id","name")
-        message = {"success":query_data}
-        return True,message
+                    department_query_dict = company_obj.department_set.filter(name=value).values("name","rank","salary")
+                    main = "successfully found data"
+                    second = {"department_json":department_query_dict}
+                    success_messsage = OutputMessages.success_with_message(main,second)
+                    return success_messsage
 
 
     def update(self,cleaned_data,user):
-        user_email = user["email"]
-        required_fields = ["department_id","update_data"]
+        required_fields = ["name","update_data"]
         allowed_update_fields = ["name","rank","salary"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass all this fields","example_json":{
-                "department_id":"id of the department as integer",
-                "update_data":{
-                    "name":"engineer",
-                    "rank":"123",
-                    "salary":"2000"
-                    }}}
-            
-            return False,message
-        
-        #*checking that the user passed all fields
-        for field in required_fields:
-            if field not in cleaned_data.keys():
-                message = {"error":"you must pass all fields","json_example":{
-                "department_id":"id of the department as integer",
-                "update_data":{
-                    "name":"engineer",
-                    "rank":"123",
-                    "salary":"2000"
-                    },
-                    "and you passed":cleaned_data.items()
-                    }}
-            
-                return False,message
-
-        #* checking that the user didnt pass additional fields and only the allowed in the update data
-        for field in cleaned_data["update_data"].keys():
-            if field not in allowed_update_fields:
-                message = {"error":"passed invalid fields into the update_data json","json example of update_data":{
-                    "name":"engineer",
-                    "rank":"123",
-                    "salary":"2000"
-                    }}
-                return False,message
-
-
-        #* first im checking if the user exists
-        user_exists = User.objects.filter(email=user_email).exists()
-        if not user_exists:
-            message = {"error":"user not exists"}
-            return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not basic_validation:
+            return basic_validation
         else:
-            user_obj = User.objects.get(email=user_email)
+            user_obj = basic_validation[1]["object"]
+        
+        valid_update_data = cv.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
+        if not valid_update_data:
+            main = "passed invalid fields into the update_data json"
+            second = {"json_example":{
+                    "name":"engineer",
+                    "rank":"123",
+                    "salary":"2000"
+                    }}
+            error_message = OutputMessages.error_with_message(main,second)
+            return error_message
+        
         
 
         #* checking that the user have company 
         if not user_obj.company:
-            message = {"error":"this user doesnt have company"}
-            return False,message
+            main = "this user doesnt have company"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         
         
         # #*checking if the department exists with the id provided
         company_obj = user_obj.company
-        department_exists = company_obj.department_set.filter(id = cleaned_data["department_id"]).exists()
+        department_exists = company_obj.department_set.filter(name = cleaned_data["name"]).exists()
         if not department_exists:
-            message = {"error":"this department is not exist with this id"}
-            return False,message
-
-
-
-        #* checking that the user didnt pass empty update data dict
-        if not cleaned_data["update_data"]:
-            message = {"error":"you cant pass empty udpate_data ","json_example for updata_data":{
-                    "name":"engineer",
-                    "rank":"123",
-                    "salary":"2000"
-                    }}
-            return False,message
-        
+            main = "this department is not exist with this id"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
+        else:
+            department_obj = company_obj.department_set.get(name = cleaned_data["name"])
 
 
         #*serializing update_data fields in another serializer
         update_data_serializer = GeneralDepartmentSerializer(data=cleaned_data["update_data"])
-        if update_data_serializer.is_valid(raise_exception=True):
+        if update_data_serializer.is_valid(raise_exception=False):
 
-            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
-            if all(check_unique_fields):
-                update_obj = company_obj.department_set.get(id=cleaned_data["department_id"])
-                update_data = check_unique_fields[1]
-                
-                for key,value in update_data.items():
-                    setattr(update_obj,key,value)
+            update_data = cleaned_data["update_data"]    
+            for key,value in update_data.items():
+                setattr(department_obj,key,value)
 
-                update_obj.save()
-                message = {"success":"updated the required fields","updated_data":{
-                    "name":update_obj.name,
-                    "rank":update_obj.rank,
-                    "salary":update_obj.salary
+            department_obj.save()
+            main = "updated the required fields"
+            second = {"updated_data":{
+                "name":department_obj.name,
+                "rank":department_obj.rank,
+                "salary":department_obj.salary
                 }}
-                return True,message
+            success_message = OutputMessages.success_with_message(main,second)
+            return success_message
             
-            return False,check_unique_fields[1]
 
-        message = {"error":"invalid update_data fields"}
-        return False,message
+        main = "invalid update_data fields"
+        error_message = OutputMessages.error_with_message(main)
+        return error_message
 
 
 
 class GetDepartmentSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50,default=None)
-    department_id = serializers.IntegerField(default=None)
     all_departments = serializers.BooleanField(default=False)
 
 
     def get_info(self,cleaned_data,user):
-        user_email = user["email"]
-        required_fields = ["name","department_id","all_departments"]
-        for fields in cleaned_data.keys():
-            if fields not in required_fields:
-                message = {"error":"passed invalid fields","required_fields":required_fields}
-                return False,message
-            
-        #* checking if the user passed empty json
-        if not cleaned_data.items():
-            message = {"error":"you passed empty json","example_json":{
-            "name":"engineer",
-            "department_id":"2",
-            "all_departments":"boolean field"
-            }}
-            return False,message
+        required_fields = ["name","all_departments"]
 
-        #* checking if company exists in user model
-        user_exists = User.objects.filter(email=user_email)
-        if not user_exists:
-            message = {"error":"the user not exists"}
-            return False,message
+        cv = CustomValidation()
+        basic_validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not basic_validation:
+            return basic_validation
         else:
-            user_obj = User.objects.get(email=user_email)
-
+            user_obj = basic_validation[1]["object"]
+            
         
         #* checking if user have company field
         if not user_obj.company:
-            message = {"error":"this user doesnt have company field"}
-            return False,message
-
-        #* getting company object
-        company_id = user_obj.company.id
-        company_obj = Company.objects.get(id=company_id)
+            main = "this user doesnt have company field"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
+        else:
+            company_obj = user_obj.company
 
 
         #* checking if passed all_department first
         if "all_departments" in cleaned_data.keys():
-            departments = company_obj.department_set.all()
-            # departments = Department.objects.get(company=company)
-            message = {"success":"all_departments field passed successfully","departments":departments.values("id","name","rank","salary")}
-            return True,message
+            department_exists = company_obj.department_set.all().exists()
+            if not department_exists:
+                main = "no departments exists"
+                error_message = OutputMessages.error_with_message(main)
+                return error_message
+            else:
+                departments = company_obj.department_set.all().values("name","rank","salary")
+                main = "all_departments field passed successfully"
+                second = {"departments":departments}
+                success_message = OutputMessages.success_with_message(main,second)
+                return success_message
         
-        #* this section is trying to query the database with the provided fields
-        query = Q()
-
-        for key,value in self.__getattribute__("data").items():
-            if key == "name" and value != None:
-                #*checking if something found with this name
-                name_exists = company_obj.department_set.filter(name=value).exists()
-                if name_exists:
-                    query &= Q(name=value)
-
-                else:
-                    message = {"error":"department with this name not found"}
-                    return False,message
-            if key == "department_id" and value != None:
-                #* checking if department exists with the provided id
-                department_exists = company_obj.department_set.filter(id=value).exists()
-                if department_exists:
-                    query &= Q(id=value)
-                else:
-                    message = {"error":"department not found with this id"}
-                    return False,message
+        if "name" in cleaned_data.keys():
+            for key,value in self.__getattribute__("data").items():
+                if key == "name" and value != None:
+                    #*checking if something found with this name
+                    name_exists = company_obj.department_set.filter(name=value).exists()
+                    if not name_exists:
+                        main = "department with this name not found"
+                        error_message = OutputMessages.error_with_message(main)
+                        return error_message
+                    else:
+                        departments_query_dict = company_obj.department_set.filter(name=value).values("name","rank","salary")
+                        main = "successfully found departments"
+                        second = {"department_json":departments_query_dict}
+                        success_message = OutputMessages.success_with_message(main,second)
+                        return success_message
             
-        department_exists = company_obj.department_set.filter(query).exists()
-        if department_exists:
-            department_data = company_obj.department_set.filter(query).values("name","id")
-            message = {"success":"found department with the provided data","department_json":department_data}
-            return True,message
-        message = {"error","department not exists with the provided fields"}
-        return False,message

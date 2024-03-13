@@ -32,8 +32,8 @@ class DepartmentTest(GeneralTestAPI):
         test_list = [valid_input,invalid_input]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 
-
-    def test_create_valid_input(self):
+    #* testing create with invalid input (POST REQUEST)
+    def test_create_invalid_input(self):
         path="/v1/api/department/create"
         method = "post"
 
@@ -45,9 +45,13 @@ class DepartmentTest(GeneralTestAPI):
         
         #*invalid fieldname
         fields = {"invalid":"invalid"}
-        response = {"message":["success","required_fields"],"status":200}
+        response = {"message":["error","required_fields"],"status":404}
         invalid_field_name= {"fields":fields,"response":response,"method":method}
         
-
-        test_list = [empty_json,invalid_field_name]
+        #* passing only "name"
+        fields = {"name":"only name"}
+        response = {"message":["error","required_fields"],"status":404}
+        one_field_only = {"fields":fields,"response":response,"method":method}
+        
+        test_list = [empty_json,invalid_field_name,one_field_only]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
