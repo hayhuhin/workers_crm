@@ -77,7 +77,11 @@ class TestAPIData:
 
     def permit_admin(self):
         it,med = Group.objects.create(name="IT_permission"),Group.objects.create(name="medium_permission"),
-        self.user_obj.groups.add(it,med)
+        finance_full_per = Group.objects.create(name="finance_full_permission")
+        finance_view_per = Group.objects.create(name="finance_view_permission")
+        finance_update_per = Group.objects.create(name="finance_update_permission")
+        self.user_obj.groups.add(it,med,finance_full_per,finance_update_per,finance_view_per)
+
 
     def create_company(self):
         user_obj = User.objects.get(email=self.email)

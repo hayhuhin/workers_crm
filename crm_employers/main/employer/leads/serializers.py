@@ -2,7 +2,7 @@ from rest_framework import serializers
 from employer.models import Employer,Lead
 from finance.models import Customer
 from django.db.models import Q,F
-
+from custom_validation.validation import CustomValidation,OutputMessages
 
 #* general serializers
 
@@ -90,8 +90,8 @@ class CreateLeadSerializer(serializers.Serializer):
     assigned_to = serializers.EmailField(default=None)
 
 
-    def get_info(self,cleaned_data):
-        message = {"success":{"example json":{
+    def get_info(self,cleaned_data,user):
+        main = {"success":{"example json":{
             "first_name":"john",
             "last_name":"doe",
             "email":"john_doe@electric.com",
@@ -103,31 +103,30 @@ class CreateLeadSerializer(serializers.Serializer):
             "assigned_to":"employee email who assigned to the lead"
         }}}
 
-        return True,message
+        #* checking the user that creating the lead
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=None,required_fields=None,user=user)
+        if not all(validation):
+            return validation
+        success_message = OutputMessages.success_with_message(main_message=main)
+        return success_message
+    
+    
 
-    def create(self,cleaned_data):
+    def create(self,cleaned_data,user):
         required_fields = ["first_name","last_name","email","phone_number","customer_id","status","source","notes","assigned_to"]
-        for fields in required_fields:
-            if fields not in cleaned_data.keys():
-                message = {"error":"you must add all required fields","required_fields":required_fields}
-                return False,message
-            
-        #* checking if the user passed empty json
-        if not cleaned_data.items():
-            message = {"error":"you passed empty json","example_json":{
-            "first_name":"john",
-            "last_name":"doe",
-            "email":"john_doe@electric.com",
-            "phone_number":"112233",
-            "customer_id":123456789,
-            "status":"choose one of these: new,contacted,qulified,lost,converted",
-            "source":"Source from which the lead was acquired (optional, e.g., website, referral, cold call)",
-            "notes":"notes text",
-            "assigned_to":"employee email who assigned to the lead"}}
-            return False,message
+        
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
+        
+        else:
+            user_obj = validation[1]["object"]
 
 
         #* checking that the customer exist with the provided id
+        
         customer_exist = Customer.objects.filter(customer_id=cleaned_data["customer_id"]).exists()
         if customer_exist:
             customer_obj = Customer.objects.get(customer_id=cleaned_data["customer_id"])
