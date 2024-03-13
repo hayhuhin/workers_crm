@@ -372,3 +372,18 @@ class DepartmentTest(GeneralTestAPI):
         test_list = [invalid_name,invalid_all_departments,empty_json,invalid_field_name,another_company_department]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 
+
+    #* testing get with valid fields (GET REQUEST)
+    def test_get_valid_get(self):
+        path="/v1/api/department/get"
+        method = "get"
+
+        #* valid fields
+        fields = {"name":"test_department"}
+        response = {"message":["success","department_json"],"status":201}
+        valid_field = {"fields":fields,"response":response,"method":method}
+
+
+        test_list = [valid_field]
+        valid_test = self.generic_tests(path=path,custom_fields=test_list)
+

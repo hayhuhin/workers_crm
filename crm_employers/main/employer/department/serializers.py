@@ -287,11 +287,11 @@ class GetDepartmentSerializer(serializers.Serializer):
         required_fields = ["name","all_departments"]
 
         cv = CustomValidation()
-        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
-        if not validation:
+        validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=required_fields)
+        if not all(validation):
             return validation
         else:
-            user_obj = validation[1]["object"]
+            user_obj = User.objects.get(email=user["email"])
             
         
         #* checking if user have company field
