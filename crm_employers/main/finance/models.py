@@ -1,5 +1,7 @@
 from django.db import models
 from user.models import User
+from company.models import Company
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
@@ -8,6 +10,7 @@ class Customer(models.Model):
     address = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     customer_id = models.IntegerField()
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
 
 
@@ -20,7 +23,7 @@ class Income(models.Model):
     # receipt = models.FileField(upload_to='receipts/', blank=True, null=True) # later it will be used 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='income_entries',default=None)
     # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used
-
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
 
     def __str__(self):
@@ -42,7 +45,7 @@ class Outcome(models.Model):
     vendor = models.CharField(max_length=100,blank=True,null=True)
     project_or_department = models.CharField(max_length=100,blank=True,null=True)
     # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used
-
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.date_time} -- {self.amount}"
@@ -50,22 +53,3 @@ class Outcome(models.Model):
 
 
 
-class CompanyWorth:
-    #class the queries and returns dataframe as list format
-    def __init__(self,period,model):
-        self.period = period
-        self.model = model
-
-    def dataframe_query(self,data):
-        group = [] 
-        value = []
-        query_record = self.model.objects.get(data)#TODO add django sum func
-        for month,income in query_record:
-            group.append(month)
-            value.append(income)
-        
-        if len(group) == len(value):
-            return group,value
-        else:
-            raise ValueError
-        
