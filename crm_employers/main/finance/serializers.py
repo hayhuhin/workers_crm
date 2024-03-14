@@ -103,7 +103,6 @@ class GeneralOutcomeSerializer(serializers.Serializer):
 #* income CRUD serializers
 
 class CreateIncomeSerializer(serializers.Serializer):
-    user_email = serializers.EmailField(default=None)
     amount = serializers.DecimalField(max_digits=10,decimal_places=2,default=None)
     date_received = serializers.DateField(default=None)
     description = serializers.CharField(max_length=300,default=None)
@@ -113,25 +112,24 @@ class CreateIncomeSerializer(serializers.Serializer):
     def get_info(self,cleaned_data,user):
 
         cv = CustomValidation()
-        validation = cv.basic_validation(user=user)
+        validation = cv.basic_validation(user=user,empty_json=True)
         if not all(validation):
             return validation
         else:
             main = "for creating the income this is how the json should look like"
             second = {"json_example":{
-                "user_email":"the user email that submits the income",
                 "amount":"float number of the amount",
                 "date_received":"YYYY-MM-DD format",
                 "description":"text field of 300 digits allowed",
                 "payment_method":"credit_card or cash allowed",
-                "costumer_id":"existing customer ID"}
-                }
+                "costumer_id":"existing customer ID"}}
+                
             success_message = OutputMessages.success_with_message(main,second)
-        return success_message
+            return success_message
 
 
     def create(self,cleaned_data,user):
-        required_fields = ["user_email","amount","date_received","description","payment_method","customer_id"]
+        required_fields = ["amount","date_received","description","payment_method","customer_id"]
     
         cv = CustomValidation()
         validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)

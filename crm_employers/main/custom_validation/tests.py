@@ -15,8 +15,13 @@ from finance.models import Customer,Income,Outcome
 class TestAPIData:
     def __init__(self):
         self.email = "test@test.com"
+        self.request_args = self.initialize()
+        
+        self.user_obj = self.request_args[0]
+        self.token = self.request_args[1]
+        self.header_args = {"content_type":"application/json"}
 
-    def create_user(self):
+    def initialize(self):
         self.user_obj = User.objects.create_user(username="test",email=self.email,password="Aa1122!!")
         self.user_obj.save()
         token = Token.objects.get(user=self.user_obj)
@@ -39,6 +44,7 @@ class TestAPIData:
             customer_names = ["radco1","radco2","radco3","radco4","radco5"]
             second_names = ["partner1","partner2","partner3","partner4","partner5"]
             
+            #* first company customers
             for index,name in enumerate(customer_names):
                 customer_obj = Customer.objects.create(
                 name=name,
@@ -51,7 +57,7 @@ class TestAPIData:
                 )
                 customer_obj.save()
             
-            
+            #* second company customers
             for index,name in enumerate(second_names):
                 customer_obj = Customer.objects.create(
                 name=name,
@@ -59,7 +65,7 @@ class TestAPIData:
                 phone_number="112233",
                 address="partner address",
                 notes=f"{name} notes",
-                customer_id=index,
+                customer_id=index+10,
                 company=second_company_obj
                 )
                 customer_obj.save()
@@ -108,17 +114,17 @@ class TestAPIData:
                 )
             income_obj.save()
 
-        #*fikrst company outcome
+        #*first company outcome
         for index,amount in enumerate(amount_list):
             #* creating outcome 
             outcome_obj = Outcome.objects.create(
                 user = first_users[index],
                 date_time = dates_list[index],
-                category = "spendings",
+                category = "spending",
                 amount = amount,
                 description = f"some description",
                 payment_method = "cash",
-                vendor = "somesome",
+                vendor = "some some",
                 project_or_department = "project"
                 )
             outcome_obj.save()
@@ -130,11 +136,11 @@ class TestAPIData:
             outcome_obj = Outcome.objects.create(
                 user = second_users[index],
                 date_time = dates_list[index],
-                category = "spendings",
+                category = "spending",
                 amount = amount,
                 description = f"some description",
                 payment_method = "cash",
-                vendor = "somesome",
+                vendor = "some some",
                 project_or_department = "project"
                 )
             outcome_obj.save()
@@ -203,7 +209,7 @@ class TestAPIData:
         self.user_obj.company = compnay_obj
         self.user_obj.save()
 
-        #* creating another mopck companies for testing
+        #* creating another mock companies for testing
         mock_user_obj = User.objects.create_user(username="john",email="jonh@john.com",password="Aa1122!!")
         mock_user_obj.save()
 
@@ -225,6 +231,122 @@ class TestAPIData:
         department_obj = Department.objects.create(name=department_name,salary=3000,company=company_obj)
 
 
+    def generate_mock_data(self):
+        #this class will create the needed mock data:
+        #1.15 users(5 in one company as employers and 5 in another and 5 users not as employers)
+        #2.two companies
+        #3.in each company two departments
+        #4.creating customer to each company
+        #5.creating mock income and outcome records to each company
+        #6.the user is permitted as admin
+        
+        #?adding permission to our admin user
+        admin_permissions = ["IT_permission","medium_permission"]
+        finance_permission = ["finance_full_permission","finance_view_permission","finance_update_permission"]
+        permission_objects = []
+        for admin in admin_permissions:
+            group_object = Group.objects.create(name=admin)
+            permission_objects.append(group_object)
+        
+        for finance in finance_permission:
+            group_object  = Group.objects.create(name=finance)
+            permission_objects.append(group_object)
+
+        for permission in permission_objects:
+            self.user_obj.groups.add(permission)
+
+
+        #*here im creating two companies
+            
+        company_data = {
+            "name":"test_company",
+            "description":"for testing purposes only",
+            "address":"test address 1212",
+            "admin_email":self.user_obj.email
+                }
+        first_company_obj = Company.objects.create(**company_data)
+        
+        #* creating the relationship uf the creator and the company
+        self.user_obj.company = first_company_obj
+        self.user_obj.save()
+
+        #* creating another mock companies for testing
+        mock_user_obj = User.objects.create_user(username="john",email="jonh@john.com",password="Aa1122!!")
+        mock_user_obj.save()
+        company_data = {
+            "name":"django_dev",
+            "description":"for testing purposes only",
+            "address":"test address 1212",
+            "admin_email":mock_user_obj.email
+                }
+        second_company_object = Company.objects.create(**company_data)
+        #* creating the relationship uf the creator and the company
+        mock_user_obj.company = second_company_object
+        mock_user_obj.save()
+
+
+        #*here im creating 15 users in total
+        #5 normal users to a company
+        #5 users as employers to first company
+        #5 users as employers to second company
+        
+        normal_user_list = ["arti","dani","yuval","asisa","banan"]
+        for user in normal_user_list:
+            email = f"{user}@{user}.com"
+            user_obj = User.objects.create_user(username=user,email=email,password="Aa1122!!")
+            user_obj.company = first_company_obj
+            user_obj.save()
+
+        #* for creating employers we need departments first
+        comp_1_dep_1 = Department.objects.create(name="test_department",salary=3000,company=first_company_obj)
+        comp_1_dep_2 = Department.objects.create(name="test_company_department",salary=3000,company=first_company_obj)
+
+        comp_2_dep_1 = Department.objects.create(name="test_department",salary=3000,company=second_company_object)
+        comp_2_dep_2 = Department.objects.create(name="django_dev_department",salary=3000,company=second_company_object)
+
+        first_comp_users = ["qq","ww","ee","rr","tt"]
+        second_comp_users = ["aa","ss","dd","ff","gg"]
+
+        #*creating the users first
+        first_user_object_list = {}
+        for user in first_comp_users:
+            email = f"{user}@{user}.com"
+            user_obj = User.objects.create_user(username=user,email=email,password="Aa1122!!")
+            user_obj.company = first_company_obj
+            user_obj.save()
+            first_user_object_list[user] = user_obj
+        
+        #* here im creating the employers for them
+        for name,obj in first_user_object_list.items():
+            create_data = {"user":obj,"first_name":obj.username,"last_name":obj.username,"phone":"121212","email":obj.email,"department":comp_1_dep_1,"company":obj.company}
+            emp_creation = Employer.objects.create(**create_data)
+            emp_creation.save()
+
+        #*creating first the employers for the second company
+        second_user_object_list = {}
+        for user in second_comp_users:
+            email = f"{user}@{user}.com"
+            user_obj = User.objects.create_user(username=user,email=email,password="Aa1122!!")
+            user_obj.company = second_company_object
+            user_obj.save()
+            second_user_object_list[user] = user_obj
+        
+        #* here im creating the employers for them
+        for name,obj in second_user_object_list.items():
+            create_data = {"user":obj,"first_name":obj.username,"last_name":obj.username,"phone":"121212","email":obj.email,"department":comp_2_dep_1,"company":obj.company}
+            emp_creation = Employer.objects.create(**create_data)
+            emp_creation.save()
+        
+        
+        #* now im creating the customers for each company
+        first_customer_names = ["radco1","radco2","radco3","radco4","radco5"]
+        second_customer_names = ["partner1","partner2","partner3","partner4","partner5"]
+            
+
+
+
+
+
 
 
 # Create your tests here.
@@ -232,10 +354,10 @@ class GeneralTestAPI(TestCase):
 
     def setUp(self):
         self.APIClassTest = TestAPIData()
-        self.created_user = self.APIClassTest.create_user()
-        self.token = self.created_user[1]
-        self.user_info = self.created_user[0]
-        self.headers = {"content_type":"application/json"}
+        # self.created_user = self.APIClassTest.initialize()
+        self.user_info = self.APIClassTest.user_obj
+        self.token = self.APIClassTest.token
+        self.headers = self.APIClassTest.header_args
 
         self.send_request = APIClient()
         self.send_request.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
