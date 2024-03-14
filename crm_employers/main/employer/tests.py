@@ -214,13 +214,11 @@ class TestEmployerAPI(TestCase):
                 
                 if method == "get":
                     get_response = self.send_request.get(format=json_format,path=path,data=fields)
-                    print(get_response.json())
                     message_test = self.assertEqual(list(get_response.json().keys()),response["message"])
                     status_code_test = self.assertEqual(get_response.status_code,response["status"])
                 
                 if method == "post":
                     get_response = self.send_request.post(format=json_format,path=path,data=fields)
-                    print(get_response.json())
                     message_test = self.assertEqual(list(get_response.json().keys()),response["message"])
                     status_code_test = self.assertEqual(get_response.status_code,response["status"])
 

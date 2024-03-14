@@ -168,7 +168,6 @@ class UpdateCompanySerializer(serializers.Serializer):
     update_data = serializers.DictField(default=None)
 
     def get_info(self,cleaned_data,user):
-        # print(cleaned_data)
         admin_email = user["email"]
         allowed_fields = ["name"]
 

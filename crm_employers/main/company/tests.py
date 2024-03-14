@@ -135,7 +135,6 @@ class TestCompanyAPI(TestCase):
         #* passed empty name
         data = {"name":"test","description":"no desc","address":"no addr"}
         response = self.send_request.post(format="json",path="/v1/api/company/create",data=data)
-        print(response.json())
         message_test = self.assertEqual(list(response.json().keys()),["success"])
         status_code_test = self.assertEqual(response.status_code,201)
         

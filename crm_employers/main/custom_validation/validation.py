@@ -60,15 +60,22 @@ class OutputMessages:
 
 class CustomValidation:
 
-    def basic_validation(self,input_fields:dict,user:dict,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False):
+    def basic_validation(self,user:dict,input_fields:dict=None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False):
         #* check if passed empty json
         if not empty_json:
-            if not input_fields.keys():
-                main="passed empty json"
-                second = {"required_fields":required_fields or allowed_fields}
-                error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
-                return error_output
-        
+            if not input_fields:
+                # if not input_fields.keys():
+                    main="passed empty json"
+                    second = {"required_fields":required_fields or allowed_fields}
+                    error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
+                    return error_output
+            # else:
+            #     main="passed empty json"
+            #     second = {"required_fields":required_fields or allowed_fields}
+            #     error_output = OutputMessages.error_with_message(main_message=main,second_message=second)
+            #     return error_output
+            
+
         if required_fields:
             #* check that all the required fields are filled in
             for valid_field in required_fields:

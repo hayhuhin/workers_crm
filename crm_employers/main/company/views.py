@@ -106,7 +106,6 @@ class UpdateCompany(APIView):
         cleaned_data = request.data
         user = {"email":request.user.email}
 
-        print(cleaned_data)
         serializer = UpdateCompanySerializer(data=cleaned_data)
         if serializer.is_valid():
             updated_department = serializer.update(cleaned_data=cleaned_data,user=user)

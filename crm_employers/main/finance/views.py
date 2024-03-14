@@ -14,11 +14,14 @@ class CreateIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceUpdatePermission,)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = CreateIncomeSerializer(data=cleaned_data)
         
         if serializer.is_valid():
-            get_data = serializer.get_info(cleaned_data=cleaned_data)
+            get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             return Response(get_data[1],status=status.HTTP_200_OK)
 
@@ -28,9 +31,12 @@ class CreateIncome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+        
+        
         serializer = CreateIncomeSerializer(data=cleaned_data)
-        if serializer.is_valid(raise_exception=True):
-            created_data = serializer.create(cleaned_data=cleaned_data)
+        if serializer.is_valid():
+            created_data = serializer.create(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -46,11 +52,14 @@ class DeleteIncome(APIView):
 
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = DeleteIncomeSerializer(data=cleaned_data)
         
         if serializer.is_valid():
-            get_data = serializer.get_info(cleaned_data=cleaned_data)
+            get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             return Response(get_data[1],status=status.HTTP_200_OK)
 
@@ -59,9 +68,11 @@ class DeleteIncome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = DeleteIncomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.delete(cleaned_data=cleaned_data)
+            created_data = serializer.delete(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -74,11 +85,13 @@ class UpdateIncome(APIView):
 
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
         serializer = UpdateIncomeSerializer(data=cleaned_data)
         
         if serializer.is_valid():
-            get_data = serializer.get_info(cleaned_data=cleaned_data)
+            get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             return Response(get_data[1],status=status.HTTP_200_OK)
 
@@ -87,9 +100,11 @@ class UpdateIncome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+        
         serializer = UpdateIncomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.update(cleaned_data=cleaned_data)
+            created_data = serializer.update(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -101,10 +116,13 @@ class GetIncome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = GetIncomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.get_info(cleaned_data=cleaned_data)
+            created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -122,11 +140,14 @@ class CreateOutcome(APIView):
 
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = CreateOutcomeSerializer(data=cleaned_data)
         
         if serializer.is_valid():
-            get_data = serializer.get_info(cleaned_data=cleaned_data)
+            get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
             return Response(get_data[1],status=status.HTTP_200_OK)
 
@@ -136,9 +157,11 @@ class CreateOutcome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = CreateOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.create(cleaned_data=cleaned_data)
+            created_data = serializer.create(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -152,10 +175,13 @@ class DeleteOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = DeleteOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            get_information = serializer.get_info(cleaned_data=cleaned_data)
+            get_information = serializer.get_info(cleaned_data=cleaned_data,user=user)
             return Response(get_information[1],status=status.HTTP_200_OK)
         
         message = {"error":"invalid get request"}
@@ -164,9 +190,11 @@ class DeleteOutcome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = DeleteOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.delete(cleaned_data=cleaned_data)
+            created_data = serializer.delete(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -178,10 +206,13 @@ class UpdateOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceFullPermission)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = UpdateOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.get_info(cleaned_data=cleaned_data)
+            created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -194,9 +225,11 @@ class UpdateOutcome(APIView):
 
     def post(self,request):
         cleaned_data = request.data
+        user = {"email":request.user.email}
+
         serializer = UpdateOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.update(cleaned_data=cleaned_data)
+            created_data = serializer.update(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
@@ -208,10 +241,13 @@ class GetOutcome(APIView):
     permission_classes = (permissions.IsAuthenticated,FinanceViewPermission)
 
     def get(self,request):
-        cleaned_data = request.data
+        query_dict = {**request.GET}
+        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        user = {"email":request.user.email}
+
         serializer = GetOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
-            created_data = serializer.get_info(cleaned_data=cleaned_data)
+            created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)

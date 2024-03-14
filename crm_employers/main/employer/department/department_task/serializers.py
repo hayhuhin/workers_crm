@@ -161,7 +161,6 @@ class DeleteTaskSerializer(serializers.Serializer):
 
         #* this section will query the databases and return error if nothing was found
         query = Q()
-        # print(self.__getattribute__("data").items())
         for item,item_value in self.__getattribute__("data").items():
 
             
@@ -279,7 +278,6 @@ class UpdateTaskSerializer(serializers.Serializer):
 
         #* this section will query the databases and return error if nothing was found
         query = Q()
-        # print(self.__getattribute__("data").items())
         for item,item_value in self.__getattribute__("data").items():
 
             
@@ -461,7 +459,6 @@ class GetTaskSerializer(serializers.Serializer):
 
         #* this section will query the databases and return error if nothing was found
         query = Q()
-        # print(self.__getattribute__("data").items())
         for item,item_value in self.__getattribute__("data").items():
 
             

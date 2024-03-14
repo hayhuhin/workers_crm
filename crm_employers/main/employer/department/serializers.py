@@ -333,3 +333,5 @@ class GetDepartmentSerializer(serializers.Serializer):
                         success_message = OutputMessages.success_with_message(main,second)
                         return success_message
             
+
+            
