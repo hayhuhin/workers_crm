@@ -341,6 +341,117 @@ class TestAPIData:
         #* now im creating the customers for each company
         first_customer_names = ["radco1","radco2","radco3","radco4","radco5"]
         second_customer_names = ["partner1","partner2","partner3","partner4","partner5"]
+        
+        #* first company customers
+        for index,name in enumerate(first_customer_names):
+            first_comp_customer = Customer.objects.create(
+            name=name,
+            email=f"{name}@{name}.com",
+            phone_number="112233",
+            address="radco inter",
+            notes=f"{name} notes",
+            customer_id=index,
+            company=first_company_obj
+            )
+            first_comp_customer.save()
+        
+        #* second company customers
+        for index,name in enumerate(second_customer_names):
+            second_comp_customer = Customer.objects.create(
+            name=name,
+            email=f"{name}@{name}.com",
+            phone_number="112233",
+            address="partner address",
+            notes=f"{name} notes",
+            customer_id=index+10,
+            company=second_company_object
+            )
+            second_comp_customer.save()
+
+
+        #* here im creating the finance mock income and outcome records
+            
+
+        
+        first_users = first_company_obj.user_set.all()
+        second_users = second_company_object.user_set.all()
+
+        first_customer = first_company_obj.customer_set.all()
+        second_customer = second_company_object.customer_set.all()
+
+        dates_list = ["2024-01-01","2024-02-01","2024-03-01","2024-04-01","2024-05-01",]
+        amount_list = ["1111","2222","3333","4444","5555"]
+        second_amount = ["6666","7777","8888","9999","1111"]
+
+        #TODO:the bug is in this loop of the creation of Income record
+
+        #*first company income
+        for index,amount in enumerate(amount_list):
+                
+            #* creating income
+            income_obj = Income.objects.create(
+                user=first_users[index],
+                amount=amount,
+                date_received=dates_list[index],
+                description="first company",
+                payment_method="credit_card",
+                customer=first_customer[index],
+                company=first_company_obj
+                )
+            
+            income_obj.save()
+
+        #*second company income
+        for index,amount in enumerate(second_amount):
+                
+            #* creating income
+            income_obj = Income.objects.create(
+                user=second_users[index],
+                amount=amount,
+                date_received=dates_list[index],
+                description=f"{second_users[index].username}",
+                payment_method="credit_card",
+                customer=second_customer[index],
+                company=second_company_object
+                )
+            income_obj.save()
+
+
+        #*first company outcome
+        for index,amount in enumerate(amount_list):
+            #* creating outcome 
+            outcome_obj = Outcome.objects.create(
+                user = first_users[index],
+                date_received = dates_list[index],
+                category = "spending",
+                amount = amount,
+                description = f"some description",
+                payment_method = "cash",
+                vendor = "some some",
+                project_or_department = "project",
+                company=first_company_obj
+                )
+            outcome_obj.save()
+
+
+        #*second company outcome
+        for index,amount in enumerate(second_amount):
+            #* creating outcome 
+            outcome_obj = Outcome.objects.create(
+                user = second_users[index],
+                date_received = dates_list[index],
+                category = "spending",
+                amount = amount,
+                description = f"some description",
+                payment_method = "cash",
+                vendor = "some some",
+                project_or_department = "project",
+                company=second_company_object
+                )
+            outcome_obj.save()
+
+        
+
             
 
 
@@ -369,15 +480,16 @@ class GeneralTestAPI(TestCase):
 
     def generic_tests(self,path,custom_method=None,custom_fields=None):
         json_format = "json"
-        self.APIClassTest.permit_admin()
-        self.APIClassTest.create_company()
+        self.APIClassTest.generate_mock_data()
+        # self.APIClassTest.permit_admin()
+        # self.APIClassTest.create_company()
         
-        self.APIClassTest.create_5_employer(company_name="test_company",department_name="test_department",employers_list=["qq","ww","ee","rr","tt"])
-        self.APIClassTest.create_5_employer(company_name="django_dev",department_name="test_department",employers_list=["aa","ss","dd","ff","gg"])
-        self.APIClassTest.create_5_users(company_name="test_company")
+        # self.APIClassTest.create_5_employer(company_name="test_company",department_name="test_department",employers_list=["qq","ww","ee","rr","tt"])
+        # self.APIClassTest.create_5_employer(company_name="django_dev",department_name="test_department",employers_list=["aa","ss","dd","ff","gg"])
+        # self.APIClassTest.create_5_users(company_name="test_company")
         
-        self.APIClassTest.create_department(company_name="test_company",department_name="test_company_department")
-        self.APIClassTest.create_department(company_name="django_dev",department_name="django_dev_department")
+        # self.APIClassTest.create_department(company_name="test_company",department_name="test_company_department")
+        # self.APIClassTest.create_department(company_name="django_dev",department_name="django_dev_department")
 
         # self.APIClassTest.create_customer_mock_data(company_name="test_company",second_company_name="django_dev")
         # self.APIClassTest.create_finance_mock_data(company_name="test_company",second_company_name="django_dev")
