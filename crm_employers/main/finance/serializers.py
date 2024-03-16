@@ -189,26 +189,32 @@ class DeleteIncomeSerializer(serializers.Serializer):
 
         cv = CustomValidation()
 
-        user_validation = cv.basic_validation(input_fields=None,required_fields=None,user=user)
-        if not all(user_validation):
-            return user_validation
+        user_exists = User.objects.filter(email=user["email"]).exists()
+        if not user_exists:
+            main = "this user is not exists"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         else:
-            user_obj = user_validation[1]["object"]
-            company_obj = user_obj.company
+            user_obj = User.objects.get(email=user["email"])
+            if not user_obj.company:
+                main = "user doesnt have company"
+                error_message = OutputMessages.error_with_message(main)
+                return error_message
+            else:
+                company_obj = user_obj.company
             
         valid_fields = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
         if not all(valid_fields):
             return valid_fields
             
-
+        
         query = Q()
-
         for key,value in self.__getattribute__("data").items():
             if value != None:
                 kwargs = {key:value}
                 query &= Q(**kwargs)
 
-
+        print(Income.objects.all().values("company__name","amount","user__username"))
         income_exists = company_obj.income_set.filter(query).exists()
         if not income_exists:
             main = "income not exists with the data provided.the data may not be created or you passed invalid fields"

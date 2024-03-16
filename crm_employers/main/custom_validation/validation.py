@@ -63,7 +63,7 @@ class CustomValidation:
     def basic_validation(self,user:dict,input_fields:dict=None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False):
         #* check if passed empty json
         if not empty_json:
-            if not input_fields.keys():
+            if not input_fields or not input_fields.keys():
                 # if not input_fields.keys():
                     main="passed empty json"
                     second = {"required_fields":required_fields or allowed_fields}

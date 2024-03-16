@@ -60,9 +60,11 @@ class DeleteIncome(APIView):
         
         if serializer.is_valid():
             get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
+            if all(get_data):
+                return Response(get_data[1],status=status.HTTP_200_OK)
 
-            return Response(get_data[1],status=status.HTTP_200_OK)
-
+            return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
+            
         return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
 
 
@@ -78,6 +80,9 @@ class DeleteIncome(APIView):
                 return Response(created_data[1],status=status.HTTP_201_CREATED)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
+        
+        return Response({"error":"passed invalid fields"},status=status.HTTP_404_NOT_FOUND)
+
 
 
 class UpdateIncome(APIView):

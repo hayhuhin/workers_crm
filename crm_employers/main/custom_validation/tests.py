@@ -401,6 +401,7 @@ class TestAPIData:
             
             income_obj.save()
 
+
         #*second company income
         for index,amount in enumerate(second_amount):
                 
@@ -409,7 +410,7 @@ class TestAPIData:
                 user=second_users[index],
                 amount=amount,
                 date_received=dates_list[index],
-                description=f"{second_users[index].username}",
+                description="some desc",
                 payment_method="credit_card",
                 customer=second_customer[index],
                 company=second_company_object
@@ -450,8 +451,8 @@ class TestAPIData:
                 )
             outcome_obj.save()
 
-        
-
+        first_company_obj.save()
+        second_company_object.save()
             
 
 
@@ -481,19 +482,7 @@ class GeneralTestAPI(TestCase):
     def generic_tests(self,path,custom_method=None,custom_fields=None):
         json_format = "json"
         self.APIClassTest.generate_mock_data()
-        # self.APIClassTest.permit_admin()
-        # self.APIClassTest.create_company()
-        
-        # self.APIClassTest.create_5_employer(company_name="test_company",department_name="test_department",employers_list=["qq","ww","ee","rr","tt"])
-        # self.APIClassTest.create_5_employer(company_name="django_dev",department_name="test_department",employers_list=["aa","ss","dd","ff","gg"])
-        # self.APIClassTest.create_5_users(company_name="test_company")
-        
-        # self.APIClassTest.create_department(company_name="test_company",department_name="test_company_department")
-        # self.APIClassTest.create_department(company_name="django_dev",department_name="django_dev_department")
 
-        # self.APIClassTest.create_customer_mock_data(company_name="test_company",second_company_name="django_dev")
-        # self.APIClassTest.create_finance_mock_data(company_name="test_company",second_company_name="django_dev")
-        
 
         if custom_method:
             if custom_method == "get":
