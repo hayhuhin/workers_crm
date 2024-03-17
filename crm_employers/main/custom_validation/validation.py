@@ -60,7 +60,7 @@ class OutputMessages:
 
 class CustomValidation:
 
-    def basic_validation(self,user:dict,input_fields:dict=None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False):
+    def basic_validation(self,user:dict,input_fields:dict = None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False,check_company=True):
         #* check if passed empty json
         if not empty_json:
             if not input_fields or not input_fields.keys():
@@ -110,6 +110,12 @@ class CustomValidation:
             return error_output
         else:
             user_obj = User.objects.get(email=user_email)
+
+        if check_company:
+            if not user_obj.company:
+                main = "this user dont have company"
+                return OutputMessages.error_with_message(main)
+
 
         main = "user exists"
         return OutputMessages.success_and_object(main_message=main,output_object=user_obj)

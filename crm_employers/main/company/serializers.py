@@ -44,7 +44,7 @@ class CreateCompanySerializer(serializers.ModelSerializer):
             return message
         
 
-        wrong_fields_exists = custom_validation.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        wrong_fields_exists = custom_validation.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user,check_company=False)
         if not all(wrong_fields_exists):
             return wrong_fields_exists
         else:
@@ -97,7 +97,7 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
         #* checking that the delete company name is one of this users companies
         company_exists = user_obj.company
         if not company_exists:
-            main = "this user doesnt created this companies"
+            main = "this user doesn't created this companies"
             return OutputMessages.error_with_message(main_message=main)
 
 

@@ -13,11 +13,11 @@ from custom_validation.validation import CustomValidation,OutputMessages
 # allowed_update_fields = ["user","amount","description","payment_method","customer","date_recieved"]
 
 
-#*general serailizers 
+#*general serializers 
 
 class GeneralIncomeSerializer(serializers.Serializer):
     """
-    purpose of this class is basicly to have field validation when updating existing data
+    purpose of this class is basically to have field validation when updating existing data
     and the data is passed to us from the user input and we dont trust it
     """
     user = serializers.EmailField(default=None)
@@ -182,7 +182,7 @@ class DeleteIncomeSerializer(serializers.Serializer):
     created_by = serializers.EmailField(default=None)
     customer_name = serializers.CharField(max_length=50,default=None)
     customer_id = serializers.IntegerField(default=None)
-    payment_id = serializers.IntegerField(default=None)
+    payment_id = serializers.CharField(max_length=80,default=None)
 
     def get_info(self,cleaned_data,user):
         allowed_fields = ["date_received","created_by","customer_name","customer_id","payment_id"]
@@ -197,7 +197,7 @@ class DeleteIncomeSerializer(serializers.Serializer):
         else:
             user_obj = User.objects.get(email=user["email"])
             if not user_obj.company:
-                main = "user doesnt have company"
+                main = "user dont have company"
                 error_message = OutputMessages.error_with_message(main)
                 return error_message
             else:
@@ -206,24 +206,80 @@ class DeleteIncomeSerializer(serializers.Serializer):
         valid_fields = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
         if not all(valid_fields):
             return valid_fields
-            
+        
+        
+        # cant_be_passed_together= ["customer_name","customer_id"]
+        if "customer_name" in cleaned_data.keys() and "customer_id" in cleaned_data.keys():
+            main = "cant pass both the customer name and the customer id."
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
+        
         
         query = Q()
         for key,value in self.__getattribute__("data").items():
-            if value != None:
-                kwargs = {key:value}
-                query &= Q(**kwargs)
+            #* checking keys and its values
+            if key == "created_by" and value != None:
+                required_user_exists = company_obj.user_set.filter(email=value).exists()
+                if not required_user_exists:
+                    main = "created_by field is invalid"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    created_by_obj = company_obj.user_set.get(email=value)
+                    query &= Q(user=created_by_obj)
 
-        print(Income.objects.all().values("company__name","amount","user__username"))
+            if key == "customer_name" and value != None:
+                customer_exists_by_name = company_obj.customer_set.filter(name=value).exists()
+                if not customer_exists_by_name:
+                    main = "customer not exists with the provided name"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(name=value)
+                    query &= Q(customer=customer_obj)
+
+            if key == "customer_id" and value != None:
+                customer_exists_by_id = company_obj.customer_set.filter(customer_id=value).exists()
+                if not customer_exists_by_id:
+                    main = "customer not exists with the provided id"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(customer_id=value)
+                    query &= Q(customer=customer_obj)
+            
+            if key == "date_received" and value != None:
+                income_exists = company_obj.income_set.filter(date_received=value).exists()
+                if not income_exists:
+                    main = "income not exists with the provided date_received"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    query &= Q(date_received=value)
+               
+            if key == "payment_id" and value != None:
+                try:
+                    income_exists = company_obj.income_set.filter(payment_id=value).exists()
+                    if not income_exists:
+                        main = "income not exists with the provided payment_id"
+                        error_message = OutputMessages.error_with_message(main)
+                        return error_message
+                    else:
+                        query &= Q(payment_id=value)
+                except:
+                    main = "invalid payment_id field"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+    
         income_exists = company_obj.income_set.filter(query).exists()
         if not income_exists:
             main = "income not exists with the data provided.the data may not be created or you passed invalid fields"
-            second = {"passed_fields":cleaned_data}
-            error_msg = OutputMessages.error_with_message(main,second)
+            error_msg = OutputMessages.error_with_message(main)
             return error_msg
         
         else:
-            income_query_dict = company_obj.income_set.filter(query).values(list(cleaned_data.keys()),"payment_id")
+            include_fields = ["user__email","date_received","amount","description","payment_method","customer__name","company"]
+            income_query_dict = company_obj.income_set.filter(query).values(*include_fields)
             main = "income found successfully"
             second = {"income_json":income_query_dict}
             success_msg = OutputMessages.success_with_message(main,second)
@@ -285,40 +341,100 @@ class UpdateIncomeSerializer(serializers.Serializer):
         allowed_fields = ["date_received","created_by","customer_name","customer_id","payment_id"]
         cv = CustomValidation()
 
-        user_validation = cv.basic_validation(input_fields=None,required_fields=None,user=user)
-        if not all(user_validation):
-            return user_validation
+        user_exists = User.objects.filter(email=user["email"]).exists()
+        if not user_exists:
+            main = "this user is not exists"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         else:
-            user_obj = user_validation[1]["object"]
-            company_obj = user_obj.company
+            user_obj = User.objects.get(email=user["email"])
+            if not user_obj.company:
+                main = "user dont have company"
+                error_message = OutputMessages.error_with_message(main)
+                return error_message
+            else:
+                company_obj = user_obj.company
             
         valid_fields = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
         if not all(valid_fields):
             return valid_fields
-            
-
+        
+        
+        # cant_be_passed_together= ["customer_name","customer_id"]
+        if "customer_name" in cleaned_data.keys() and "customer_id" in cleaned_data.keys():
+            main = "cant pass both the customer name and the customer id."
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
+        
+        
         query = Q()
-
         for key,value in self.__getattribute__("data").items():
-            if value != None:
-                kwargs = {key:value}
-                query &= Q(**kwargs)
+            #* checking keys and its values
+            if key == "created_by" and value != None:
+                required_user_exists = company_obj.user_set.filter(email=value).exists()
+                if not required_user_exists:
+                    main = "created_by field is invalid"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    created_by_obj = company_obj.user_set.get(email=value)
+                    query &= Q(user=created_by_obj)
 
+            if key == "customer_name" and value != None:
+                customer_exists_by_name = company_obj.customer_set.filter(name=value).exists()
+                if not customer_exists_by_name:
+                    main = "customer not exists with the provided name"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(name=value)
+                    query &= Q(customer=customer_obj)
+
+            if key == "customer_id" and value != None:
+                customer_exists_by_id = company_obj.customer_set.filter(customer_id=value).exists()
+                if not customer_exists_by_id:
+                    main = "customer not exists with the provided id"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(customer_id=value)
+                    query &= Q(customer=customer_obj)
+            
+            if key == "date_received" and value != None:
+                income_exists = company_obj.income_set.filter(date_received=value).exists()
+                if not income_exists:
+                    main = "income not exists with the provided date_received"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    query &= Q(date_received=value)
+               
+            if key == "payment_id" and value != None:
+                income_exists = company_obj.income_set.filter(payment_id=value).exists()
+                if not income_exists:
+                    main = "income not exists with the provided payment_id"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    query &= Q(payment_id=value)
+                
 
         income_exists = company_obj.income_set.filter(query).exists()
         if not income_exists:
             main = "income not exists with the data provided.the data may not be created or you passed invalid fields"
-            second = {"passed_fields":cleaned_data}
-            error_msg = OutputMessages.error_with_message(main,second)
+            error_msg = OutputMessages.error_with_message(main)
             return error_msg
         
         else:
-            income_query_dict = company_obj.income_set.filter(query).values(list(cleaned_data.keys()),"payment_id")
+            include_fields = ["user__email","date_received","amount","description","payment_method","customer__name","company"]
+            income_query_dict = company_obj.income_set.filter(query).values(*include_fields)
             main = "income found successfully"
             second = {"income_json":income_query_dict}
             success_msg = OutputMessages.success_with_message(main,second)
             return success_msg
         
+        
+
 
     def update(self,cleaned_data,user):
         required_fields = ["payment_id","update_data"]
@@ -397,35 +513,93 @@ class GetIncomeSerializer(serializers.Serializer):
 
         cv = CustomValidation()
 
-        user_validation = cv.basic_validation(input_fields=None,required_fields=None,user=user)
-        if not all(user_validation):
-            return user_validation
+        user_exists = User.objects.filter(email=user["email"]).exists()
+        if not user_exists:
+            main = "this user is not exists"
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
         else:
-            user_obj = user_validation[1]["object"]
-            company_obj = user_obj.company
+            user_obj = User.objects.get(email=user["email"])
+            if not user_obj.company:
+                main = "user dont have company"
+                error_message = OutputMessages.error_with_message(main)
+                return error_message
+            else:
+                company_obj = user_obj.company
             
         valid_fields = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
         if not all(valid_fields):
             return valid_fields
-            
-
+        
+        
+        # cant_be_passed_together= ["customer_name","customer_id"]
+        if "customer_name" in cleaned_data.keys() and "customer_id" in cleaned_data.keys():
+            main = "cant pass both the customer name and the customer id."
+            error_message = OutputMessages.error_with_message(main)
+            return error_message
+        
+        
         query = Q()
-
         for key,value in self.__getattribute__("data").items():
-            if value != None:
-                kwargs = {key:value}
-                query &= Q(**kwargs)
+            #* checking keys and its values
+            if key == "created_by" and value != None:
+                required_user_exists = company_obj.user_set.filter(email=value).exists()
+                if not required_user_exists:
+                    main = "created_by field is invalid"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    created_by_obj = company_obj.user_set.get(email=value)
+                    query &= Q(user=created_by_obj)
 
+            if key == "customer_name" and value != None:
+                customer_exists_by_name = company_obj.customer_set.filter(name=value).exists()
+                if not customer_exists_by_name:
+                    main = "customer not exists with the provided name"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(name=value)
+                    query &= Q(customer=customer_obj)
+
+            if key == "customer_id" and value != None:
+                customer_exists_by_id = company_obj.customer_set.filter(customer_id=value).exists()
+                if not customer_exists_by_id:
+                    main = "customer not exists with the provided id"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    customer_obj = company_obj.customer_set.get(customer_id=value)
+                    query &= Q(customer=customer_obj)
+            
+            if key == "date_received" and value != None:
+                income_exists = company_obj.income_set.filter(date_received=value).exists()
+                if not income_exists:
+                    main = "income not exists with the provided date_received"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    query &= Q(date_received=value)
+               
+            if key == "payment_id" and value != None:
+                income_exists = company_obj.income_set.filter(payment_id=value).exists()
+                if not income_exists:
+                    main = "income not exists with the provided payment_id"
+                    error_message = OutputMessages.error_with_message(main)
+                    return error_message
+                else:
+                    query &= Q(payment_id=value)
+                
 
         income_exists = company_obj.income_set.filter(query).exists()
         if not income_exists:
             main = "income not exists with the data provided.the data may not be created or you passed invalid fields"
-            second = {"passed_fields":cleaned_data}
-            error_msg = OutputMessages.error_with_message(main,second)
+            error_msg = OutputMessages.error_with_message(main)
             return error_msg
         
         else:
-            income_query_dict = company_obj.income_set.filter(query).values(list(cleaned_data.keys()),"payment_id")
+            include_fields = ["user__email","date_received","amount","description","payment_method","customer__name","company"]
+            income_query_dict = company_obj.income_set.filter(query).values(*include_fields)
             main = "income found successfully"
             second = {"income_json":income_query_dict}
             success_msg = OutputMessages.success_with_message(main,second)
@@ -847,7 +1021,7 @@ class GetOutcomeSerializer(serializers.Serializer):
                 message = {"error":"invalid key passed"}
                 return False,message
             
-            #* passing the key,values that are not None into our passed_fields dict
+            #* passing the key,values that are not None into our invalid_fields dict
             if value != None:
                 if key == "user_email":
                     #checking that the user exists first

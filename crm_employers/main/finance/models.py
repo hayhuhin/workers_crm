@@ -21,8 +21,8 @@ class Income(models.Model):
     date_received = models.DateField()
     description = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, choices=[('cash', 'Cash'), ('credit_card', 'Credit Card'), ('bank_transfer', 'Bank Transfer')])
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='income_entries',default=None)
-    company = models.ForeignKey(Company,on_delete=models.CASCADE,related_name='company_entries')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,default=None)
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
     payment_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     # receipt = models.FileField(upload_to='receipts/', blank=True, null=True) # later it will be used 
     # tax_info = models.CharField(max_length=100, blank=True, null=True)#later it will be used

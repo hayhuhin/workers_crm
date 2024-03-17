@@ -150,7 +150,7 @@ class IncomeTest(GeneralTestAPI):
 
         #* passing only one field
         fields = {"date_received":"2024-01-01"}
-        response = {"message":["error","required_fields"],"status":404}
+        response = {"message":["success","income_json"],"status":200}
         only_one_field = {"fields":fields,"response":response,"method":method}
 
        #* date fields is incorrect  
@@ -168,12 +168,19 @@ class IncomeTest(GeneralTestAPI):
         response = {"message":["error"],"status":404}
         invalid_customer_id= {"fields":fields,"response":response,"method":method}
 
-       #* another company customer
+       #* another company customer_id
         fields = {
             "customer_id":12
             }
         response = {"message":["error"],"status":404}
-        another_company_customer= {"fields":fields,"response":response,"method":method}
+        another_company_customer_id= {"fields":fields,"response":response,"method":method}
+
+       #* another company customer_name
+        fields = {
+            "customer_name":"partner1"
+            }
+        response = {"message":["error"],"status":404}
+        another_company_customer_name = {"fields":fields,"response":response,"method":method}
 
 
        #* invalid created_by
@@ -200,6 +207,15 @@ class IncomeTest(GeneralTestAPI):
         response = {"message":["error"],"status":404}
         invalid_customer_name = {"fields":fields,"response":response,"method":method}
 
+       #* passing two different customer data together
+        fields = {
+            "customer_name":"radco1",
+            "customer_id":1
+            }
+        response = {"message":["error"],"status":404}
+        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
+
+
        #* invalid payment_id
         fields = {
             "payment_id":"123123"
@@ -209,17 +225,378 @@ class IncomeTest(GeneralTestAPI):
 
 
 
+
         test_list = [
             empty_json,
             invalid_field,
             only_one_field,
             incorrect_date,
             invalid_customer_id,
-            another_company_customer,
+            another_company_customer_id,
+            another_company_customer_name,
             another_created_by,
             another_company_created_by,
+            two_customer_wrong_input,
             invalid_customer_name,
             invalid_payment_id
             ]
+        valid_test = self.generic_tests(path=path,custom_fields=test_list)
+
+
+    #*testing delete with valid input (GET REQUEST)
+    def test_delete_valid_get(self):
+        path="/v1/api/finance/income/delete"
+        method = "get"
+      
+
+        #* passing valid customer_name
+        fields = {
+            "customer_name":"radco3"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_customer_name = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid customer_name
+        fields = {
+            "customer_id":"4"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_customer_id = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid created_by
+        fields = {
+            "created_by":"test@test.com"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_created_by = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid date_received
+        fields = {
+            "date_received":"2024-01-01"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_date_received = {"fields":fields,"response":response,"method":method}
+
+   
+
+        test_list= [valid_customer_name,valid_customer_id,valid_created_by,valid_date_received]
+        valid_test = self.generic_tests(path=path,custom_fields=test_list)
+
+
+    #! for now its not possible to test this because the db always erases 
+    #! and i cant get the random income id that generated each time we
+    #! create an income in our database
+    #*testing delete with invalid input(POST REQUEST)
+    def test_delete_invalid_post(self):
+        path="/v1/api/finance/income/delete"
+        method = "post"
+      
+
+        # #* passing invalid income id 
+        # fields = {
+        #     "income_id":True
+        #     }
+        # response = {"message":["error"],"status":404}
+        # invalid_income_id = {"fields":fields,"response":response,"method":method}
+
+   
+        # #* passing field name
+        # fields = {
+        #     "invalid":"invalid"
+        #     }
+        # response = {"message":["error"],"status":404}
+        # invalid_field_name = {"fields":fields,"response":response,"method":method}
+
+
+        # #* passing income_id of another company
+        # fields = {
+        #     "income_id":"another company"
+        #     }
+        # response = {"message":["error"],"status":404}
+        # another_company_income_id = {"fields":fields,"response":response,"method":method}
+
+        # #* passing empty json
+        # fields = {}
+        # response = {"message":["error","required_fields"],"status":404}
+        # another_company_income_id = {"fields":fields,"response":response,"method":method}
+
+
+
+        # test_list = [
+        #     invalid_income_id,
+        #     invalid_field_name,
+        #     another_company_income_id
+        #     ]
+        # valid_test = self.generic_tests(path=path,custom_fields=test_list)
+
+    #* testing update with invalid fields(GET REQUEST)
+    def test_update_invalid_get(self):
+        path="/v1/api/finance/income/update"
+        method = "get"
+      
+        #* empty json
+        fields = {}
+        response = {"message":["error","required_fields"],"status":404}
+        empty_json = {"fields":fields,"response":response,"method":method}
+
+        #* invalid field name
+        fields = {"invalid":"invalid"}
+        response = {"message":["error","required_fields"],"status":404}
+        invalid_field = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing only one field
+        fields = {"date_received":"2024-01-01"}
+        response = {"message":["success","income_json"],"status":200}
+        only_one_field = {"fields":fields,"response":response,"method":method}
+
+       #* date fields is incorrect  
+        fields = {
+            "date_received":True
+            }
+        response = {"message":["error"],"status":404}
+        incorrect_date = {"fields":fields,"response":response,"method":method}
+
+       #* invalid customer_id
+        fields = {
+            "date_received":"2024-12-12",
+            "customer_id":99
+            }
+        response = {"message":["error"],"status":404}
+        invalid_customer_id= {"fields":fields,"response":response,"method":method}
+
+       #* another company customer_id
+        fields = {
+            "customer_id":12
+            }
+        response = {"message":["error"],"status":404}
+        another_company_customer_id= {"fields":fields,"response":response,"method":method}
+
+       #* another company customer_name
+        fields = {
+            "customer_name":"partner1"
+            }
+        response = {"message":["error"],"status":404}
+        another_company_customer_name = {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid created_by
+        fields = {
+            "created_by":"invalid@invalid.com"
+            }
+        response = {"message":["error"],"status":404}
+        another_created_by= {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid created_by from another company
+        fields = {
+            "created_by":"aa@aa.com"
+            }
+        response = {"message":["error"],"status":404}
+        another_company_created_by= {"fields":fields,"response":response,"method":method}
+
+
+
+       #* invalid customer name
+        fields = {
+            "customer_name":"invalid"
+            }
+        response = {"message":["error"],"status":404}
+        invalid_customer_name = {"fields":fields,"response":response,"method":method}
+
+       #* passing two different customer data together
+        fields = {
+            "customer_name":"radco1",
+            "customer_id":1
+            }
+        response = {"message":["error"],"status":404}
+        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid payment_id
+        fields = {
+            "payment_id":"123123"
+            }
+        response = {"message":["error"],"status":404}
+        invalid_payment_id = {"fields":fields,"response":response,"method":method}
+
+
+
+
+        test_list = [
+            empty_json,
+            invalid_field,
+            only_one_field,
+            incorrect_date,
+            invalid_customer_id,
+            another_company_customer_id,
+            another_company_customer_name,
+            another_created_by,
+            another_company_created_by,
+            two_customer_wrong_input,
+            invalid_customer_name,
+            invalid_payment_id
+            ]
+        valid_test = self.generic_tests(path=path,custom_fields=test_list)
+
+
+
+    #!cant test update valid data and invalid data as post 
+        
+    #*testing get with invalid fields (GER REQUEST)
+    def test_get_invalid_get(self):
+        path="/v1/api/finance/income/get"
+        method = "get"
+      
+        #* empty json
+        fields = {}
+        response = {"message":["error","required_fields"],"status":404}
+        empty_json = {"fields":fields,"response":response,"method":method}
+
+        #* invalid field name
+        fields = {"invalid":"invalid"}
+        response = {"message":["error","required_fields"],"status":404}
+        invalid_field = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing only one field
+        fields = {"date_received":"2024-01-01"}
+        response = {"message":["success","income_json"],"status":200}
+        only_one_field = {"fields":fields,"response":response,"method":method}
+
+       #* date fields is incorrect  
+        fields = {
+            "date_received":True
+            }
+        response = {"message":["error"],"status":404}
+        incorrect_date = {"fields":fields,"response":response,"method":method}
+
+       #* invalid customer_id
+        fields = {
+            "date_received":"2024-12-12",
+            "customer_id":99
+            }
+        response = {"message":["error"],"status":404}
+        invalid_customer_id= {"fields":fields,"response":response,"method":method}
+
+       #* another company customer_id
+        fields = {
+            "customer_id":12
+            }
+        response = {"message":["error"],"status":404}
+        another_company_customer_id= {"fields":fields,"response":response,"method":method}
+
+       #* another company customer_name
+        fields = {
+            "customer_name":"partner1"
+            }
+        response = {"message":["error"],"status":404}
+        another_company_customer_name = {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid created_by
+        fields = {
+            "created_by":"invalid@invalid.com"
+            }
+        response = {"message":["error"],"status":404}
+        another_created_by= {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid created_by from another company
+        fields = {
+            "created_by":"aa@aa.com"
+            }
+        response = {"message":["error"],"status":404}
+        another_company_created_by= {"fields":fields,"response":response,"method":method}
+
+
+
+       #* invalid customer name
+        fields = {
+            "customer_name":"invalid"
+            }
+        response = {"message":["error"],"status":404}
+        invalid_customer_name = {"fields":fields,"response":response,"method":method}
+
+       #* passing two different customer data together
+        fields = {
+            "customer_name":"radco1",
+            "customer_id":1
+            }
+        response = {"message":["error"],"status":404}
+        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
+
+
+       #* invalid payment_id
+        fields = {
+            "payment_id":"123123"
+            }
+        response = {"message":["error"],"status":404}
+        invalid_payment_id = {"fields":fields,"response":response,"method":method}
+
+
+
+
+        test_list = [
+            empty_json,
+            invalid_field,
+            only_one_field,
+            incorrect_date,
+            invalid_customer_id,
+            another_company_customer_id,
+            another_company_customer_name,
+            another_created_by,
+            another_company_created_by,
+            two_customer_wrong_input,
+            invalid_customer_name,
+            invalid_payment_id
+            ]
+        valid_test = self.generic_tests(path=path,custom_fields=test_list)
+
+
+
+    #*testing get with valid input(GET REQUEST)
+    def test_get_valid_get(self):
+        path="/v1/api/finance/income/get"
+        method = "get"
+            
+
+        #* passing valid customer_name
+        fields = {
+            "customer_name":"radco3"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_customer_name = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid customer_name
+        fields = {
+            "customer_id":"4"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_customer_id = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid created_by
+        fields = {
+            "created_by":"test@test.com"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_created_by = {"fields":fields,"response":response,"method":method}
+
+
+        #* passing valid date_received
+        fields = {
+            "date_received":"2024-01-01"
+            }
+        response = {"message":["success","income_json"],"status":200}
+        valid_date_received = {"fields":fields,"response":response,"method":method}
+
+   
+
+        test_list= [valid_customer_name,valid_customer_id,valid_created_by,valid_date_received]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 

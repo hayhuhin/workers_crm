@@ -402,6 +402,8 @@ class TestAPIData:
             income_obj.save()
 
 
+
+
         #*second company income
         for index,amount in enumerate(second_amount):
                 
@@ -450,6 +452,40 @@ class TestAPIData:
                 company=second_company_object
                 )
             outcome_obj.save()
+
+
+        #? adding income records to test@test.com user
+        for index,amount in enumerate(amount_list):
+                
+            #* creating income
+            income_obj = Income.objects.create(
+                user=self.user_obj,
+                amount=amount,
+                date_received=dates_list[index],
+                description="first company",
+                payment_method="credit_card",
+                customer=first_customer[index],
+                company=first_company_obj
+                )
+            
+            income_obj.save()
+
+        #?  adding outcome records to test@test.com user
+        for index,amount in enumerate(amount_list):
+            #* creating outcome 
+            outcome_obj = Outcome.objects.create(
+                user = self.user_obj,
+                date_received = dates_list[index],
+                category = "spending",
+                amount = amount,
+                description = f"some description",
+                payment_method = "cash",
+                vendor = "some some",
+                project_or_department = "project",
+                company=first_company_obj
+                )
+            outcome_obj.save()
+
 
         first_company_obj.save()
         second_company_object.save()
@@ -548,6 +584,7 @@ class GeneralTestAPI(TestCase):
                 method = test_data["method"]                
                 
                 if method == "get":
+
                     get_response = self.send_request.get(format=json_format,path=path,data=fields)
                     error_message = {
                         "fields_passed":fields,

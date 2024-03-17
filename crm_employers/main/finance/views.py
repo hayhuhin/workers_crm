@@ -71,7 +71,6 @@ class DeleteIncome(APIView):
     def post(self,request):
         cleaned_data = request.data
         user = {"email":request.user.email}
-
         serializer = DeleteIncomeSerializer(data=cleaned_data)
         if serializer.is_valid():
             created_data = serializer.delete(cleaned_data=cleaned_data,user=user)
@@ -97,9 +96,10 @@ class UpdateIncome(APIView):
         
         if serializer.is_valid():
             get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
-
-            return Response(get_data[1],status=status.HTTP_200_OK)
-
+            if all(get_data):
+                return Response(get_data[1],status=status.HTTP_200_OK)
+            else:
+                return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
         return Response({"error":"invalid data passed"},status=status.HTTP_404_NOT_FOUND)
 
 
@@ -130,7 +130,7 @@ class GetIncome(APIView):
             created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
-                return Response(created_data[1],status=status.HTTP_201_CREATED)
+                return Response(created_data[1],status=status.HTTP_200_OK)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
         
