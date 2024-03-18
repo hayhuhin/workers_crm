@@ -2,19 +2,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
-# from .serializers import CreateIncomeSerializer,DeleteIncomeSerializer,UpdateIncomeSerializer,GetIncomeSerializer,CreateOutcomeSerializer,DeleteOutcomeSerializer,UpdateOutcomeSerializer,GetOutcomeSerializer
-# from user.models import User
-# from employer.models import Employer
 from user.permissions import FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission
 from .serializers import CreateCustomerSerializer,DeleteClientSerializer,UpdateClientSerializer,GetClientSerializer
 
-#* customer table fields
-    # name = models.CharField(max_length=100)
-    # email = models.EmailField(unique=True)
-    # phone_number = models.CharField(max_length=15, blank=True, null=True)
-    # address = models.TextField(blank=True, null=True)
-    # notes = models.TextField(blank=True, null=True)
-    # customer_id = models.IntegerField()
 
 
 class CreateCustomerView(APIView):
@@ -38,8 +28,7 @@ class CreateCustomerView(APIView):
 
 
     def post(self,request):
-        query_dict = {**request.GET}
-        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        cleaned_data = request.data
         user = {"email":request.user.email}
 
         serializer = CreateCustomerSerializer(data = cleaned_data)
@@ -73,8 +62,7 @@ class DeleteClientView(APIView):
 
 
     def post(self,request):
-        query_dict = {**request.GET}
-        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        cleaned_data = request.data
         user = {"email":request.user.email}
         serializer = DeleteClientSerializer(data = cleaned_data)
         if serializer.is_valid():
@@ -110,8 +98,8 @@ class UpdateClientView(APIView):
 
 
     def post(self,request):
-        query_dict = {**request.GET}
-        cleaned_data = {key: value[0] for key, value in query_dict.items()}
+        cleaned_data = request.data
+
         user = {"email":request.user.email}
         serializer = UpdateClientSerializer(data = cleaned_data)
         if serializer.is_valid():

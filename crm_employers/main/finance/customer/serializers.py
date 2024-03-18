@@ -71,7 +71,7 @@ class GeneralClientSerializer(serializers.Serializer):
 
 
 class CreateCustomerSerializer(serializers.Serializer):
-    company_name = serializers.CharField(max_length=100,default=None)
+    name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
     phone_number = serializers.CharField(max_length=15,default=None)
     address = serializers.CharField(max_length=350,default=None)
@@ -91,7 +91,7 @@ class CreateCustomerSerializer(serializers.Serializer):
 
         main = "to create you need to pass the fields as post method"
         second = {"json_example":{
-            "company_name":"name of the customer company",
+            "name":"name of the customer company",
             "email":"email of the customer contact person",
             "phone_number":"phone number of the client",
             "address":"physical address of the client",
@@ -102,7 +102,7 @@ class CreateCustomerSerializer(serializers.Serializer):
         return success_msg
 
 
-    def create(self,cleaned_data):
+    def create(self,cleaned_data,user):
         required_fields = ["name","email","phone_number","address","notes","customer_id"]
 
         #* returning example json if the user passed empty json

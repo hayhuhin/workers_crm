@@ -345,7 +345,7 @@ class TestAPIData:
         #* first company customers
         for index,name in enumerate(first_customer_names):
             first_comp_customer = Customer.objects.create(
-            company_name=name,
+            name=name,
             email=f"{name}@{name}.com",
             phone_number="112233",
             address="radco inter",
@@ -358,7 +358,7 @@ class TestAPIData:
         #* second company customers
         for index,name in enumerate(second_customer_names):
             second_comp_customer = Customer.objects.create(
-            company_name=name,
+            name=name,
             email=f"{name}@{name}.com",
             phone_number="112233",
             address="partner address",
