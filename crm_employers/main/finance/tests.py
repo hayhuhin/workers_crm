@@ -1070,7 +1070,3 @@ class OutcomeTest(GeneralTestAPI):
             valid_created_by,
             valid_date_received]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
-
-
-
-

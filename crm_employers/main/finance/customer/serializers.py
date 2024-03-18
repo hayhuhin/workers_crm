@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from finance.models import Income,Outcome,Customer
 from user.models import User
 from django.db.models import Q,F
+from custom_validation.validation import CustomValidation,OutputMessages
 
 
 #* customer table fields
@@ -47,11 +48,6 @@ class GeneralClientSerializer(serializers.Serializer):
     customer_id = serializers.IntegerField(default=None)
 
     def check_unique(self,cleaned_data):
-        """
-        this method will check if there is already existing data with the same id.
-
-        unique fields are customer_id,email
-        """
 
         for key in cleaned_data.keys():
             #* checking if the email exists
@@ -74,67 +70,36 @@ class GeneralClientSerializer(serializers.Serializer):
 
 
 
-class CreateClientSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=100,default=None)
+class CreateCustomerSerializer(serializers.Serializer):
+    company_name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
     phone_number = serializers.CharField(max_length=15,default=None)
     address = serializers.CharField(max_length=350,default=None)
     notes = serializers.CharField(max_length=350,default=None)
     customer_id = serializers.IntegerField(default=None)
     
-    def get_info(self,cleaned_data):
-        allowed_fields = ["name","email","phone_number","address","notes","customer_id"]
-        required_fields = [""]
-        
+    def get_info(self,cleaned_data,user):
+        required_fields = ["name","email","phone_number","address","notes","customer_id"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass at least one of the fields","example_json":{
-                "name":"rechard ltd",
-                "email":"rechard@rechard-ltd.com",
-                "customer_id":123456789
-            }}
-            return False,message
-        
-        #*checking fort allowed fields
-        for key in cleaned_data.keys():
-            if key not in allowed_fields:
-                message = {"error":f"passed invalid field -{key}-"}
-                return False,message
+        cv = CustomValidation()
+        user_valid = cv.basic_validation(user=user,empty_json=True)
+        if not all(user_valid):
+            return user_valid
+        else:
+            user_obj = user_valid[1]["object"]
+            company_obj = user_obj.company
 
-        #this will have my query that will be passed later
-        query = Q()
-
-        #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
-        for key,value in self.__getattribute__("data").items():
-            if key == "name" and value != None:
-                name_exists = Customer.objects.filter(name=value).exists()
-                if name_exists: 
-                    query &= Q(name=value)
-                else:
-                    message = {"error":"name not exist. try another field or check if you miss typed"}
-                    return False,message
-                
-            if key == "email" and value != None:
-                email_exists = Customer.objects.filter(email=value).exists()
-                if email_exists:
-                    query &= Q(email=value)
-                else:
-                    message = {"error":"email not exist. try another field or check if you miss typed"}
-                    return False,message
-
-            if key == "customer_id" and value != None:
-                customer_id_exists = Customer.objects.filter(customer_id=value).exists()
-                if customer_id_exists:
-                    query &= Q(customer_id=value)
-                else:
-                    message = {"error":"customer_id not exist. try another field or check if you miss typed"}
-                    return False,message
-        
-        
-        query_data = Customer.objects.filter(query).values("name","email","phone_number","address","notes","customer_id")
-        message = {"success":query_data}
-        return True,message
+        main = "to create you need to pass the fields as post method"
+        second = {"json_example":{
+            "company_name":"name of the customer company",
+            "email":"email of the customer contact person",
+            "phone_number":"phone number of the client",
+            "address":"physical address of the client",
+            "notes":"notes can be up to 350 characters",
+            "customer_id":"customer's id that must be unique"
+        }}
+        success_msg = OutputMessages.success_with_message(main,second)
+        return success_msg
 
 
     def create(self,cleaned_data):

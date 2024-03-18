@@ -1,6 +1,6 @@
 from django.urls import path,include
 from . import views as income_views
-from .clients import views as client_views
+from .customer import views as customer_views
 
 urlpatterns = [
     #* income operation routes
@@ -16,10 +16,11 @@ urlpatterns = [
     path("outcome/get",income_views.GetOutcome.as_view()),
 
     #* client operation routes
-    path("client/create",client_views.CreateClientView.as_view()),
-    path("client/delete",client_views.DeleteClientView.as_view()),
-    path("client/update",client_views.UpdateClientView.as_view()),
-    path("client/get",client_views.GetClientView.as_view()),
+    path("customer/create",customer_views.CreateCustomerView.as_view()),
+    path("client/delete",customer_views.DeleteClientView.as_view()),
+    path("client/update",customer_views.UpdateClientView.as_view()),
+    path("client/get",customer_views.GetClientView.as_view()),
+
 
 
 
