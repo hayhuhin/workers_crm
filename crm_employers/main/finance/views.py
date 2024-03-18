@@ -220,7 +220,7 @@ class UpdateOutcome(APIView):
             created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
-                return Response(created_data[1],status=status.HTTP_201_CREATED)
+                return Response(created_data[1],status=status.HTTP_200_OK)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
         
@@ -255,7 +255,7 @@ class GetOutcome(APIView):
             created_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
             
             if all(created_data):
-                return Response(created_data[1],status=status.HTTP_201_CREATED)
+                return Response(created_data[1],status=status.HTTP_200_OK)
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
 
