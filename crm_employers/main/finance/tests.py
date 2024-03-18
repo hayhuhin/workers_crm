@@ -763,28 +763,6 @@ class OutcomeTest(GeneralTestAPI):
         response = {"message":["error"],"status":404}
         incorrect_date = {"fields":fields,"response":response,"method":method}
 
-       #* invalid customer_id
-        fields = {
-            "date_received":"2024-12-12",
-            "customer_id":99
-            }
-        response = {"message":["error"],"status":404}
-        invalid_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_id
-        fields = {
-            "customer_id":12
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_name
-        fields = {
-            "customer_name":"partner1"
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_name = {"fields":fields,"response":response,"method":method}
-
 
        #* invalid created_by
         fields = {
@@ -802,23 +780,6 @@ class OutcomeTest(GeneralTestAPI):
         another_company_created_by= {"fields":fields,"response":response,"method":method}
 
 
-
-       #* invalid customer name
-        fields = {
-            "customer_name":"invalid"
-            }
-        response = {"message":["error"],"status":404}
-        invalid_customer_name = {"fields":fields,"response":response,"method":method}
-
-       #* passing two different customer data together
-        fields = {
-            "customer_name":"radco1",
-            "customer_id":1
-            }
-        response = {"message":["error"],"status":404}
-        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
-
-
        #* invalid payment_id
         fields = {
             "payment_id":"123123"
@@ -834,13 +795,8 @@ class OutcomeTest(GeneralTestAPI):
             invalid_field,
             only_one_field,
             incorrect_date,
-            invalid_customer_id,
-            another_company_customer_id,
-            another_company_customer_name,
             another_created_by,
             another_company_created_by,
-            two_customer_wrong_input,
-            invalid_customer_name,
             invalid_payment_id
             ]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
@@ -851,22 +807,6 @@ class OutcomeTest(GeneralTestAPI):
         path="/v1/api/finance/outcome/delete"
         method = "get"
       
-
-        #* passing valid customer_name
-        fields = {
-            "customer_name":"radco3"
-            }
-        response = {"message":["success","outcome_json"],"status":200}
-        valid_customer_name = {"fields":fields,"response":response,"method":method}
-
-
-        #* passing valid customer_name
-        fields = {
-            "customer_id":"4"
-            }
-        response = {"message":["success","outcome_json"],"status":200}
-        valid_customer_id = {"fields":fields,"response":response,"method":method}
-
 
         #* passing valid created_by
         fields = {
@@ -883,13 +823,19 @@ class OutcomeTest(GeneralTestAPI):
         response = {"message":["success","outcome_json"],"status":200}
         valid_date_received = {"fields":fields,"response":response,"method":method}
 
+
+        #!cant add valid payment_id because the id always erased and recreated for each 
+
    
 
-        test_list= [valid_customer_name,valid_customer_id,valid_created_by,valid_date_received]
+        test_list= [
+            valid_created_by,
+            valid_date_received
+            ]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 
 
-    #! for now its not possible to test this because the db always erases 
+    #! its not possible to test this because the db always erases 
     #! and i cant get the random income id that generated each time we
     #! create an income in our database
     #*testing delete with invalid input(POST REQUEST)
@@ -956,34 +902,13 @@ class OutcomeTest(GeneralTestAPI):
         response = {"message":["success","outcome_json"],"status":200}
         only_one_field = {"fields":fields,"response":response,"method":method}
 
+
        #* date fields is incorrect  
         fields = {
             "date_received":True
             }
         response = {"message":["error"],"status":404}
         incorrect_date = {"fields":fields,"response":response,"method":method}
-
-       #* invalid customer_id
-        fields = {
-            "date_received":"2024-12-12",
-            "customer_id":99
-            }
-        response = {"message":["error"],"status":404}
-        invalid_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_id
-        fields = {
-            "customer_id":12
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_name
-        fields = {
-            "customer_name":"partner1"
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_name = {"fields":fields,"response":response,"method":method}
 
 
        #* invalid created_by
@@ -1003,20 +928,13 @@ class OutcomeTest(GeneralTestAPI):
 
 
 
-       #* invalid customer name
+       #* invalid payment_id
         fields = {
-            "customer_name":"invalid"
+            "payment_id":1
             }
         response = {"message":["error"],"status":404}
-        invalid_customer_name = {"fields":fields,"response":response,"method":method}
+        invalid_payment_id = {"fields":fields,"response":response,"method":method}
 
-       #* passing two different customer data together
-        fields = {
-            "customer_name":"radco1",
-            "customer_id":1
-            }
-        response = {"message":["error"],"status":404}
-        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
 
 
        #* invalid payment_id
@@ -1024,7 +942,7 @@ class OutcomeTest(GeneralTestAPI):
             "payment_id":"123123"
             }
         response = {"message":["error"],"status":404}
-        invalid_payment_id = {"fields":fields,"response":response,"method":method}
+        invalid_payment_id_str = {"fields":fields,"response":response,"method":method}
 
 
 
@@ -1034,14 +952,9 @@ class OutcomeTest(GeneralTestAPI):
             invalid_field,
             only_one_field,
             incorrect_date,
-            invalid_customer_id,
-            another_company_customer_id,
-            another_company_customer_name,
             another_created_by,
-            another_company_created_by,
-            two_customer_wrong_input,
-            invalid_customer_name,
-            invalid_payment_id
+            invalid_payment_id,
+            invalid_payment_id_str
             ]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 
@@ -1077,27 +990,13 @@ class OutcomeTest(GeneralTestAPI):
         response = {"message":["error"],"status":404}
         incorrect_date = {"fields":fields,"response":response,"method":method}
 
-       #* invalid customer_id
+       #* invalid extra field
         fields = {
             "date_received":"2024-12-12",
-            "customer_id":99
+            "extra_field":99
             }
-        response = {"message":["error"],"status":404}
+        response = {"message":["error","required_fields"],"status":404}
         invalid_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_id
-        fields = {
-            "customer_id":12
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_id= {"fields":fields,"response":response,"method":method}
-
-       #* another company customer_name
-        fields = {
-            "customer_name":"partner1"
-            }
-        response = {"message":["error"],"status":404}
-        another_company_customer_name = {"fields":fields,"response":response,"method":method}
 
 
        #* invalid created_by
@@ -1117,22 +1016,6 @@ class OutcomeTest(GeneralTestAPI):
 
 
 
-       #* invalid customer name
-        fields = {
-            "customer_name":"invalid"
-            }
-        response = {"message":["error"],"status":404}
-        invalid_customer_name = {"fields":fields,"response":response,"method":method}
-
-       #* passing two different customer data together
-        fields = {
-            "customer_name":"radco1",
-            "customer_id":1
-            }
-        response = {"message":["error"],"status":404}
-        two_customer_wrong_input = {"fields":fields,"response":response,"method":method}
-
-
        #* invalid payment_id
         fields = {
             "payment_id":"123123"
@@ -1149,12 +1032,8 @@ class OutcomeTest(GeneralTestAPI):
             only_one_field,
             incorrect_date,
             invalid_customer_id,
-            another_company_customer_id,
-            another_company_customer_name,
             another_created_by,
             another_company_created_by,
-            two_customer_wrong_input,
-            invalid_customer_name,
             invalid_payment_id
             ]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
@@ -1165,23 +1044,7 @@ class OutcomeTest(GeneralTestAPI):
     def test_get_valid_get(self):
         path="/v1/api/finance/outcome/get"
         method = "get"
-            
-
-        #* passing valid customer_name
-        fields = {
-            "customer_name":"radco3"
-            }
-        response = {"message":["success","outcome_json"],"status":200}
-        valid_customer_name = {"fields":fields,"response":response,"method":method}
-
-
-        #* passing valid customer_name
-        fields = {
-            "customer_id":"4"
-            }
-        response = {"message":["success","outcome_json"],"status":200}
-        valid_customer_id = {"fields":fields,"response":response,"method":method}
-
+    
 
         #* passing valid created_by
         fields = {
@@ -1198,9 +1061,14 @@ class OutcomeTest(GeneralTestAPI):
         response = {"message":["success","outcome_json"],"status":200}
         valid_date_received = {"fields":fields,"response":response,"method":method}
 
+
+        #! cant add payment_id because the tests are always erases the unique payment_id
+
    
 
-        test_list= [valid_customer_name,valid_customer_id,valid_created_by,valid_date_received]
+        test_list= [
+            valid_created_by,
+            valid_date_received]
         valid_test = self.generic_tests(path=path,custom_fields=test_list)
 
 

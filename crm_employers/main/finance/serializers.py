@@ -811,8 +811,9 @@ class DeleteOutcomeSerializer(serializers.Serializer):
 
 
 class UpdateOutcomeSerializer(serializers.Serializer):
-    date_time = serializers.DateField(default=None)
-    outcome_id = serializers.IntegerField(default=None)
+    date_received = serializers.DateField(default=None)
+    created_by = serializers.CharField(default=None)
+    payment_id = serializers.IntegerField(default=None)
     update_data = serializers.DictField(default=None)
 
 

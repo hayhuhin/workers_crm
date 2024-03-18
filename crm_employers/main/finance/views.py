@@ -187,7 +187,9 @@ class DeleteOutcome(APIView):
         serializer = DeleteOutcomeSerializer(data=cleaned_data)
         if serializer.is_valid():
             get_information = serializer.get_info(cleaned_data=cleaned_data,user=user)
-            return Response(get_information[1],status=status.HTTP_200_OK)
+            if all(get_information):
+                return Response(get_information[1],status=status.HTTP_200_OK)
+            return Response(get_information[1],status=status.HTTP_404_NOT_FOUND)
         
         message = {"error":"invalid get request"}
         return Response(message,status=status.HTTP_404_NOT_FOUND)
@@ -259,3 +261,5 @@ class GetOutcome(APIView):
             
             return Response(created_data[1],status=status.HTTP_404_NOT_FOUND)
 
+        message = {"error":"invalid fields"}
+        return Response(message,status=status.HTTP_404_NOT_FOUND)
