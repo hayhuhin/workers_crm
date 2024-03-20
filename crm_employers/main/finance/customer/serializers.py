@@ -105,45 +105,30 @@ class CreateCustomerSerializer(serializers.Serializer):
     def create(self,cleaned_data,user):
         required_fields = ["name","email","phone_number","address","notes","customer_id"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass all this fields","example_json":{
-                "name":"rechard ltd",
-                "email":"rechard@rechard-ltd.com",
-                "phone_number":"0101010101",
-                "address":"albert ainstein 3344 New York",
-                "notes":"this customer is very important",
-                "customer_id":123456789                
-            }}
-            return False,message
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
         
-        #*checking that the user passed all fields
-        for field in required_fields:
-            if field not in cleaned_data.keys():
-                message = {"error":"you must pass all fields","json_example":{
-                "name":"rechard ltd",
-                "email":"rechard@rechard-ltd.com",
-                "phone_number":"0101010101",
-                "address":"albert ainstein 3344 New York",
-                "notes":"this customer is very important",
-                "customer_id":123456789                
-            },"and you passed":cleaned_data.keys()}
-            
-                return False,message
+        else:
+            user_obj = validation[1]["object"]
+            company_obj = user_obj.company
 
 
         #*checking if the customer is already exists 
-        customer_exists = Customer.objects.filter(customer_id = cleaned_data["customer_id"]).exists()
+        customer_exists = company_obj.customer_set.filter(customer_id=cleaned_data["customer_id"]).exists()
         if customer_exists:
-            message = {"error":"cant create new customer because this customer is already exists with this data"}
-            return False,message
+            main = "cant create new customer because this customer is already exists with this data"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
 
 
         #*checking that the email of the customer is not already existing
-        customer_email_exist = Customer.objects.filter(email=cleaned_data["email"]).exists()
-        if customer_email_exist:
-            message = {"error":"this email is already registered and you cant create this customer with this email"}
-            return False,message
+        customer_email_exists = company_obj.customer_set.filter(email=cleaned_data["email"]).exists()
+        if customer_email_exists:
+            main = "this email is already registered and you cant create this customer with this email"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
 
 
         customer_obj = Customer.objects.create(
@@ -152,20 +137,24 @@ class CreateCustomerSerializer(serializers.Serializer):
             phone_number=cleaned_data["phone_number"],
             address=cleaned_data["address"],
             notes=cleaned_data["notes"],
-            customer_id=cleaned_data["customer_id"]
+            customer_id=cleaned_data["customer_id"],
+            company=company_obj
         )
+
         customer_obj.save()
         
-        
-        message = {"success":"created new customer successfully","created_data":{
+        main = "created new customer successfully"
+        second = {"customer_json":{
             "name":cleaned_data["name"],
             "email":cleaned_data["email"],
             "phone_number":cleaned_data["phone_number"],
             "address":cleaned_data["address"],
             "notes":cleaned_data["notes"],
-            "customer_id":cleaned_data["customer_id"]
+            "customer_id":cleaned_data["customer_id"],
+            "company":company_obj.name
         }}
-        return True,message
+        success_msg = OutputMessages.success_with_message(main,second)
+        return success_msg
 
 
 class DeleteClientSerializer(serializers.Serializer):
