@@ -17,7 +17,7 @@ urlpatterns = [
 
     #* client operation routes
     path("customer/create",customer_views.CreateCustomerView.as_view()),
-    path("client/delete",customer_views.DeleteClientView.as_view()),
+    path("customer/delete",customer_views.DeleteCustomertView.as_view()),
     path("client/update",customer_views.UpdateClientView.as_view()),
     path("client/get",customer_views.GetClientView.as_view()),
 

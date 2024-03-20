@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from user.permissions import FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission
-from .serializers import CreateCustomerSerializer,DeleteClientSerializer,UpdateClientSerializer,GetClientSerializer
+from .serializers import CreateCustomerSerializer,DeleteCustomerSerializer,UpdateClientSerializer,GetClientSerializer
 
 
 
@@ -43,7 +43,7 @@ class CreateCustomerView(APIView):
 
 
 
-class DeleteClientView(APIView):
+class DeleteCustomertView(APIView):
     permission_classes = [permissions.IsAuthenticated,FinanceUpdatePermission]
 
 
@@ -51,7 +51,7 @@ class DeleteClientView(APIView):
         query_dict = {**request.GET}
         cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
-        serializer = DeleteClientSerializer(data = cleaned_data)
+        serializer = DeleteCustomerSerializer(data = cleaned_data)
         if serializer.is_valid():
             get_info = serializer.get_info(cleaned_data=cleaned_data,user=user)
             if all(get_info):
@@ -64,7 +64,7 @@ class DeleteClientView(APIView):
     def post(self,request):
         cleaned_data = request.data
         user = {"email":request.user.email}
-        serializer = DeleteClientSerializer(data = cleaned_data)
+        serializer = DeleteCustomerSerializer(data = cleaned_data)
         if serializer.is_valid():
             delete_data = serializer.delete(cleaned_data=cleaned_data,user=user)
             if all(delete_data):
