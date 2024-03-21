@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from user.permissions import FinanceFullPermission,FinanceUpdatePermission,FinanceViewPermission
-from .serializers import CreateCustomerSerializer,DeleteCustomerSerializer,UpdateClientSerializer,GetClientSerializer
+from .serializers import CreateCustomerSerializer,DeleteCustomerSerializer,UpdateCustomerSerializer,GetCustomerSerializer
 
 
 
@@ -43,7 +43,7 @@ class CreateCustomerView(APIView):
 
 
 
-class DeleteCustomertView(APIView):
+class DeleteCustomerView(APIView):
     permission_classes = [permissions.IsAuthenticated,FinanceUpdatePermission]
 
 
@@ -77,7 +77,7 @@ class DeleteCustomertView(APIView):
 
 
 
-class UpdateClientView(APIView):
+class UpdateCustomerView(APIView):
     permission_classes = [permissions.IsAuthenticated,FinanceUpdatePermission]
 
 
@@ -85,7 +85,8 @@ class UpdateClientView(APIView):
         query_dict = {**request.GET}
         cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
-        serializer = UpdateClientSerializer(data = cleaned_data)
+
+        serializer = UpdateCustomerSerializer(data = cleaned_data)
         if serializer.is_valid():
             delete_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 
@@ -101,7 +102,7 @@ class UpdateClientView(APIView):
         cleaned_data = request.data
 
         user = {"email":request.user.email}
-        serializer = UpdateClientSerializer(data = cleaned_data)
+        serializer = UpdateCustomerSerializer(data = cleaned_data)
         if serializer.is_valid():
             update_data = serializer.update(cleaned_data=cleaned_data,user=user)
             if all(update_data):
@@ -113,14 +114,14 @@ class UpdateClientView(APIView):
 
 
 
-class GetClientView(APIView):
+class GetCustomerView(APIView):
     permission_classes = [permissions.IsAuthenticated,FinanceUpdatePermission]
 
     def get(self,request):
         query_dict = {**request.GET}
         cleaned_data = {key: value[0] for key, value in query_dict.items()}
         user = {"email":request.user.email}
-        serializer = GetClientSerializer(data = cleaned_data)
+        serializer = GetCustomerSerializer(data = cleaned_data)
         if serializer.is_valid():
             delete_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
 

@@ -39,7 +39,7 @@ from custom_validation.validation import CustomValidation,OutputMessages
 
 
 
-class GeneralClientSerializer(serializers.Serializer):
+class GeneralCustomerSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
     phone_number = serializers.CharField(max_length=15,default=None)
@@ -47,21 +47,23 @@ class GeneralClientSerializer(serializers.Serializer):
     notes = serializers.CharField(max_length=350,default=None)
     customer_id = serializers.IntegerField(default=None)
 
-    def check_unique(self,cleaned_data):
+    def check_unique(self,cleaned_data,company_object):
 
         for key in cleaned_data.keys():
             #* checking if the email exists
             if key == "email":
-                email_exists = Customer.objects.filter(email=cleaned_data["email"]).exists()
+                email_exists = company_object.customer_set.filter(email=cleaned_data["email"]).exists()
                 if email_exists:
-                    message = {"error":"this email is already exist and cant be used"}
-                    return False,message
+                    main = "this email is already exist and cant be used in a different customer"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
                 
             if key == "customer_id":
-                customer_id_exists = Customer.objects.filter(customer_id=cleaned_data["customer_id"]).exists()
+                customer_id_exists = company_object.customer_set.filter(customer_id=cleaned_data["customer_id"]).exists()
                 if customer_id_exists:
-                    message = {"error","this customer id is already exist and cant be used"}
-                    return False,message
+                    main = "this customer id is already exist and cant be used in a different customer"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
 
 
         return True,cleaned_data
@@ -267,228 +269,217 @@ class DeleteCustomerSerializer(serializers.Serializer):
             customer_obj = company_obj.customer_set.get(email=cleaned_data["email"],customer_id=cleaned_data["customer_id"])
             customer_obj.delete()
             main = "deleted the customer successfully"
-            #!!! have to fix the customer_obj.values() not working it has to be query dict
-            second = {"customer_json":customer_obj.values("name","email","phone_number","address",)}
+            second = {"customer_json":{
+                "name":customer_obj.name,
+                "email":customer_obj.email,
+                "phone_number":customer_obj.phone_number,
+                "address":customer_obj.address,
+                "customer_id":customer_obj.customer_id
+            }}
             success_msg = OutputMessages.success_with_message(main,second)
             return success_msg
 
 
 
-class UpdateClientSerializer(serializers.Serializer):
+class UpdateCustomerSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
     customer_id = serializers.IntegerField(default=None)
     update_data = serializers.DictField(default=None)
 
-    def get_info(self,cleaned_data):
-        allowed_fields = ["name","email","phone_number","address","notes","customer_id"]
-        required_fields = [""]
-        
+    def get_info(self,cleaned_data,user):
+        allowed_fields = ["name","email","phone_number","address","customer_id"]
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass at least one of the fields","example_json":{
-                "name":"test ltd",
-                "email":"test@test-ltd.com",
-                "customer_id":123456789
-            }}
-            return False,message
         
-        #*checking fort allowed fields
-        for key in cleaned_data.keys():
-            if key not in allowed_fields:
-                message = {"error":f"passed invalid field -{key}-"}
-                return False,message
+        cv = CustomValidation()
+        validation = cv.basic_validation(user=user,empty_json=True)
+        if not all(validation):
+            print("its here")
+            return validation
 
+        else:
+            user_obj = validation[1]["object"]
+            company_obj = user_obj.company
+        
+        field_validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
+        if not all(field_validation):
+            return field_validation
+        
         #this will have my query that will be passed later
         query = Q()
-
-        #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
+        #* this whole section is checking if the passed data is valid and returning error message or proceeds to the next stage
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
-                name_exists = Customer.objects.filter(name=value).exists()
+                name_exists = company_obj.customer_set.filter(name=value).exists()
                 if name_exists: 
                     query &= Q(name=value)
                 else:
-                    message = {"error":"name not exist. try another field or check if you miss typed"}
-                    return False,message
-                
+                    main = "name not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
+            
             if key == "email" and value != None:
-                email_exists = Customer.objects.filter(email=value).exists()
+                email_exists = company_obj.customer_set.filter(email=value).exists()
                 if email_exists:
                     query &= Q(email=value)
                 else:
-                    message = {"error":"email not exist. try another field or check if you miss typed"}
-                    return False,message
+                    main = "email not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
 
             if key == "customer_id" and value != None:
-                customer_id_exists = Customer.objects.filter(customer_id=value).exists()
+                customer_id_exists = company_obj.customer_set.filter(customer_id=value).exists()
                 if customer_id_exists:
                     query &= Q(customer_id=value)
                 else:
-                    message = {"error":"customer_id not exist. try another field or check if you miss typed"}
-                    return False,message
+                    main = "customer_id not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
         
-        query_data = Customer.objects.filter(query).values("name","email","phone_number","address","notes","customer_id")
-        message = {"success":query_data}
-        return True,message
-
-    def update(self,cleaned_data):
-        required_fields = ["email","customer_id","update_data"]
-
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass all this fields","example_json":{
-                "email":"rechard@rechard-ltd.com",
-                "customer_id":123456789,
-                "update_data":{
-                    "name":"new name",
-                    "email":"new@new.com",
-                    "phone_number":"111222333444",
-                    "address":"alfred kakoi 1122",
-                    "notes":"some new notes",
-                    "customer_id":11223344
-                    }}}
-            return False,message
-        
-        #*checking that the user passed all fields
-        for field in required_fields:
-            if field not in cleaned_data.keys():
-                message = {"error":"you must pass all fields","json_example":{
-                "email":"rechard@rechard-ltd.com",
-                "customer_id":123456789,
-                "update_data":{
-                    "name":"new name",
-                    "email":"new@new.com",
-                    "phone_number":"111222333444",
-                    "address":"alfred kakoi 1122",
-                    "notes":"some new notes",
-                    "customer_id":11223344
-                    }},"and you passed":cleaned_data.items()}
-            
-                return False,message
-
-
-        #*checking if the customer is already exists 
-        customer_exists = Customer.objects.filter(customer_id = cleaned_data["customer_id"]).exists()
+        customer_exists = company_obj.customer_set.filter(query).exists()
         if not customer_exists:
-            message = {"error":"this customer is not exist with this id"}
-            return False,message
+            main = "no customer found"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        else:
+            customer_query_dict = company_obj.customer_set.filter(query).values("name","email","phone_number","address","notes","customer_id")
+            main = "successfully found the data"
+            second = {"customer_json":customer_query_dict}
+            success_msg = OutputMessages.success_with_message(main,second)
+            return success_msg
 
 
-        #*checking that the email of the customer is not already existing
-        customer_email_exist = Customer.objects.filter(email=cleaned_data["email"]).exists()
-        if not customer_email_exist:
-            message = {"error":"this customer not exist with this email"}
-            return False,message
-
-
-        #* checkiing that the user didnt pass empty update data dict
-        if not cleaned_data["update_data"]:
-            message = {"error":"you cant pass empty udpate_data ","json_example for updata_data":{
-                    "name":"new name",
-                    "email":"new@new.com",
-                    "phone_number":"111222333444",
-                    "address":"alfred kakoi 1122",
-                    "notes":"some new notes",
-                    "customer_id":11223344
-                    }}
-            return False,message
+    def update(self,cleaned_data,user):
+        required_fields = ["email","customer_id","update_data"]
+        allowed_update_fields = ["name","email","phone_number","address","notes","customer_id"]
         
 
-        #* checking that bothg fields are matching the quiery
-        update_obj_exist = Customer.objects.filter(email=cleaned_data["email"],customer_id=cleaned_data["customer_id"]).exists()
-        if not update_obj_exist:
-            message = {"error":"customer not exist with both data provided. or there is a mismatch with the fields or miss typed them"}
-            return False,message
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
+        else:
+            user_obj = validation[1]["object"]
+            company_obj = user_obj.company
 
+        #*checking that this customer is exists
+        customer_exists =  company_obj.customer_set.filter(email=cleaned_data["email"],customer_id=cleaned_data["customer_id"]).exists()
+        if not customer_exists:
+            main = "this customer not exist with this email or the customer id"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+
+
+        #*checking the update data fields
+        update_data_validation = cv.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
+        if not all(update_data_validation):
+            main = "error in the update data fields"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        
 
         #*serializing update_data fields in another serializer
-        update_data_serializer = GeneralClientSerializer(data=cleaned_data["update_data"])
-        if update_data_serializer.is_valid(raise_exception=True):
+        update_data_serializer = GeneralCustomerSerializer(data=cleaned_data["update_data"])
+        if update_data_serializer.is_valid():
 
-            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"])
+            check_unique_fields = update_data_serializer.check_unique(cleaned_data=cleaned_data["update_data"],company_object=company_obj)
             if all(check_unique_fields):
-                update_obj = Customer.objects.get(email=cleaned_data["email"],customer_id=cleaned_data["customer_id"])
+                update_obj = company_obj.customer_set.get(email=cleaned_data["email"],customer_id=cleaned_data["customer_id"])
 
                 for key,value in cleaned_data["update_data"].items():
                     setattr(update_obj,key,value)
 
                 update_obj.save()
-                message = {"success":"updated the required fields","updated_data":{
+                main = "updated the required fields"
+                second = {"customer_json":{
                     "name":update_obj.name,
                     "email":update_obj.email,
-                    "phone_nomber":update_obj.phone_number,
+                    "phone_number":update_obj.phone_number,
                     "address":update_obj.address,
                     "notes":update_obj.notes,
-                    "customer_id":update_obj.customer_id
+                    "customer_id":update_obj.customer_id,
                 }}
-                return True,message
+                success_msg = OutputMessages.success_with_message(main,second)
+                return success_msg
             
-            return False,check_unique_fields[1]
+            err_msg = OutputMessages.error_with_message(check_unique_fields[1])
+            return err_msg
 
-        message = {"error":"invalid update_data fields"}
-        return False,message
+        main = "invalid update_data fields"
+        err_msg = OutputMessages.error_with_message(main)
+        return err_msg
 
 
 
-class GetClientSerializer(serializers.Serializer):
+class GetCustomerSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100,default=None)
     email = serializers.EmailField(default=None)
+    phone_number = serializers.CharField(default=None)
+    address = serializers.CharField(default=None)
     customer_id = serializers.IntegerField(default=None)
 
-    def get_info(self,cleaned_data):
-        allowed_fields = ["name","email","customer_id"]
-        required_fields = [""]
-        
+    def get_info(self,cleaned_data,user):
 
-        #* returning example json if the user passed empty json
-        if not cleaned_data.keys():
-            message = {"error":"you must pass at least one of the fields","example_json":{
-                "name":"rechard ltd",
-                "email":"rechard@rechard-ltd.com",
-                "customer_id":123456789
-            }}
-            return False,message
-        
-        #*checking for allowed fields
-        for key in cleaned_data.keys():
-            if key not in allowed_fields:
-                message = {"error":f"passed invalid field -{key}-"}
-                return False,message
+        allowed_fields = ["name","email","phone_number","address","customer_id"]
 
+        
+        cv = CustomValidation()
+        validation = cv.basic_validation(user=user,empty_json=True)
+        if not all(validation):
+            print("its here")
+            return validation
+
+        else:
+            user_obj = validation[1]["object"]
+            company_obj = user_obj.company
+        
+        field_validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=allowed_fields)
+        if not all(field_validation):
+            return field_validation
+        
         #this will have my query that will be passed later
         query = Q()
-
         #* this whole section is checking if the passed data is valid and returning error message or proccedes to the next stage
         for key,value in self.__getattribute__("data").items():
             if key == "name" and value != None:
-                name_exists = Customer.objects.filter(name=value).exists()
+                name_exists = company_obj.customer_set.filter(name=value).exists()
                 if name_exists: 
                     query &= Q(name=value)
                 else:
-                    message = {"error":"name not exist. try another field or check if you miss typed"}
-                    return False,message
-                
+                    main = "name not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
+            
             if key == "email" and value != None:
-                email_exists = Customer.objects.filter(email=value).exists()
+                email_exists = company_obj.customer_set.filter(email=value).exists()
                 if email_exists:
                     query &= Q(email=value)
                 else:
-                    message = {"error":"email not exist. try another field or check if you miss typed"}
-                    return False,message
+                    main = "email not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
 
             if key == "customer_id" and value != None:
-                customer_id_exists = Customer.objects.filter(customer_id=value).exists()
+                customer_id_exists = company_obj.customer_set.filter(customer_id=value).exists()
                 if customer_id_exists:
                     query &= Q(customer_id=value)
                 else:
-                    message = {"error":"customer_id not exist. try another field or check if you miss typed"}
-                    return False,message
+                    main = "customer_id not exist. try another field or check if you miss typed"
+                    err_msg = OutputMessages.error_with_message(main)
+                    return err_msg
         
-        query_data = Customer.objects.filter(query).values("name","email","phone_number","address","notes","customer_id")
-        message = {"success":query_data}
-        return True,message
+        customer_exists = company_obj.customer_set.filter(query).exists()
+        if not customer_exists:
+            main = "no customer found"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        else:
+            customer_query_dict = company_obj.customer_set.filter(query).values("name","email","phone_number","address","notes","customer_id")
+            main = "successfully found the data"
+            second = {"customer_json":customer_query_dict}
+            success_msg = OutputMessages.success_with_message(main,second)
+            return success_msg
+
 
 
 
