@@ -60,7 +60,7 @@ class OutputMessages:
 
 class CustomValidation:
 
-    def basic_validation(self,user:dict,input_fields:dict = None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False,check_company=True):
+    def basic_validation(self,user:dict=True,input_fields:dict = None,required_fields:list=None,allowed_fields:list=None,empty_json:bool=False,check_company=True):
         #* check if passed empty json
         if not empty_json:
             if not input_fields or not input_fields.keys():
@@ -102,24 +102,27 @@ class CustomValidation:
                     output_error = OutputMessages.error_with_message(main_message=main,second_message=second)
                     return output_error
 
-        #* check if the user exists as user and have a company
-        user_email = user["email"]
-        user_exists = User.objects.filter(email=user_email).exists()
-        if not user_exists:
-            error_output = OutputMessages.user_not_exsts()
-            return error_output
-        else:
-            user_obj = User.objects.get(email=user_email)
+        if user:
+            #* check if the user exists as user and have a company
+            user_email = user["email"]
+            user_exists = User.objects.filter(email=user_email).exists()
+            if not user_exists:
+                error_output = OutputMessages.user_not_exsts()
+                return error_output
+            else:
+                user_obj = User.objects.get(email=user_email)
 
-        if check_company:
-            if not user_obj.company:
-                main = "this user dont have company"
-                return OutputMessages.error_with_message(main)
+            if check_company:
+                if not user_obj.company:
+                    main = "this user dont have company"
+                    return OutputMessages.error_with_message(main)
 
 
-        main = "user exists"
-        return OutputMessages.success_and_object(main_message=main,output_object=user_obj)
-    
+            main = "user exists"
+            return OutputMessages.success_and_object(main_message=main,output_object=user_obj)
+
+        main = "passed valid data"
+        return OutputMessages.success_with_message(main)
 
     def passed_valid_fields(self,input_fields,valid_fields):
         #* check if passed empty json    

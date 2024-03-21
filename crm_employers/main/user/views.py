@@ -9,53 +9,73 @@ from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializ
 from rest_framework.authtoken.models import Token
 from .permissions import SystemAdminPermission,ITAdminPermission,MediumPermission
 from .models import User
+from custom_validation.validation import OutputMessages
 
 
 
 
-#!! maybe i will switch the creation of the user inside the  employer togheter as a user 
-
-
+#*normal user creation
 class CreateUser(APIView):
 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
 
 	def get(self,request):
-		cleaned_data = request.data
+		query_dict = {**request.GET}
+		cleaned_data = {key: value[0] for key, value in query_dict.items()}
+		user = {"email":request.user.email}
+
 		serializer = CreateUserSerializer(data=cleaned_data)
 		get_data = serializer.get_info(cleaned_data=cleaned_data)
 		message = {"success":get_data[1]}
-		return Response(message,status=status.HTTP_202_ACCEPTED)
+		return Response(message,status=status.HTTP_200_OK)
 
 
 	def post(self,request):
 		cleaned_data = request.data
 		user = {"email":request.user.email}
 		serializer = CreateUserSerializer(data=cleaned_data)
+
 		if serializer.is_valid(raise_exception=True):
 			get_data = serializer.create(cleaned_data=cleaned_data,user=user)
-			if all(get_data):
-				message = {"success":get_data[1]}
-				return Response(message,status=status.HTTP_202_ACCEPTED)
-		
-			message = {"error":get_data[1]}
-			return Response(message,status=status.HTTP_404_NOT_FOUND)
-		
-		message = {'error',"passed invalid fields"}
-		return Response(message,status=status.HTTP_404_NOT_FOUND)
+			if not all(get_data):
+				return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
 			
 
-#*user section
+			return Response(get_data[1],status=status.HTTP_201_CREATED)
+		
+		
+		main = "passed invalid fields"
+		err_msg = OutputMessages.error_with_message(main)
+		return Response(err_msg,status=status.HTTP_404_NOT_FOUND)
+			
+
+#*Admin user creation
 class AdminUserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 
+	def get(self,request):
+		main = "request must be as post"
+		second = {"json_example":{
+			"username":"hero",
+			"email":"hero@hero.com",
+			"password":"Aa1122!!"
+		}}
+		err_msg = OutputMessages.error_with_message(main,second)
+		return Response(err_msg,status=status.HTTP_400_BAD_REQUEST)
+
 
 	def post(self, request):
-		clean_data = custom_validation(request.data)
-		serializer = UserRegisterSerializer(data=clean_data)
-		if serializer.is_valid(raise_exception=True):
-			user = serializer.create(clean_data)
-			if user:
-				return Response(user, status=status.HTTP_201_CREATED)
+		check_validation = custom_validation(request.data)
+		if not all(check_validation):
+			main = check_validation[1]
+			return Response(main,status=status.HTTP_400_BAD_REQUEST)
+
+		cleaned_data = check_validation[1]
+		serializer = UserRegisterSerializer(data=cleaned_data)
+		if serializer.is_valid():
+			user_created = serializer.create(cleaned_data=cleaned_data)
+			if all(user_created):
+				return Response(user_created[1], status=status.HTTP_201_CREATED)
+			return Response(status=status.HTTP_400_BAD_REQUEST)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
