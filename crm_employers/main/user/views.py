@@ -34,7 +34,7 @@ class CreateUser(APIView):
 		user = {"email":request.user.email}
 		serializer = CreateUserSerializer(data=cleaned_data)
 
-		if serializer.is_valid(raise_exception=True):
+		if serializer.is_valid():
 			get_data = serializer.create(cleaned_data=cleaned_data,user=user)
 			if not all(get_data):
 				return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
@@ -43,9 +43,9 @@ class CreateUser(APIView):
 			return Response(get_data[1],status=status.HTTP_201_CREATED)
 		
 		
-		main = "passed invalid fields"
+		main = "passed invalid fields or the values are exists"
 		err_msg = OutputMessages.error_with_message(main)
-		return Response(err_msg,status=status.HTTP_404_NOT_FOUND)
+		return Response(err_msg[1],status=status.HTTP_404_NOT_FOUND)
 			
 
 #*Admin user creation

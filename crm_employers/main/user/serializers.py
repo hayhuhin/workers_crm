@@ -5,10 +5,6 @@ from django.contrib.auth.models import Group
 from company.models import Company
 from user.models import User 
 from custom_validation.validation import CustomValidation,OutputMessages
-
-
-
-
 UserModel = get_user_model()
 
 
