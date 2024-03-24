@@ -1,0 +1,26 @@
+#create admin portal
+1.CRUD operations for himself
+2.draw a diagram with the structure of the project
+3.plan and start executing the project
+
+
+
+#admin steps to add user:
+1.click add user
+2.its generating one time code and the admin give this user the code 
+3.the user need to fill company data and press accept:
+    a)admin email
+    b)company code
+4.the request is sent to our admin and this adding our user to the company
+5.now that the user exists in the company our admin can perform actions on this user
+
+#user steps to use the portal:
+1.login into the portal
+2.choose your company that you want to enter
+3.in the backend it will save selected_company with the selected company FK
+4.every api call will use the user's selected company
+
+
+TASKS:
+1.adjust all databases
+2.refactor user creation,update,delete,get

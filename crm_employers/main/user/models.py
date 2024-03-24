@@ -50,15 +50,16 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser,PermissionsMixin):
 
     user_id = models.AutoField(primary_key=True)
-    email = models.EmailField(max_length=50)
+    email = models.EmailField(max_length=50,unique=True)
     username = models.CharField(max_length=50)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     is_superuser = models.BooleanField(default=False)
-    company = models.ForeignKey(Company,blank=True,on_delete=models.CASCADE,null=True)
+    companies = models.ManyToManyField(Company,blank=True,related_name="company_list")
+    selected_company = models.ForeignKey(Company,blank=True,on_delete=models.SET_NULL,null=True,related_name="company")
 
-    class Meta:
-        unique_together = ('email', 'company',)
+    # class Meta:
+    #     unique_together = ('email', 'company',)
 
 
     objects = UserManager()

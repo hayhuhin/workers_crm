@@ -1,0 +1,196 @@
+<mxfile host="app.diagrams.net" modified="2024-03-22T17:04:48.093Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0" etag="9IBRqoJM0oqWkPIgUYi-" version="24.0.7" type="device">
+  <diagram name="Page-1" id="4hpzpII2Nei9479nCM0a">
+    <mxGraphModel dx="1741" dy="958" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-18" target="4IL_gws0GhNrjO0gAOpW-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-18" target="4IL_gws0GhNrjO0gAOpW-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-18" value="duplicated user-&lt;div&gt;exists in two different companies in the same time&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="165" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-19" value="admin portal" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-21" target="4IL_gws0GhNrjO0gAOpW-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-21" value="user portal" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="285" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-23" value="deny if the user is not an admin" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="75" y="320" width="70" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-24" value="accept and ask which company you want to access portal" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="300" y="310" width="95" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-25" value="chose one of the companies" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="355" y="500" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-28" value="specific company portal" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="285" y="560" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-33" target="4IL_gws0GhNrjO0gAOpW-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-33" value="duplicated user - tries to log in" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-34" target="4IL_gws0GhNrjO0gAOpW-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-34" value="the database tries to find this user in the database and detects a user that have 2 companies" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="360" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-36" target="4IL_gws0GhNrjO0gAOpW-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-36" value="user have to decide to which company he wants to login" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="485" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-38" value="from now on all pages will be of this specific company" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="625" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-41" value="duplicated user scenario" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;" vertex="1" parent="1">
+          <mxGeometry x="20" y="30" width="305" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-42" value="duplicated user side" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;strokeColor=default;" vertex="1" parent="1">
+          <mxGeometry x="40" y="190" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-43" value="admin side" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;strokeColor=default;" vertex="1" parent="1">
+          <mxGeometry x="40" y="720" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-56" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-54" target="4IL_gws0GhNrjO0gAOpW-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-54" value="admin creates a user that already exists in another company" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="112.5" y="790" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-55" value="" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="112.5" y="910" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-57" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-58" target="4IL_gws0GhNrjO0gAOpW-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-58" value="duplicated user - tries to log in" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-59" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-60" target="4IL_gws0GhNrjO0gAOpW-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-60" value="logs in with his username and password and then choosing the company he wants to log in to" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="360" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-61" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-62" target="4IL_gws0GhNrjO0gAOpW-63">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-62" value="connects to this company specific data that he filled in the company id" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="485" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-78" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-82" target="4IL_gws0GhNrjO0gAOpW-77">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-63" value="from now on all pages will be of this specific company" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="625" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-64" value="verifies that this user is exists in the company that he filled in the login page" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-65" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="4IL_gws0GhNrjO0gAOpW-64">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1030" y="250" as="sourcePoint" />
+            <mxPoint x="770" y="510" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1160" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-66" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="4IL_gws0GhNrjO0gAOpW-64">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1040" y="300" as="sourcePoint" />
+            <mxPoint x="970" y="490" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-67" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1140" y="180" as="sourcePoint" />
+            <mxPoint x="1180" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-68" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1320" y="190" as="sourcePoint" />
+            <mxPoint x="1270" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-69" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-60" target="4IL_gws0GhNrjO0gAOpW-70">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="900" y="545" as="sourcePoint" />
+            <mxPoint x="990" y="580" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-76" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-70" target="4IL_gws0GhNrjO0gAOpW-75">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-70" value="user will have a field that called selected_company and this field will contain the foreign key of the chose company" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="450" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-75" value="each API call will happen from the company_obj = user_obj.selected_company" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="570" width="200" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-90" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-77" target="4IL_gws0GhNrjO0gAOpW-89">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-77" value="choosing the company he wants to log in to" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="770" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-83" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-62" target="4IL_gws0GhNrjO0gAOpW-70">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="910" y="430" as="sourcePoint" />
+            <mxPoint x="990" y="500" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-84" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-85" target="4IL_gws0GhNrjO0gAOpW-86">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-85" value="user will have a field that called selected_company and this field will contain the foreign key of the chose company" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="790" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-86" value="each API call will happen from the company_obj = user_obj.selected_company" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="910" width="200" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-87" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-85" target="4IL_gws0GhNrjO0gAOpW-77">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="990" y="760" as="sourcePoint" />
+            <mxPoint x="1040" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-88" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-85" target="4IL_gws0GhNrjO0gAOpW-89">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="970" y="818" as="sourcePoint" />
+            <mxPoint x="900" y="810" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-89" value="connects to this company specific data that he filled in the company id" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="890" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-91" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="4IL_gws0GhNrjO0gAOpW-63" target="4IL_gws0GhNrjO0gAOpW-82">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="830" y="685" as="sourcePoint" />
+            <mxPoint x="830" y="770" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4IL_gws0GhNrjO0gAOpW-82" value="switch company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="800" y="710" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

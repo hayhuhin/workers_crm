@@ -1,0 +1,68 @@
+<mxfile host="app.diagrams.net" modified="2024-03-24T07:59:00.900Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0" etag="SsvsLQxqA3nizLC0bYst" version="24.1.0" type="device">
+  <diagram name="Page-1" id="au8BLat31U1E7mPtGl3_">
+    <mxGraphModel dx="1077" dy="622" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ct3IxivBum2_tP7J4uRt-52" value="admin_portal" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="305" y="45" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-53" value="user_portal" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="470" y="45" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-55" value="v1/api/adminportal/register" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-57" value="v1/api/adminportal/login" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-58" value="v1/api/adminportal/home" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="120" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-59" value="v1/api/adminportal/company/create" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="150" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-60" value="v1/api/adminportal/company/delete" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="180" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-61" value="v1/api/adminportal/user/create" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="210" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-62" value="v1/api/adminportal/user/delete" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="240" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-63" value="v1/api/user/register" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="680" y="50" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-64" value="v1/api/user/login" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="670" y="80" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-65" value="v1/api/user/home" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="670" y="110" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="I_1H-PwaqH8emQdjbOPr-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ct3IxivBum2_tP7J4uRt-70" target="I_1H-PwaqH8emQdjbOPr-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3IxivBum2_tP7J4uRt-70" value="&lt;h1&gt;how admin will add user to a company?&lt;/h1&gt;&lt;p&gt;1.the admin creates a company.&lt;/p&gt;&lt;p&gt;2.admin can generate company code.&lt;/p&gt;&lt;p&gt;3.this code have to be added in the user company page&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="280" y="135" width="190" height="225" as="geometry" />
+        </mxCell>
+        <mxCell id="I_1H-PwaqH8emQdjbOPr-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="I_1H-PwaqH8emQdjbOPr-3" target="I_1H-PwaqH8emQdjbOPr-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="535" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I_1H-PwaqH8emQdjbOPr-3" value="&lt;h1&gt;user adding the code to his company&lt;/h1&gt;&lt;div&gt;now that the user added the company our admin can manage this user and give him permissions and create an employer for this user&lt;/div&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="440" width="190" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="I_1H-PwaqH8emQdjbOPr-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="I_1H-PwaqH8emQdjbOPr-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="110" y="645" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="I_1H-PwaqH8emQdjbOPr-8" value="technical handling" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="505" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
