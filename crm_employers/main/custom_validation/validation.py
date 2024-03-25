@@ -113,7 +113,7 @@ class CustomValidation:
                 user_obj = User.objects.get(email=user_email)
 
             if check_company:
-                if not user_obj.company:
+                if not user_obj.companies:
                     main = "this user dont have company"
                     return OutputMessages.error_with_message(main)
 

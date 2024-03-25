@@ -19,6 +19,8 @@ class GeneralCompanySerializer(serializers.Serializer):
         """
         return True,cleaned_data
 
+
+
 class CreateCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
@@ -61,12 +63,14 @@ class CreateCompanySerializer(serializers.ModelSerializer):
             address=cleaned_data["address"],
             admin_email=admin_email
         )
-        company_obj.save()
         
         
         #* as we creating the company we must add this user to the company in the user model        
         user_obj = User.objects.get(email=admin_email)
-        user_obj.company = company_obj
+        user_obj.companies.add(company_obj)
+        user_obj.is_manager = True
+        user_obj.managed_company = company_obj
+        company_obj.save()
         user_obj.save()
 
         main = f"company {company_obj.name} created. admin email is {admin_email}"
@@ -95,7 +99,7 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
         user_obj = fields_validated[1]["object"]
 
         #* checking that the delete company name is one of this users companies
-        company_exists = user_obj.company
+        company_exists = user_obj.managed_company
         if not company_exists:
             main = "this user doesn't created this companies"
             return OutputMessages.error_with_message(main_message=main)
@@ -151,14 +155,19 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
 
 
         company_exists = Company.objects.filter(query).exists()
+        user_obj = User.objects.get(email=admin_email)
         if company_exists:
             company_obj = Company.objects.get(query)
+            user_obj.is_manager = False
+            user_obj.companies.remove(company_obj)
+            user_obj.managed_company = None
+            user_obj.save()
             company_obj.delete()
             message = {"success":f"required company is deleted, employers that were in this department set to Null"}
             return True,message
         
 
-        message = {"error":"this company doesnt exists"}
+        message = {"error":"this company doesn't exists"}
         return False,message
 
 
@@ -218,7 +227,7 @@ class UpdateCompanySerializer(serializers.Serializer):
             return basic_validation
 
 
-        #* checking that the user didnt pass additional fields and only the allowed in the update data
+        #* checking that the user didn't pass additional fields and only the allowed in the update data
         update_data_validation = custom_validation.passed_valid_fields(input_fields=cleaned_data["update_data"],valid_fields=allowed_update_fields)
         if not all(update_data_validation):
             return update_data_validation
@@ -232,6 +241,8 @@ class UpdateCompanySerializer(serializers.Serializer):
             return error_message
         else:
             company_obj = company_exists[1]["object"]
+        
+
 
 
         #* checking if this user is admin_email and its hes company

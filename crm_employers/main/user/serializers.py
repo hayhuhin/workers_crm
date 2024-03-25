@@ -8,57 +8,57 @@ from custom_validation.validation import CustomValidation,OutputMessages
 UserModel = get_user_model()
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserModel
-        fields = ["username","email","password"]
+# class CreateUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserModel
+#         fields = ["username","email","password"]
 
 
-    def get_info(self,cleaned_data):
-        main = "you have to fill this json as a post method"
-        second = {"example_json":{
-            "username":"the wanted username for the user",
-            "email":"email of the user",
-            "password":"password of the user"
-        }}
-        success_msg = OutputMessages.success_with_message(main,second)
-        return success_msg
+#     def get_info(self,cleaned_data):
+#         main = "you have to fill this json as a post method"
+#         second = {"example_json":{
+#             "username":"the wanted username for the user",
+#             "email":"email of the user",
+#             "password":"password of the user"
+#         }}
+#         success_msg = OutputMessages.success_with_message(main,second)
+#         return success_msg
 
 
-    def create(self,cleaned_data,user):
-        admin_email = user["email"]
+#     def create(self,cleaned_data,user):
+#         admin_email = user["email"]
 
-        #* first im checking if the admin is already has a company
-        admin_has_company = User.objects.get(email=admin_email)
-        if not admin_has_company.company:
-            main = "the admin didn't created a company"
-            err_msg = OutputMessages.error_with_message(main)
-            return err_msg
+#         #* first im checking if the admin is already has a company
+#         admin_has_company = User.objects.get(email=admin_email)
+#         if not admin_has_company.company:
+#             main = "the admin didn't created a company"
+#             err_msg = OutputMessages.error_with_message(main)
+#             return err_msg
 
-        else:
-            creator_user_obj = User.objects.get(email=admin_email)
-            creator_company_obj = creator_user_obj.company
-
-
-        user_obj = User.objects.create_user(email=cleaned_data["email"],username=cleaned_data["username"],password=cleaned_data["password"])
-        user_obj.save()
-
-        user_obj.company = creator_company_obj
-        user_obj.save()
-        token = Token.objects.get(user=user_obj).key
-
-        main = "user created successfully"
-        second = {"user_json":{
-            "username" :user_obj.username,
-            "email" :user_obj.email,
-            "token" : token,
-            "company": creator_company_obj.name
-        }}
-        success_msg = OutputMessages.success_with_message(main,second)
-        return success_msg
+#         else:
+#             creator_user_obj = User.objects.get(email=admin_email)
+#             creator_company_obj = creator_user_obj.company
 
 
-#!this user is the first one that will handle the whole company he creates
+#         user_obj = User.objects.create_user(email=cleaned_data["email"],username=cleaned_data["username"],password=cleaned_data["password"])
+#         user_obj.save()
+
+#         user_obj.company = creator_company_obj
+#         user_obj.save()
+#         token = Token.objects.get(user=user_obj).key
+
+#         main = "user created successfully"
+#         second = {"user_json":{
+#             "username" :user_obj.username,
+#             "email" :user_obj.email,
+#             "token" : token,
+#             "company": creator_company_obj.name
+#         }}
+#         success_msg = OutputMessages.success_with_message(main,second)
+#         return success_msg
+
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -76,18 +76,19 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 "token" : token
         }}
         
-        #* this section im creating all start permission and admin permission for this specific user
-        admin_permissions = ["admin_permission","IT_permission","medium_permission","finance_full_permission","finance_view_permission","finance_update_permission"]
+        # #* this section im creating all start permission and admin permission for this specific user
+        # admin_permissions = ["admin_permission","IT_permission","medium_permission","finance_full_permission","finance_view_permission","finance_update_permission"]
 
-        for permission in admin_permissions:
-            group_obj = Group.objects.create(name=permission)
-            group_obj.save()
+        # for permission in admin_permissions:
+        #     group_obj = Group.objects.create(name=permission)
+        #     group_obj.save()
 
-            user_obj.groups.add(group_obj)
-            user_obj.save()
+        #     user_obj.groups.add(group_obj)
+        #     user_obj.save()
         
         success_msg = OutputMessages.success_with_message(main,second)
         return success_msg
+
 
 
 class UserLoginSerializer(serializers.ModelSerializer):

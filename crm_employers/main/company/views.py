@@ -10,7 +10,7 @@ from .serializers import CreateCompanySerializer,DeleteCompanySerializer,UpdateC
 #*need to create department handling of creation and deletion
 
 class CreateCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self,request):
         query_dict = {**request.GET}
@@ -46,7 +46,7 @@ class CreateCompany(APIView):
 
 
 class DeleteCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self,request):
         query_dict = {**request.GET}
@@ -83,7 +83,7 @@ class DeleteCompany(APIView):
 
 
 class UpdateCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self,request):
         query_dict = {**request.GET}

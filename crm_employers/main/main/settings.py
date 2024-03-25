@@ -19,7 +19,7 @@ import json
 WINDOWS_PATH_FOR_DJANGO = 'D:\git_shell\Git\etc\crm_secret_key.json'
 MAC_PATH_FOR_DJANGO = '/etc/workers_crm.json'
 BASE_DIR = Path(__file__).resolve().parent.parent
-with open(MAC_PATH_FOR_DJANGO) as json_file:
+with open(WINDOWS_PATH_FOR_DJANGO) as json_file:
     read_data = json.load(json_file)
     DJANGO_KEY = read_data['SECRET_KEY']
     DATABASE_KEY = read_data["DB_PASSWORD"]

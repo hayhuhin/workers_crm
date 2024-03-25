@@ -1,0 +1,202 @@
+<mxfile host="app.diagrams.net" modified="2024-03-25T21:56:52.500Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0" etag="BRgfxifOeAg-mKNmRu_G" version="24.0.7" type="device">
+  <diagram name="Page-1" id="4hpzpII2Nei9479nCM0a">
+    <mxGraphModel dx="1393" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="A6D10lAh6pebBf_-n4FE-59" value="main page after the user logged in" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="373.75" y="100" width="117.5" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-60" value="main page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="150" width="200" height="200" as="geometry">
+            <mxRectangle x="340" y="150" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-61" value="create company of your own" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=default;fillColor=none;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-60">
+          <mxGeometry x="15" y="40" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-62" value="join an existing company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-60">
+          <mxGeometry x="15" y="85" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-65" value="choose your company:0" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-60">
+          <mxGeometry x="15" y="140" width="165" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-66" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.633;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-61">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="370" as="sourcePoint" />
+            <mxPoint x="770" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-71" value="main page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="150" width="200" height="200" as="geometry">
+            <mxRectangle x="770" y="150" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-75" value="join an existing company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-71">
+          <mxGeometry x="18.130000000000003" y="85" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-76" value="choose your company:1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-71">
+          <mxGeometry x="18.13" y="130" width="165" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-77" value="CRUD your company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-71">
+          <mxGeometry x="18.130000000000003" y="40" width="163.75" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-72" value="main page after the user logged in" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="800" y="100" width="117.5" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-78" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-77">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="370" as="sourcePoint" />
+            <mxPoint x="1040" y="80" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-82" value="delete company&lt;div&gt;create company&lt;/div&gt;&lt;div&gt;update company&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="40" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-83" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-75">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="370" as="sourcePoint" />
+            <mxPoint x="1060" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-84" value="join company page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="150" width="200" height="200" as="geometry">
+            <mxRectangle x="1060" y="150" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-85" value="copmany OTP: 123123&lt;div&gt;admin email:admin@admin.com&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-84">
+          <mxGeometry y="40" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-86" value="companies page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="770.63" y="400" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-90" value="managed by you:&lt;div&gt;1.google&lt;/div&gt;&lt;div&gt;2.radco&lt;/div&gt;&lt;div&gt;3.somesome&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-86">
+          <mxGeometry x="6.239999999999999" y="30" width="140.63" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-91" value="joined companies:&lt;div&gt;1.partner&lt;/div&gt;&lt;div&gt;2.radco2&lt;/div&gt;&lt;div&gt;3.radco3&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-86">
+          <mxGeometry x="6.24" y="120" width="143.76" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-89" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-76" target="A6D10lAh6pebBf_-n4FE-86">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="880" y="370" as="sourcePoint" />
+            <mxPoint x="930" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-92" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-94">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="880" y="370" as="sourcePoint" />
+            <mxPoint x="1170" y="465" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-95" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-90" target="A6D10lAh6pebBf_-n4FE-94">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="918" y="465" as="sourcePoint" />
+            <mxPoint x="1170" y="465" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-94" value="clicked on managed by you company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="450" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-96" value="Google company page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="380" width="200" height="200" as="geometry">
+            <mxRectangle x="1175" y="400" width="160" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-97" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;google&amp;nbsp;&lt;/h1&gt;&lt;p&gt;home page&lt;/p&gt;&lt;p&gt;create department&lt;/p&gt;&lt;p&gt;add users and employers&lt;/p&gt;&lt;p&gt;dashboard&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-96">
+          <mxGeometry x="10" y="30" width="180" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-98" value="partner company page" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="620" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-103" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;partner&lt;/h1&gt;&lt;p&gt;home page&lt;/p&gt;&lt;p&gt;dashboard&lt;/p&gt;&lt;p&gt;tasks&lt;/p&gt;&lt;p&gt;insights&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-98">
+          <mxGeometry x="10" y="30" width="180" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-99" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-101" target="A6D10lAh6pebBf_-n4FE-98">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="880" y="570" as="sourcePoint" />
+            <mxPoint x="930" y="520" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1130" y="543" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-102" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitX=0.989;exitY=0.383;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-91" target="A6D10lAh6pebBf_-n4FE-101">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="921" y="550" as="sourcePoint" />
+            <mxPoint x="1175" y="670" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-101" value="clicked on joined companies" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="535" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-106" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-109">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1390" y="520" as="sourcePoint" />
+            <mxPoint x="1600" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-107" value="manager permissions" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+          <mxGeometry x="1375" y="370" width="160" height="30" as="geometry">
+            <mxRectangle x="1375" y="370" width="200" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-104" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;here our user have manager permissions to create departments&lt;/b&gt;&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;or remove users etc..&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-107">
+          <mxGeometry x="5" y="25" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-108" value="regular permissions" style="swimlane;whiteSpace=wrap;html=1;startSize=30;" vertex="1" collapsed="1" parent="1">
+          <mxGeometry x="1375" y="600" width="150" height="30" as="geometry">
+            <mxRectangle x="1375" y="600" width="200" height="150" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-105" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;here our user have regular permissions of a simple user because the company is not created by him&amp;nbsp;&lt;/b&gt;&lt;/span&gt;&lt;b style=&quot;font-size: 15px; background-color: initial;&quot;&gt;etc..&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-108">
+          <mxGeometry x="10" y="30" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-110" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" target="A6D10lAh6pebBf_-n4FE-109">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1390" y="520" as="sourcePoint" />
+            <mxPoint x="1670" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-109" value="clicked on add user" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="505" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-111" value="add user page" style="swimlane;whiteSpace=wrap;html=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1600" y="440" width="200" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-114" value="company OTP:1231231&lt;div&gt;user email:user@user.com&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-111">
+          <mxGeometry x="10" y="52.5" width="170" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-115" value="send the user the OTP to join the company" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;strokeColor=default;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-111">
+          <mxGeometry x="10" y="30" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-116" value="user joins the company" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="2090" y="500" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-117" value="user clicked on join the company&lt;div&gt;filled the company OTP and admin email&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-116">
+          <mxGeometry y="55" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-119" value="verification system" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="200" width="240" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-122" value="&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;this system verify the user and the OTP&lt;/span&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;after the verification the admin notified&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;that the user is added to he&#39;s company&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;but now the admin have to add this user&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;into the department and create him as&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;employer&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;in the end he have to unblock the user&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;so the user can enter the company CRM&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="A6D10lAh6pebBf_-n4FE-119">
+          <mxGeometry x="10" y="30" width="220" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-124" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="A6D10lAh6pebBf_-n4FE-116" target="A6D10lAh6pebBf_-n4FE-119">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1730" y="560" as="sourcePoint" />
+            <mxPoint x="1780" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-126" value="notify our manager and adding the user into the company but as blocked user" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="A6D10lAh6pebBf_-n4FE-127" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" target="A6D10lAh6pebBf_-n4FE-126">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1810" y="310" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

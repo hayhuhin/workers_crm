@@ -159,7 +159,7 @@ class CreateEmployerSerializer(serializers.Serializer):
 
         #*checking if the user is already in a company
         if not user_obj.company:
-            main_message = "this user doesnt have company"
+            main_message = "this user doesn't have company"
             error_message = OutputMessages.error_with_message(main_message=main_message)
             return error_message
         else:

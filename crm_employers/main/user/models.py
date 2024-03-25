@@ -57,9 +57,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     companies = models.ManyToManyField(Company,blank=True,related_name="company_list")
     selected_company = models.ForeignKey(Company,blank=True,on_delete=models.SET_NULL,null=True,related_name="company")
+    is_manager = models.BooleanField(default=False)
+    managed_company =  models.ForeignKey(Company,blank=True,on_delete=models.CASCADE,null=True,related_name="managed_company")
+    blocked_by = models.ManyToManyField(Company,blank=True,related_name="blocked_by")
 
-    # class Meta:
-    #     unique_together = ('email', 'company',)
 
 
     objects = UserManager()
@@ -76,6 +77,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     def __str__(self) -> str:
         return self.username
     
+
+
+
+
 
 @receiver(post_save,sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender,instance=None,created=False, **kwargs):
