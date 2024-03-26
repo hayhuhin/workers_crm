@@ -7,6 +7,9 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 from company.models import Company
+import secrets
+import datetime
+
 
 
 class UserManager(BaseUserManager):
@@ -78,6 +81,24 @@ class User(AbstractBaseUser,PermissionsMixin):
         return self.username
     
 
+class CompanyInvitation(models.Model):
+    code = models.CharField(max_length=6, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ttl_minutes = 3
+    used = models.BooleanField(default=False)
+    company = models.ForeignKey(Company,blank=True,null=True,on_delete=models.SET_NULL)
+
+
+    @classmethod
+    def generate(cls,company):
+        code = secrets.token_hex(3).upper()  # Generate a random 3-byte OTP
+        return cls.objects.create(code=code,company=company)
+
+    def is_valid(self):
+        if self.used:
+            return False
+        ttl_duration = datetime.timedelta(minutes=self.ttl_minutes)
+        return self.created_at + ttl_duration >= datetime.datetime.now()
 
 
 

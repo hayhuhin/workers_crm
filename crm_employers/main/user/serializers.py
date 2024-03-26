@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model,authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
 from company.models import Company
-from user.models import User 
+from user.models import User,CompanyInvitation
 from custom_validation.validation import CustomValidation,OutputMessages
 UserModel = get_user_model()
 
@@ -90,7 +90,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return success_msg
 
 
-
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -110,6 +109,132 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = ("email","username")
     
+
+class JoinCompanySerializer(serializers.Serializer):
+    admin_email = serializers.EmailField(default = None)
+    otp = serializers.CharField(default=None)
+
+    def get_info(self,cleaned_data,user):
+        user_obj = User.objects.get(email=user["email"])
+
+        main = "request have to be sent as post"
+        second = {
+            "admin_email":"admin@admin.com",
+            "otp":"one time password that the admin gave you"
+                  }
+        success_msg = OutputMessages.success_with_message(main,second)
+        
+        return success_msg
+    
+    def create(self,cleaned_data,user):
+        required_fields = list(self.fields.keys())
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
+        else:
+            user_obj = validation[1]["object"]
+        
+        required_company_exists = CompanyInvitation.objects.filter(code=cleaned_data["otp"]).exists()
+        if not required_company_exists:
+            main = "cant join this company"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        else:
+            join_otp = CompanyInvitation.objects.get(code=cleaned_data["otp"])
+            required_company = join_otp.company
+            print(required_company)
+        user_obj.companies.add(required_company)
+        user_obj.blocked_by.add(required_company)
+        user_obj.save()
+
+        main = "successfully joined the company"
+        second = {
+            "company":required_company.name,
+            "company_admin":cleaned_data["admin_email"]
+            }
+        success_msg = OutputMessages.success_with_message(main,second)
+        return success_msg
+
+
+class GenerateOTPSerializer(serializers.Serializer):
+    def get_info(self,cleaned_data,user):
+        user_obj = User.objects.get(email=user["email"])
+        company_obj = user_obj.selected_company
+
+
+        code_otp = CompanyInvitation.generate(company=company_obj)
+        # Send otp.code to the user via email
+        main = "otp generated successfully"
+        second = {"otp":code_otp.code}
+        success_msg = OutputMessages.success_with_message(main,second)
+        
+        return success_msg
+        # When user submits OTP:
+        user_inputted_otp = request.POST.get('otp')
+        otp = OTP.objects.filter(code=user_inputted_otp).first()
+        if otp and otp.is_valid():
+            otp.used = True
+            otp.save()
+            # Add user to company
+
+
+class CompanySelectSerializer(serializers.Serializer):
+    company_name = serializers.CharField(default = None)
+
+    def get_info(self,cleaned_data,user):
+
+        cv = CustomValidation()
+        validation = cv.basic_validation(user=user,empty_json=True)
+        if not all(validation):
+            return validation
+        else:
+            user_obj = validation[1]["object"]
+
+        
+        if user_obj.managed_company :
+            managed_companies = user_obj.managed_company.name
+        else:
+            managed_companies = None
+
+        joined_companies = user_obj.companies.all().values("name")
+
+        main = "data found successfully"
+        second = {
+            "managed_companies":managed_companies,
+            "companies":joined_companies
+                  }
+        success_msg = OutputMessages.success_with_message(main,second)
+        return success_msg
+    
+
+    def select(self,cleaned_data,user):
+        required_fields = list(self.fields.keys())
+        cv = CustomValidation()
+        validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
+        if not all(validation):
+            return validation
+        else:
+            user_obj = validation[1]["object"]
+        
+        required_company_exists = user_obj.companies.filter(name=cleaned_data["company_name"]).exists()
+        if not required_company_exists:
+            main = "company not found"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        else:
+            company_obj =  user_obj.companies.get(name=cleaned_data["company_name"])
+
+        user_obj.selected_company = company_obj
+        user_obj.save()
+
+        main = "successfully selected company"
+        second = {
+            "selected_company":user_obj.selected_company.name
+            }
+        success_msg = OutputMessages.success_with_message(main,second)
+        return success_msg
+
 
 #* assign rules serializer section
 class AssignFinanceFullPermissionSerializer(serializers.Serializer):

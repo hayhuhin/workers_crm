@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
 from .validations import  custom_validation,validate_email,validate_password
-from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer,AssignFinanceFullPermissionSerializer,AssignFinanceUpdatePermissionSerializer,AssignFinanceViewPermissionSerializer,DisallowFinanceFullPermissionSerializer,DisallowFinanceUpdatePermissionSerializer,DisallowFinanceViewPermissionSerializer
+from .serializers import UserLoginSerializer,UserRegisterSerializer,UserSerializer,AssignFinanceFullPermissionSerializer,AssignFinanceUpdatePermissionSerializer,AssignFinanceViewPermissionSerializer,DisallowFinanceFullPermissionSerializer,DisallowFinanceUpdatePermissionSerializer,DisallowFinanceViewPermissionSerializer,GenerateOTPSerializer,JoinCompanySerializer,CompanySelectSerializer
 from rest_framework.authtoken.models import Token
 from .permissions import SystemAdminPermission,ITAdminPermission,MediumPermission
 from .models import User
@@ -13,6 +13,79 @@ from custom_validation.validation import OutputMessages
 
 
 
+class GenerateOTP(APIView):
+	permission_classes = (permissions.IsAuthenticated,SystemAdminPermission)
+
+	def get(self,request):
+		query_dict = {**request.GET}
+		cleaned_data = {key: value[0] for key, value in query_dict.items()}
+		user = {"email":request.user.email}
+
+		serializer = GenerateOTPSerializer(data=cleaned_data)
+		get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
+		message = {"success":get_data[1]}
+		return Response(message,status=status.HTTP_200_OK)
+
+
+class JoinCompany(APIView):
+	def get(self,request):
+		query_dict = {**request.GET}
+		cleaned_data = {key: value[0] for key, value in query_dict.items()}
+		user = {"email":request.user.email}
+
+		serializer = JoinCompanySerializer(data=cleaned_data)
+		get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
+		message = {"success":get_data[1]}
+		return Response(message,status=status.HTTP_200_OK)
+
+	def post(self,request):
+		cleaned_data = request.data
+		user = {"email":request.user.email}
+		serializer = JoinCompanySerializer(data=cleaned_data)
+
+		if serializer.is_valid():
+			get_data = serializer.create(cleaned_data=cleaned_data,user=user)
+			if not all(get_data):
+				return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
+			
+
+			return Response(get_data[1],status=status.HTTP_201_CREATED)
+		
+		
+		main = "passed invalid fields or the values are exists"
+		err_msg = OutputMessages.error_with_message(main)
+		return Response(err_msg[1],status=status.HTTP_404_NOT_FOUND)
+			
+
+class CompanySelect(APIView):
+	def get(self,request):
+		query_dict = {**request.GET}
+		cleaned_data = {key: value[0] for key, value in query_dict.items()}
+		user = {"email":request.user.email}
+
+		serializer = CompanySelectSerializer(data=cleaned_data)
+		get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
+		message = {"success":get_data[1]}
+		return Response(message,status=status.HTTP_200_OK)
+
+	def post(self,request):
+		cleaned_data = request.data
+		user = {"email":request.user.email}
+		serializer = CompanySelectSerializer(data=cleaned_data)
+
+		if serializer.is_valid():
+			get_data = serializer.select(cleaned_data=cleaned_data,user=user)
+			if not all(get_data):
+				return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
+			
+
+			return Response(get_data[1],status=status.HTTP_201_CREATED)
+		
+		
+		main = "passed invalid fields or the values are not exists"
+		err_msg = OutputMessages.error_with_message(main)
+		return Response(err_msg[1],status=status.HTTP_404_NOT_FOUND)
+			
 
 # #*normal user creation
 # class CreateUser(APIView):
