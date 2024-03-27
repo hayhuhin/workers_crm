@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from employer.models import Department
+from django.contrib.auth.models import Group
+
 from django.db.models import Q,F
 from .models import Company
 from user.models import User
@@ -35,6 +37,7 @@ class CreateCompanySerializer(serializers.ModelSerializer):
         required_fields = ["name","description","address"]
         admin_email = user["email"]
         custom_validation = CustomValidation()
+        company_creator_permission = Group.objects.get(name="company_creator_permission")
 
 
         #* check if any company is exists with this exact name
@@ -70,6 +73,7 @@ class CreateCompanySerializer(serializers.ModelSerializer):
         user_obj.companies.add(company_obj)
         user_obj.is_manager = True
         user_obj.managed_company = company_obj
+        user_obj.groups.add(company_creator_permission)
         company_obj.save()
         user_obj.save()
 
@@ -129,6 +133,7 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
 
     def delete(self,cleaned_data,user):
         admin_email = user["email"]
+        company_creator_permission = Group.objects.get(name="company_creator_permission")
 
         #* this section is trying to query the database with the provided fields
         query = Q()
@@ -161,6 +166,7 @@ class DeleteCompanySerializer(serializers.ModelSerializer):
             user_obj.is_manager = False
             user_obj.companies.remove(company_obj)
             user_obj.managed_company = None
+            user_obj.groups.remove(company_creator_permission)
             user_obj.save()
             company_obj.delete()
             message = {"success":f"required company is deleted, employers that were in this department set to Null"}

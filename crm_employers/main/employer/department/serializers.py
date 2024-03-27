@@ -48,14 +48,14 @@ class CreateDepartmentSerializer(serializers.Serializer):
 
         #* check if the user already have company
         query_fields = {"email":user["email"]}
-        if not user_obj.company:
+        if not user_obj.selected_company:
             main = "you cant create department without creating the company first"
             error_message = OutputMessages.error_with_message(main_message=main)
             return error_message
         
         else:
             #*company object
-            company_obj = user_obj.company
+            company_obj = user_obj.selected_company
 
 
         #* check if the department exists
@@ -287,20 +287,25 @@ class GetDepartmentSerializer(serializers.Serializer):
         required_fields = ["name","all_departments"]
 
         cv = CustomValidation()
-        validation = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=required_fields)
-        if not all(validation):
-            return validation
+        user_validation = cv.basic_validation(user=user,empty_json=True)
+        if not all(user_validation):
+            return user_validation
+        
+
+        valid_fields = cv.passed_valid_fields(input_fields=cleaned_data,valid_fields=required_fields)
+        if not all(valid_fields):
+            return valid_fields
         else:
             user_obj = User.objects.get(email=user["email"])
             
         
         #* checking if user have company field
-        if not user_obj.company:
-            main = "this user doesnt have company field"
+        if not user_obj.selected_company:
+            main = "you must select a company first"
             error_message = OutputMessages.error_with_message(main)
             return error_message
         else:
-            company_obj = user_obj.company
+            company_obj = user_obj.selected_company
 
 
         #* checking if passed all_department first
@@ -313,7 +318,7 @@ class GetDepartmentSerializer(serializers.Serializer):
             else:
                 departments = company_obj.department_set.all().values("name","rank","salary")
                 main = "all_departments field passed successfully"
-                second = {"departments":departments}
+                second = {"department_json":departments}
                 success_message = OutputMessages.success_with_message(main,second)
                 return success_message
         

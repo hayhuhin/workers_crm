@@ -1,6 +1,6 @@
 from django.test import TestCase
 from user.models import User
-from company.models import Company 
+from company.models import Company
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import Group
@@ -11,6 +11,60 @@ class UserRegistrationTest(TestCase):
 
     def setUp(self):
         self.send_request = APIClient()
+        permissions = ["company_creator_permission","admin_permission","selected_company_permission","medium_permission","IT_permission"]
+
+        for per in permissions:
+            g_obj = Group.objects.create(name=per)
+            g_obj.save()
+
+
+    def simple_setup(self):
+        #* admin user
+        path = "/v1/api/user/register"
+        data = {
+            "username":"admin",
+            "email":"admin@admin.com",
+            "password":"Aa1122!!"
+            }
+        response = self.send_request.post(format="json",path=path,data=data)
+        user_json = response.json()["user_json"]
+        admin_token = user_json["token"]
+        admin_request = APIClient()
+        admin_request.credentials(HTTP_AUTHORIZATION=f'Token {admin_token}')
+        admin = User.objects.get(email="admin@admin.com")
+        ad,creator,selected,med,it = Group.objects.all()
+        admin.groups.add(ad,creator,selected,med,it)
+
+        #* simple user
+        path = "/v1/api/user/register"
+        data = {
+            "username":"simple",
+            "email":"simple@simple.com",
+            "password":"Aa1122!!"
+            }
+        response = self.send_request.post(format="json",path=path,data=data)
+        user_json = response.json()["user_json"]
+        user_token = user_json["token"]
+        user_request = APIClient()
+        user_request.credentials(HTTP_AUTHORIZATION=f'Token {user_token}')
+
+        #*creating company with admin user
+        path = "/v1/api/company/create"
+        data = {
+            "name":"dev",
+            "description":"dev dev dev",
+            "address":"some addr"
+            }
+        res = admin_request.post(format="json",path=path,data=data)
+
+        #*making the admin to select the company he created
+        path = "/v1/api/user/company/select"
+        data = {
+            "company_name":"dev"
+            }
+        admin_request.post(format="json",data=data,path=path)
+        return admin_request,user_request
+
 
     def test_admin_invalid_post(self):
 
@@ -20,7 +74,7 @@ class UserRegistrationTest(TestCase):
             "username":"papa",
             "email":"new@new.com",
             "password":"Aa1122!!"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
         message_test = self.assertEqual(list(get_response.json().keys()),["success","user_json"])
         status_code_test = self.assertEqual(get_response.status_code,201)
@@ -32,14 +86,14 @@ class UserRegistrationTest(TestCase):
             "username":"papa",
             "email":"new@new.com",
             "password":"Aa1122!!"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
         message_test = self.assertEqual(list(get_response.json().keys()),["error"])
         status_code_test = self.assertEqual(get_response.status_code,400)
 
         #* empty json
         path = "/v1/api/user/register"
-        data = {}       
+        data = {}
         get_response = self.send_request.post(format="json",path=path,data=data)
         message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(get_response.status_code,400)
@@ -49,7 +103,7 @@ class UserRegistrationTest(TestCase):
         path = "/v1/api/user/register"
         data = {
             "invalid":"invalid"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
         message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
         status_code_test = self.assertEqual(get_response.status_code,400)
@@ -62,7 +116,7 @@ class UserRegistrationTest(TestCase):
             "username":"username",
             "email":True,
             "password":"Aa1122!!"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
 
         message_test = self.assertEqual(list(get_response.json().keys()),["error"])
@@ -70,16 +124,15 @@ class UserRegistrationTest(TestCase):
 
 
     def test_admin_valid_post(self):
-        
+
         #* testing with valid input
         path = "/v1/api/user/register"
         data = {
             "username":"valar",
             "email":"valar@valar.com",
             "password":"Aa1122!!"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
-        print(get_response.json())
         message_test = self.assertEqual(list(get_response.json().keys()),["success","user_json"])
         status_code_test = self.assertEqual(get_response.status_code,201)
 
@@ -90,155 +143,112 @@ class UserRegistrationTest(TestCase):
             "username":"valar",
             "email":"valar@valar.com",
             "password":"Aa1122!!"
-            }       
+            }
         get_response = self.send_request.post(format="json",path=path,data=data)
 
         message_test = self.assertEqual(list(get_response.json().keys()),["error"])
         status_code_test = self.assertEqual(get_response.status_code,400)
 
 
-# class SimpleUserTest(TestCase):
-
-
-#     def setUp(self):
-#         self.send_request = APIClient()
-
-#     def create_permissions(self):
-#         admin_permissions = ["admin_permission","IT_permission","medium_permission","finance_full_permission","finance_view_permission","finance_update_permission"]
-#         for permission in admin_permissions:
-#             group_obj = Group.objects.create(name=permission)
-#             group_obj.save()
-
-
-
-#     def create_admin_user(self,user_kwargs,company_kwargs):
-#         user_obj = User.objects.create(**user_kwargs)
-#         company_obj = Company.objects.create(**company_kwargs)
-#         user_obj.company = company_obj
-
-#         #* adding all admin permissions for our admin user
-#         admin_permissions = ["admin_permission","IT_permission","medium_permission","finance_full_permission","finance_view_permission","finance_update_permission"]
-#         for permission in admin_permissions:
-#             group_obj = Group.objects.get(name=permission)
-#             user_obj.groups.add(group_obj)
-#             user_obj.save()
+    def test_generateOTP(self):
+        admin_request,user_request = self.simple_setup()
         
-
-
-#         company_obj.save()
-
-
-#         admin_token = Token.objects.get(user=user_obj)
-#         return admin_token
-    
-
-#     #*testing create user with invalid fields
-#     def test_create_invalid_post(self):
-#         #* first we initialize admin user
-#         #* and now we send the requests with the auth token
-#         self.create_permissions()
         
-#         user_1_kwargs = {
-#             "username":"radco1",
-#             "email":"radco1@radco1.com",
-#             "password":"Aa1122!!"
-#                        }
-#         company_1_kwargs = {
-#             "name":"radco1",
-#             "description":"radco1",
-#             "address":"radco1",
-#             "admin_email":"radco1@radco1.com",
-#         }
-        
-#         #*first admin and company
-#         radco_1_token = self.create_admin_user(user_1_kwargs,company_1_kwargs)
-#         radco_1_request = APIClient()
-#         radco_1_request.credentials(HTTP_AUTHORIZATION=f'Token {radco_1_token}')
-        
-#         user_2_kwargs = {
-#             "username":"radco2",
-#             "email":"radco2@radco2.com",
-#             "password":"Aa1122!!"
-#                        }
+        #*checking generate OTP
+        path = "/v1/api/user/company_otp/create"
+        data = {}
+        response = admin_request.get(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["success","otp_json"])
+        status_code_test = self.assertEqual(response.status_code,200)
 
-#         company_2_kwargs = {
-#             "name":"radco2",
-#             "description":"radco2",
-#             "address":"radco2",
-#             "admin_email":"radco2@radco2.com",
-#         }
-#         #* second admin and company
-#         radco_2_token = self.create_admin_user(user_2_kwargs,company_2_kwargs)
-#         radco_2_request = APIClient()
-#         radco_2_request.credentials(HTTP_AUTHORIZATION=f'Token {radco_2_token}')
+    def test_join_company(self):
+        admin_request,user_request = self.simple_setup()
+        path = "/v1/api/user/company_otp/create"
+        data = {}
+        response = admin_request.get(format="json",path=path,data=data)
+        otp = response.json()["otp_json"]["code"]
 
 
-
-#         #* radco 1 creating an employer 
-#         path = "/v1/api/user/create_user"
-#         data = {
-#             "username":"papa",
-#             "email":"qwert@qwert.com",
-#             "password":"Aa1122!!"
-#             }       
-#         first_response = radco_1_request.post(format="json",path=path,data=data)
-#         first_message = self.assertEqual(list(first_response.json().keys()),["success","user_json"])
-#         status_code_test = self.assertEqual(first_response.status_code,201)
-
-#         #* radco 2 creating an employer 
-#         path = "/v1/api/user/create_user"
-#         data = {
-#             "username":"papa",
-#             "email":"qwert@qwert.com",
-#             "password":"Aa1122!!"
-#             }       
-#         second_response = radco_2_request.post(format="json",path=path,data=data)
-#         print(second_response.json())
-#         second_message = self.assertEqual(list(second_response.json().keys()),["success","user_json"])
-#         status_code_test = self.assertEqual(second_response.status_code,201)
-
-#         first_response_company = first_response.json().get("company")
-#         print(first_response_company)
-
-#         #* now we trying to create same user
-#         path = "/v1/api/user/register"
-#         data = {
-#             "username":"papa",
-#             "email":"new@new.com",
-#             "password":"Aa1122!!"
-#             }       
-#         get_response = self.send_request.post(format="json",path=path,data=data)
-#         message_test = self.assertEqual(list(get_response.json().keys()),["error"])
-#         status_code_test = self.assertEqual(get_response.status_code,400)
-
-#         #* empty json
-#         path = "/v1/api/user/register"
-#         data = {}       
-#         get_response = self.send_request.post(format="json",path=path,data=data)
-#         message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
-#         status_code_test = self.assertEqual(get_response.status_code,400)
+        path = "/v1/api/user/company/join"
+        data = {
+            "admin_email":"admin@admin.com",
+            "otp":otp,
+            }
+        response = user_request.post(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["success","company_json"])
+        status_code_test = self.assertEqual(response.status_code,201)
 
 
-#         #* testing invalid field
-#         path = "/v1/api/user/register"
-#         data = {
-#             "invalid":"invalid"
-#             }       
-#         get_response = self.send_request.post(format="json",path=path,data=data)
-#         message_test = self.assertEqual(list(get_response.json().keys()),["error","required_fields"])
-#         status_code_test = self.assertEqual(get_response.status_code,400)
+        #*trying to access this company another urls(before selected company)
+        path = "/v1/api/department/get"
+        data = {"all_departments":True}
+        response = user_request.get(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["error"])
+        status_code_test = self.assertEqual(response.status_code,404)
+
+        #*trying to access this company another urls(after selected company but blocked)
+        #selecting company in the user
+        simple_user = User.objects.get(email="simple@simple.com")
+        company_obj = simple_user.companies.get(name="dev")
+        simple_user.selected_company = company_obj
+        simple_user.save()
+
+        #trying to access the url after we selected the company but blocked
+        path = "/v1/api/department/get"
+        data = {"all_departments":True}
+        response = user_request.get(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["error"])
+        status_code_test = self.assertEqual(response.status_code,404)
 
 
 
-#         #* testing invalid field type
-#         path = "/v1/api/user/register"
-#         data = {
-#             "username":"username",
-#             "email":True,
-#             "password":"Aa1122!!"
-#             }       
-#         get_response = self.send_request.post(format="json",path=path,data=data)
+    def test_access_urls_successfully(self):
 
-#         message_test = self.assertEqual(list(get_response.json().keys()),["error"])
-#         status_code_test = self.assertEqual(get_response.status_code,400)
+        #*first initialization
+        admin_request,user_request = self.simple_setup()
+        path = "/v1/api/user/company_otp/create"
+        data = {}
+        response = admin_request.get(format="json",path=path,data=data)
+        otp = response.json()["otp_json"]["code"]
+
+
+        path = "/v1/api/user/company/join"
+        data = {
+            "admin_email":"admin@admin.com",
+            "otp":otp,
+            }
+        response = user_request.post(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["success","company_json"])
+        status_code_test = self.assertEqual(response.status_code,201)
+        #*#######
+
+
+        #unblocking the user and selecting the company
+        simple_user = User.objects.get(email="simple@simple.com")
+        company_obj = simple_user.blocked_by.get(name="dev")
+        simple_user.blocked_by.remove(company_obj)
+        simple_user.selected_company = company_obj
+        simple_user.save()
+
+
+
+        #creating department as an admin
+        path = "/v1/api/department/create"
+        data = {
+            "name":"django",
+            "rank":100,
+            "salary":1000
+        }
+        admin_request.post(format="json",data=data,path=path)
+
+
+        #* trying to access the url after we selected the company
+        #* and unblocked the user
+        #* and the department exists
+        path = "/v1/api/department/get"
+        data = {"all_departments":True}
+        response = user_request.get(format="json",path=path,data=data)
+        message_test = self.assertEqual(list(response.json().keys()),["success","department_json"])
+        status_code_test = self.assertEqual(response.status_code,201)
+
 

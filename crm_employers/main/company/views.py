@@ -1,13 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions,status
-from user.permissions import ITAdminPermission,SystemAdminPermission,MediumPermission
+from user.permissions import ITAdminPermission,SystemAdminPermission,MediumPermission,CompanyCreatorPermission
 from .serializers import CreateCompanySerializer,DeleteCompanySerializer,UpdateCompanySerializer,GetCompanySerializer
 
 
 
 
-#*need to create department handling of creation and deletion
 
 class CreateCompany(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -46,7 +45,7 @@ class CreateCompany(APIView):
 
 
 class DeleteCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,CompanyCreatorPermission,)
 
     def get(self,request):
         query_dict = {**request.GET}
@@ -83,7 +82,7 @@ class DeleteCompany(APIView):
 
 
 class UpdateCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,CompanyCreatorPermission,)
 
     def get(self,request):
         query_dict = {**request.GET}
@@ -119,7 +118,7 @@ class UpdateCompany(APIView):
 
 
 class GetCompany(APIView):
-    permission_classes = (permissions.IsAuthenticated,ITAdminPermission)
+    permission_classes = (permissions.IsAuthenticated,ITAdminPermission,CompanyCreatorPermission)
 
 
     def get(self,request):

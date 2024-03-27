@@ -135,7 +135,7 @@ class UpdateDepartment(APIView):
 
 
 class GetDepartment(APIView):
-    permission_classes = (permissions.IsAuthenticated,MediumPermission)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
     def get(self,request):

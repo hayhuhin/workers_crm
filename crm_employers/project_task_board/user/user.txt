@@ -21,6 +21,9 @@
 4.every api call will use the user's selected company
 
 
+
+
 TASKS:
-1.adjust all databases
-2.refactor user creation,update,delete,get
+1.adjust all databases - almost done
+2.refactor user creation,update,delete,get - done
+3.refactor all operations to have the user state in which company he is 

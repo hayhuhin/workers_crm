@@ -1,6 +1,25 @@
 from rest_framework.permissions import BasePermission
 
 
+class CompanyCreatorPermission(BasePermission):
+    """
+
+    """
+    
+
+
+    def has_permission(self, request, view):
+        #checking if the user specific is inside the permission
+        #later it will be gathered from the sqlite database
+        user_obj = request.user
+        if user_obj.selected_company:
+            if user_obj.email == user_obj.selected_company.admin_email:
+                return request.user.groups.filter(name="company_creator_permission")
+            else:
+                return False
+        return False
+
+
 class CompanyPermission(BasePermission):
     """
     permission:
@@ -14,6 +33,22 @@ class CompanyPermission(BasePermission):
         #later it will be gathered from the sqlite database
         return request.user.groups.filter(name="company_permission")
     
+
+class SelectedCompany(BasePermission):
+    """
+    permission:
+    general database permission for company permission
+    """
+    
+
+
+    def has_permission(self, request, view):
+        #checking if the user specific is inside the permission
+        #later it will be gathered from the sqlite database
+        return request.user.groups.filter(name="selected_company_permission")
+
+
+
 
 
 class SystemAdminPermission(BasePermission):

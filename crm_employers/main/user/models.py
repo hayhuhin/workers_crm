@@ -9,6 +9,8 @@ from django.conf import settings
 from company.models import Company
 import secrets
 import datetime
+from django.utils import timezone
+
 
 
 
@@ -97,9 +99,14 @@ class CompanyInvitation(models.Model):
     def is_valid(self):
         if self.used:
             return False
+        
         ttl_duration = datetime.timedelta(minutes=self.ttl_minutes)
-        return self.created_at + ttl_duration >= datetime.datetime.now()
-
+        expiration_time = self.created_at + ttl_duration
+        
+        # Convert the expiration time to UTC timezone to match self.created_at
+        expiration_time_utc = expiration_time.astimezone(timezone.utc)
+        
+        return expiration_time_utc >= timezone.now()
 
 
 

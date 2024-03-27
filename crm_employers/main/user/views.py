@@ -14,7 +14,7 @@ from custom_validation.validation import OutputMessages
 
 
 class GenerateOTP(APIView):
-	permission_classes = (permissions.IsAuthenticated,SystemAdminPermission)
+	permission_classes = (permissions.IsAuthenticated,SystemAdminPermission,)
 
 	def get(self,request):
 		query_dict = {**request.GET}
@@ -23,11 +23,12 @@ class GenerateOTP(APIView):
 
 		serializer = GenerateOTPSerializer(data=cleaned_data)
 		get_data = serializer.get_info(cleaned_data=cleaned_data,user=user)
-		message = {"success":get_data[1]}
-		return Response(message,status=status.HTTP_200_OK)
+		return Response(get_data[1],status=status.HTTP_200_OK)
 
 
 class JoinCompany(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+
 	def get(self,request):
 		query_dict = {**request.GET}
 		cleaned_data = {key: value[0] for key, value in query_dict.items()}
@@ -86,43 +87,8 @@ class CompanySelect(APIView):
 		err_msg = OutputMessages.error_with_message(main)
 		return Response(err_msg[1],status=status.HTTP_404_NOT_FOUND)
 			
-
-# #*normal user creation
-# class CreateUser(APIView):
-# 	permission_classes = (permissions.IsAuthenticated,MediumPermission,)
-
-# 	def get(self,request):
-# 		query_dict = {**request.GET}
-# 		cleaned_data = {key: value[0] for key, value in query_dict.items()}
-# 		user = {"email":request.user.email}
-
-# 		serializer = CreateUserSerializer(data=cleaned_data)
-# 		get_data = serializer.get_info(cleaned_data=cleaned_data)
-# 		message = {"success":get_data[1]}
-# 		return Response(message,status=status.HTTP_200_OK)
-
-
-# 	def post(self,request):
-# 		cleaned_data = request.data
-# 		user = {"email":request.user.email}
-# 		serializer = CreateUserSerializer(data=cleaned_data)
-
-# 		if serializer.is_valid():
-# 			get_data = serializer.create(cleaned_data=cleaned_data,user=user)
-# 			if not all(get_data):
-# 				return Response(get_data[1],status=status.HTTP_404_NOT_FOUND)
-			
-
-# 			return Response(get_data[1],status=status.HTTP_201_CREATED)
-		
-		
-# 		main = "passed invalid fields or the values are exists"
-# 		err_msg = OutputMessages.error_with_message(main)
-# 		return Response(err_msg[1],status=status.HTTP_404_NOT_FOUND)
-			
-
-#*Admin user creation
-class AdminUserRegister(APIView):
+	
+class UserRegister(APIView):
 	permission_classes = (permissions.AllowAny,)
 
 	def get(self,request):
@@ -150,7 +116,6 @@ class AdminUserRegister(APIView):
 				return Response(user_created[1], status=status.HTTP_201_CREATED)
 			return Response(status=status.HTTP_400_BAD_REQUEST)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class UserLogin(APIView):
@@ -190,21 +155,6 @@ class UserView(APIView):
 		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
 	
 
-
-
-#* assign rules to employer
-
-#TODO 
-	#1.assign rules to employer
-
-	#constraints:
-		#the user that assigning must have the specific permission of assiggning
-		#the assignment must be protected as much as posible
-	
-	#questions?
-		#which assigning?
-		#how much ?
-	
 
 class AssignFinanceFullPermission(APIView):
 	permission_classes = (permissions.IsAuthenticated,ITAdminPermission,)

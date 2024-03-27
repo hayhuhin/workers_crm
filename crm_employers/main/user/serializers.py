@@ -8,57 +8,6 @@ from custom_validation.validation import CustomValidation,OutputMessages
 UserModel = get_user_model()
 
 
-# class CreateUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = UserModel
-#         fields = ["username","email","password"]
-
-
-#     def get_info(self,cleaned_data):
-#         main = "you have to fill this json as a post method"
-#         second = {"example_json":{
-#             "username":"the wanted username for the user",
-#             "email":"email of the user",
-#             "password":"password of the user"
-#         }}
-#         success_msg = OutputMessages.success_with_message(main,second)
-#         return success_msg
-
-
-#     def create(self,cleaned_data,user):
-#         admin_email = user["email"]
-
-#         #* first im checking if the admin is already has a company
-#         admin_has_company = User.objects.get(email=admin_email)
-#         if not admin_has_company.company:
-#             main = "the admin didn't created a company"
-#             err_msg = OutputMessages.error_with_message(main)
-#             return err_msg
-
-#         else:
-#             creator_user_obj = User.objects.get(email=admin_email)
-#             creator_company_obj = creator_user_obj.company
-
-
-#         user_obj = User.objects.create_user(email=cleaned_data["email"],username=cleaned_data["username"],password=cleaned_data["password"])
-#         user_obj.save()
-
-#         user_obj.company = creator_company_obj
-#         user_obj.save()
-#         token = Token.objects.get(user=user_obj).key
-
-#         main = "user created successfully"
-#         second = {"user_json":{
-#             "username" :user_obj.username,
-#             "email" :user_obj.email,
-#             "token" : token,
-#             "company": creator_company_obj.name
-#         }}
-#         success_msg = OutputMessages.success_with_message(main,second)
-#         return success_msg
-
-
-
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -142,17 +91,28 @@ class JoinCompanySerializer(serializers.Serializer):
             return err_msg
         else:
             join_otp = CompanyInvitation.objects.get(code=cleaned_data["otp"])
+        
+        if join_otp.is_valid():
+            join_otp.used = True
+            join_otp.save()
+            # print(join_otp.company)
             required_company = join_otp.company
-            print(required_company)
+        
+        else:
+            main = "expired OTP or already used"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+
+        #* here im adding the user to the company
         user_obj.companies.add(required_company)
         user_obj.blocked_by.add(required_company)
         user_obj.save()
 
         main = "successfully joined the company"
-        second = {
+        second = {"company_json":{
             "company":required_company.name,
             "company_admin":cleaned_data["admin_email"]
-            }
+            }}
         success_msg = OutputMessages.success_with_message(main,second)
         return success_msg
 
@@ -160,13 +120,22 @@ class JoinCompanySerializer(serializers.Serializer):
 class GenerateOTPSerializer(serializers.Serializer):
     def get_info(self,cleaned_data,user):
         user_obj = User.objects.get(email=user["email"])
-        company_obj = user_obj.selected_company
+
+        #* if the admin didn't selected the company he cant generate the otp
+        if not user_obj.selected_company:
+            main = "admin must select company first and then generate the otp"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+        else:
+            company_obj = user_obj.selected_company
 
 
         code_otp = CompanyInvitation.generate(company=company_obj)
         # Send otp.code to the user via email
         main = "otp generated successfully"
-        second = {"otp":code_otp.code}
+        second = {"otp_json":{
+            "code":code_otp.code,"created_at":code_otp.created_at,"important":"its valid only for three minutes"
+            }}
         success_msg = OutputMessages.success_with_message(main,second)
         
         return success_msg
@@ -209,6 +178,7 @@ class CompanySelectSerializer(serializers.Serializer):
     
 
     def select(self,cleaned_data,user):
+        selected_company_permission = Group.objects.get(name="selected_company_permission")
         required_fields = list(self.fields.keys())
         cv = CustomValidation()
         validation = cv.basic_validation(input_fields=cleaned_data,required_fields=required_fields,user=user)
@@ -217,6 +187,14 @@ class CompanySelectSerializer(serializers.Serializer):
         else:
             user_obj = validation[1]["object"]
         
+
+        #* checking if the selected company in blocked list
+        if user_obj.blocked_by.filter(name=cleaned_data["company_name"]).exists():
+            user_obj.groups.remove(selected_company_permission)
+            main = "this user is blocked"
+            err_msg = OutputMessages.error_with_message(main)
+            return err_msg
+
         required_company_exists = user_obj.companies.filter(name=cleaned_data["company_name"]).exists()
         if not required_company_exists:
             main = "company not found"
@@ -225,6 +203,10 @@ class CompanySelectSerializer(serializers.Serializer):
         else:
             company_obj =  user_obj.companies.get(name=cleaned_data["company_name"])
 
+        #*adding selected_company_permission so the user can access other api urls
+        user_obj.groups.add(selected_company_permission)
+
+        #*adding the selected company into the 
         user_obj.selected_company = company_obj
         user_obj.save()
 

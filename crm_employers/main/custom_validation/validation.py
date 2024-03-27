@@ -118,6 +118,12 @@ class CustomValidation:
                     return OutputMessages.error_with_message(main)
 
 
+            if user_obj.selected_company in user_obj.blocked_by.all():
+                user_obj.selected_company = None
+                main = "cant select this company because you  blocked"
+                err_msg = OutputMessages.error_with_message(main)
+                return err_msg
+
             main = "user exists"
             return OutputMessages.success_and_object(main_message=main,output_object=user_obj)
 
